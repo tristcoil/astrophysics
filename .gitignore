@@ -1,0 +1,35 @@
+# Raw/cached data — always re-fetchable via each project's fetch_data.py
+data/
+*/data/
+
+# Large data formats that should never be committed
+*.fits
+*.fits.gz
+*.fz
+*.hdf5
+*.h5
+*.npz
+MPCORB.DAT*
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+
+# Notebook outputs are noisy in diffs; strip before committing if used
+# (keep the notebooks themselves)
+
+# Astroquery / lightkurve caches
+.astropy/
+.lightkurve/
+.astroquery/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
