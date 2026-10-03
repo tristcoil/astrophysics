@@ -65,6 +65,9 @@ Domain packages, installed per-project as needed:
 | `colossus`     | Halo mass functions and cosmology helpers (D11, K2)          |
 | `celerite2`    | Fast Gaussian-process fits to light curves (I17)             |
 | MESA + MESA SDK | Stellar evolution code (Fortran, not a Python package; installs without root) (B11) |
+| `skyfield`     | Positions of the Sun, Moon, planets and stars from JPL ephemerides (E8, B12) |
+| `orbitize`     | Orbits of directly imaged planets (A6)                       |
+| `dustmaps`     | 3D Galactic dust maps (H6)                                   |
 
 > **Note on Python 3.14:** it is very new; if a compiled package (`healpy`, `gwpy`) has no wheel for it yet, the fallback is a venv on an older interpreter or a miniforge/conda environment. We'll deal with it per-project if it comes up.
 
@@ -79,6 +82,9 @@ Difficulty: ★☆☆ = an afternoon · ★★☆ = a weekend · ★★★ = mul
 | A1 | Detect an exoplanet transit               | Exoplanets     | ★☆☆       | ~10–50 MB   | Find a planet in raw spacecraft data |
 | A2 | Exoplanet population atlas                | Exoplanets     | ★☆☆       | ~5 MB       | The demographics of 5000+ worlds |
 | A3 | Radial velocities: weigh a planet by its wobble | Exoplanets     | ★☆☆       | <20 MB      | 51 Peg b, the 2019 Nobel planet |
+| A4 | The Earth as an exoplanet (DSCOVR)        | Exoplanets     | ★★☆       | ~0.5–5 GB   | Our planet as a single dot of light |
+| A5 | Planets being born (ALMA discs)           | Exoplanets     | ★★☆       | ~1.3 GB     | Rings and gaps carved by young planets |
+| A6 | Watch planets orbit another star          | Exoplanets     | ★★☆       | <1 MB       | HR 8799's four planets in motion |
 | B1 | Hertzsprung–Russell diagram from Gaia     | Stars          | ★☆☆       | ~50–200 MB  | All of stellar evolution in one plot |
 | B2 | 3D map of the solar neighborhood          | Stars          | ★★☆       | ~70 MB      | Fly through real nearby stars |
 | B3 | Hunt star clusters by their motion        | Stars          | ★★☆       | ~50 MB      | Clusters pop out of the noise |
@@ -90,6 +96,7 @@ Difficulty: ★☆☆ = an afternoon · ★★☆ = a weekend · ★★★ = mul
 | B9 | Eclipsing binaries: weigh and measure stars | Stars        | ★★☆       | <50 MB      | Masses and radii to 2% |
 | B10 | White dwarfs: the cooling embers         | Stars          | ★★☆       | ~0.1–0.5 GB | Dead stars freezing into crystals |
 | B11 | Run a star to core collapse (MESA, simulation) | Stars    | ★★★       | a few GB (code) | The onion inside a star before it explodes |
+| B12 | Constellations in motion                  | Stars          | ★☆☆       | ~0.1 GB     | The sky ±100,000 years, and stars that brush past the Sun |
 | C1 | Gravitational waves: the GW150914 chirp   | Compact objects| ★★☆       | ~265 MB     | See + hear two black holes merge |
 | C2 | Pulsar P–Ṗ diagram                        | Compact objects| ★☆☆       | <5 MB       | The whole neutron star zoo |
 | C3 | Fast radio bursts (CHIME)                 | Compact objects| ★☆☆       | <5 MB       | The newest mystery in astronomy |
@@ -115,14 +122,23 @@ Difficulty: ★☆☆ = an afternoon · ★★☆ = a weekend · ★★★ = mul
 | E3 | Near-Earth object close approaches        | Solar system   | ★☆☆       | API, small  | What's passing by this month |
 | E4 | Meteor showers and their parent comets    | Solar system   | ★★☆       | ~0.2–1 GB   | Every shower traced to its comet |
 | E5 | Dating surfaces by counting craters       | Solar system   | ★★☆       | ~300 MB     | Ages of the Moon and Mars from craters |
+| E6 | Saturn's rings in radio light             | Solar system   | ★★☆       | ~0.1–1 GB   | Ringlets, gaps and the moons that carve them |
+| E7 | Jupiter's weather from Hubble maps        | Solar system   | ★★☆       | ~1–3 GB     | Winds and the shrinking Great Red Spot |
+| E8 | Total eclipses: draw the Moon's shadow    | Solar system   | ★★☆       | ~0.1–1 GB   | The 2026 and 2027 paths, and Baily's beads |
+| E9 | Asteroids in 3D                           | Solar system   | ★★☆       | <0.5 GB     | Shapes, the spin barrier, and DART |
+| E10 | Comet tails sculpted by sunlight         | Solar system   | ★★☆       | ~0.5 GB     | Comet Tsuchinshan–ATLAS in SOHO's view |
 | F1 | 275 years of solar cycles + butterfly diagram | The Sun    | ★☆☆       | ~25 MB      | The Sun's heartbeat since 1749 |
 | F2 | The Sun today, in extreme UV (SDO)        | The Sun        | ★★☆       | ~190 MB     | Actual current images of the Sun |
+| F3 | The Gannon storm of May 2024              | The Sun        | ★★☆       | <0.5 GB     | From solar flare to aurora |
+| F4 | The Sun's spectrum as one image           | The Sun        | ★☆☆       | ~40 MB      | Thousands of dark lines in one poster |
 | G1 | Color composites of real galaxies         | Imaging        | ★★☆       | ~510 MB     | Your own pretty pictures, honestly made |
 | G2 | Meteorite landings world map              | Fun/easy       | ★☆☆       | ~10 MB      | Quick, satisfying, geographic |
 | H1 | Weigh the black hole at the Galactic Centre | Milky Way      | ★★☆       | <1 MB       | The 2020 Nobel, from S2's orbit |
 | H2 | Our own rotation curve from 21-cm hydrogen | Milky Way      | ★★☆       | ~0.1–4 GB   | Our galaxy's rotation and spiral arms |
 | H3 | Galactic archaeology with Gaia            | Milky Way      | ★★★       | ~0.2–1 GB   | Stellar streams and the galaxy we ate |
 | H4 | The Sun's acceleration from quasars       | Milky Way      | ★★☆       | ~0.1–0.3 GB | Feel the Galaxy's pull in 1.6 million quasars |
+| H5 | The Milky Way across the spectrum         | Milky Way      | ★☆☆       | <100 MB     | Ten all-sky maps, radio to gamma rays |
+| H6 | Fly through the dust around the Sun       | Milky Way      | ★★☆       | ~3.3 GB     | The Local Bubble and the Radcliffe Wave in 3D |
 | I1 | The M–σ relation                          | Black holes    | ★☆☆       | <1 MB       | Black holes grow with their galaxies |
 | I2 | Light echoes: reverberation mapping       | Black holes    | ★★☆       | ~10–100 MB  | Weigh a black hole with light-travel time |
 | I3 | Quasars across cosmic time                | Black holes    | ★★☆       | ~1–2 GB     | 750,000 feeding black holes |
@@ -140,6 +156,7 @@ Difficulty: ★☆☆ = an afternoon · ★★☆ = a weekend · ★★★ = mul
 | I15 | Quasars as backlights: the end of reionization | Black holes | ★★☆     | ~0.1–1 GB   | When the universe became transparent |
 | I16 | Faster than light? Superluminal jets      | Black holes    | ★★☆       | <100 MB     | Jet blobs that seem to outrun light |
 | I17 | The flickering of quasars                 | Black holes    | ★☆☆       | <200 MB     | 9,000 quasars on a random walk |
+| I18 | Giant radio galaxies (LOFAR)              | Black holes    | ★★☆       | ~0.1–2 GB   | Jets 7 Mpc long |
 | J1 | Rotation curves from raw velocity fields  | Galaxies       | ★★☆       | ~50–500 MB  | Measure galaxy rotation ourselves |
 | J2 | Galaxy morphology with Galaxy Zoo         | Galaxies       | ★★☆       | ~200 MB     | Hubble's tuning fork, 300,000 galaxies |
 | J3 | The galaxy life cycle                     | Galaxies       | ★★☆       | ~0.2–1 GB   | When the universe made its stars |
@@ -148,6 +165,7 @@ Difficulty: ★☆☆ = an afternoon · ★★☆ = a weekend · ★★★ = mul
 | J6 | Dwarf galaxies of the Local Group         | Galaxies       | ★☆☆       | <5 MB       | The darkest galaxies known |
 | J7 | Andromeda is coming — or is it?           | Galaxies       | ★★☆       | <1 MB       | A coin flip for our galaxy's fate |
 | J8 | The first galaxies with JWST              | Galaxies       | ★★★       | ~0.1–1 GB   | Galaxies 300 Myr after the Big Bang |
+| J9 | Fly into the Hubble Ultra Deep Field      | Galaxies       | ★★☆       | ~0.5–2 GB   | 2,221 galaxies placed at their true distances |
 | K1 | Why dark matter can't be atoms (BBN)      | Dark matter    | ★★☆       | <1 MB       | The first minutes weigh ordinary matter |
 | K2 | Weigh a galaxy cluster three ways         | Dark matter    | ★★☆       | ~0.3 GB     | Zwicky's missing mass, measured |
 | K3 | The Bullet Cluster                        | Dark matter    | ★★☆       | ~1 MB/~1 GB | Dark matter that passed straight through |
@@ -184,6 +202,12 @@ Difficulty: ★☆☆ = an afternoon · ★★☆ = a weekend · ★★★ = mul
 - *Neutron stars:* C2 → C9 (weigh them) → C8 (what is inside) → L3 (birth kicks) → C4 (mergers) → L4 (gold).
 - *Quasars:* I3 → I17 (flicker) → I16 (jets) → I15 (backlights) → H4 (fixed beacons).
 - *Quick win (★☆☆):* I17.
+
+**Fifth wave: the visual showcase** (A4–A6, B12, E6–E10, F3–F4, H5–H6, I18, J9, added 2026-10-03). These are chosen for what they look like, each with a "keeper" picture or animation:
+- *Posters:* H5 (the Milky Way in ten wavelengths), F4 (the Sun's spectrum), A5 (newborn planetary systems), E6 (Saturn's rings), E7 (a decade of Jupiter).
+- *Animations:* A4 (the Earth turning, the Moon crossing it), A6 (planets orbiting another star), B12 (constellations dissolving), E8 (the Moon's shadow sweeping the Earth), E10 (a comet passing the Sun), F3 (a solar storm from Sun to Earth).
+- *3D:* H6 (dust clouds around the Sun), J9 (into the Hubble Ultra Deep Field), E9 (asteroid shapes), with B2 and D2 from earlier waves.
+- *Quick wins (★☆☆):* B12, F4, H5.
 
 ---
 
@@ -270,6 +294,68 @@ planets = NasaExoplanetArchive.query_criteria(table="pscomppars", select="*")
 **Watch out for.** Aliases from nightly sampling. Instrument offsets (e.g. HIRES's 2004 detector upgrade; fit them as free parameters). Jitter must be fitted, or the error bars lie. *m sin i* is a lower limit, so say so on every figure.
 
 **Builds on.** A1 (a transiting planet with radial velocities gives both mass and radius, and so density), A2.
+
+## A4. The Earth as an exoplanet ★★☆
+
+**Science question.** From 1.5 million km away, NASA's DSCOVR spacecraft photographs the whole sunlit Earth every one to two hours. If Earth were a single dot of light around another star, what could we still learn about it: its day length, its oceans and clouds, its seasons? And can we make the movie of our planet turning, and of the Moon crossing its face?
+
+**Background.** DSCOVR orbits the Sun–Earth L1 point, about 1.5 million km sunward of Earth. Its EPIC camera (Earth Polychromatic Imaging Camera) takes 2048 × 2048 images in ten narrow bands from 317 to 780 nm. Telescopes will see Earth-like exoplanets only as unresolved points, so the question is what a point's colour and brightness reveal. Summing each EPIC image into one number per band turns a decade of pictures into an exoplanet-style light curve. Its autocorrelation recovers the 24-hour rotation period, and clouds, continents and oceans modulate it (Jiang et al. 2018). On 16 July 2015 EPIC caught the Moon passing between the spacecraft and Earth, showing the lunar far side, never seen from Earth, in full sunlight.
+
+**Data.** The EPIC archive and API (`epic.gsfc.nasa.gov`; no key needed): natural-colour and enhanced images with metadata (spacecraft, Sun and Moon positions) for 3,639 days since 13 June 2015, typically 13–22 images a day. The calibrated ten-band images (level 1B) are archived at NASA's Atmospheric Science Data Center.
+
+**Method + visualizations.**
+- The keeper: a year of Earth in one movie, with an "Earth as a dot" panel beside it showing the dot's colour and brightness.
+- Light curves in each band; autocorrelation and periodogram → the rotation period. How few images per day would still recover it?
+- Colour against time: is the Pacific-facing hemisphere darker and bluer than the Africa-facing one? How much does cloud cover change the answer?
+- Seasons: the North Pole tips into view in June, the South Pole in December.
+- The Moon transit of 16 July 2015 as an animation, and the Moon's brightness against Earth's (the Moon reflects ~12% of sunlight, Earth ~30%).
+
+**Check against.** Jiang et al. 2018 (AJ 156, 26): the 24-hour period recovered by autocorrelation.
+
+**Watch out for.** The Sun–Earth–spacecraft angle swings between ~4° and ~15° as DSCOVR loops around L1, which changes the brightness; correct for it. The natural-colour PNGs are processed for display, so use level-1B data for photometry. The archive has gaps, e.g. a safe mode from mid-2019 to early 2020.
+
+**Builds on.** A1 and A2 (exoplanets as points of light), E2 (orbits), F2 (another planet-sized disk, imaged every day).
+
+## A5. Planets being born: ALMA's protoplanetary discs ★★☆
+
+**Science question.** Young stars are surrounded by discs of gas and dust from which planets form. ALMA's sharpest images show these discs carved into rings, gaps and spirals. Are we seeing young planets clearing their paths, and how massive would they have to be?
+
+**Background.** A planet embedded in a disc pushes gas away from its orbit and opens a gap, and dust grains collect in rings where the gas pressure peaks. A gap's width and depth grow with the planet's mass relative to the star, and depend on the disc's viscosity and temperature. In 2014 ALMA's first long-baseline image showed concentric rings around HL Tau, a star about a million years old (ALMA Partnership 2015). DSHARP (Disk Substructures at High Angular Resolution Project; Andrews et al. 2018) imaged 20 nearby discs at 35 mas (~5 au) resolution in 1.25 mm continuum and CO. Rings and gaps are everywhere; a few discs have spirals. From the gap widths, Zhang et al. (2018) inferred planets from about Neptune's to Jupiter's mass.
+
+**Data.** The DSHARP data release (`almascience.eso.org/almadata/lp/DSHARP/`): fiducial continuum images of all 20 discs as FITS (~64 MB each), CO line cubes (~2 GB each, optional) and the calibrated measurement sets. HL Tau's ALMA long-baseline images (ALMA science verification data). Gaia distances to each star.
+
+**Method + visualizations.**
+- The keeper: a gallery of the 20 discs on one physical scale, with the orbits of the Solar System's planets drawn for comparison.
+- Deproject each disc (inclination, position angle) and make a radial brightness profile; find the gaps and rings.
+- Gap widths → planet masses with Zhang et al.'s scaling; plot these unseen planets on A2's mass–separation diagram of known exoplanets.
+- CO velocity map of one disc (e.g. HD 163296): Keplerian rotation → the star's mass, as with J1's spider diagrams. Look for the "kink" in the CO channels that Pinte et al. (2018) attributed to a planet.
+- Spiral arms (Elias 2-27, WaOph 6): their pitch angles.
+
+**Check against.** Huang et al. 2018 (DSHARP II): ring and gap positions; Zhang et al. 2018 (DSHARP VII): planet masses.
+
+**Watch out for.** A gap does not prove a planet: snow lines, magnetic effects and dust growth can also make rings. Gap-to-mass conversions depend on the assumed viscosity and temperature, by factors of several. Continuum images trace millimetre-sized dust, not gas. The images are reconstructions from interferometer data (I5's caveat).
+
+**Builds on.** A2 (exoplanet demographics), I5 (interferometry), J1 (velocity fields), B1 (young stars on the HR diagram).
+
+## A6. Watch planets orbit another star ★★☆
+
+**Science question.** Four giant planets circle the young star HR 8799. Astronomers have imaged them directly since 2008, and found them in archival Hubble images from 1998, so we can watch them move along their orbits. Can we fit those orbits ourselves, make the movie, and test whether such a crowded system can be stable?
+
+**Background.** Direct imaging suppresses the star's light (with a coronagraph and image processing) to reveal planets tens of thousands of times fainter right beside it. HR 8799, 41 pc away and ~40 Myr old, has four planets of several Jupiter masses at ~15–70 au. The outermost takes about 450 years per orbit and the innermost about 45. Over a decade their motion is plain to see. Measuring each planet's position relative to the star (astrometry, to ~1 mas with the Gemini Planet Imager) constrains Keplerian orbits. Wang et al. (2018) found that the system is stable only if the four orbits are nearly coplanar and close to a 1:2:4:8 chain of period resonances. β Pictoris b, on a ~20-year orbit seen nearly edge-on, is a second example; its data ship with the `orbitize!` package.
+
+**Data.** Published astrometry of the four HR 8799 planets compiled by Wang et al. (2018, AJ 156, 192; GPI points with ~1 mas errors), plus earlier Keck measurements (e.g. Konopacky et al. 2016). β Pic b astrometry from `orbitize!`'s example data. Gaia DR3 for the star's distance, and the Hipparcos–Gaia Catalog of Accelerations (Brandt 2021) for a dynamical mass constraint.
+
+**Method + visualizations.**
+- Fit each planet's orbit with `orbitize!` (the OFTI method for short arcs, MCMC otherwise) → posterior orbits, periods and inclinations.
+- The keeper: an animation of the four planets moving along their fitted orbits from 1998 to 2050, with the measured positions as dots.
+- Test coplanarity and the 1:2:4:8 chain; run posterior draws through N-body integrations (REBOUND, as in E1) — which survive 40 Myr?
+- β Pic b's edge-on orbit, and its closest passages in front of the star.
+
+**Check against.** Wang et al. 2018: orbit fits and stability results.
+
+**Watch out for.** Short arcs leave orbital elements strongly correlated: quote posteriors, not single best fits. Different instruments have different plate scales and north angles; fit offsets between them. Planet masses come from evolutionary models and the age unless the dynamics constrain them.
+
+**Builds on.** A3 (orbits from motion), E1 (REBOUND), I11 (astrometric orbits), A5 (planets still forming).
 
 ---
 
@@ -501,6 +587,26 @@ Red giants oscillate over hours (νmax ~ 10–200 µHz), within reach of Kepler'
 **Watch out for.** Results depend on choices: convective overshoot, mass-loss rates, the size of the nuclear network and the resolution. Run each case with two settings and show the spread. One-dimensional models cannot capture the 3D convection of the final shells. The explosion in `ccsn_IIp` is put in by hand as an energy injection, not computed from neutrino physics.
 
 **Builds on.** B1 and B8 (tracks against real stars), B10 (the white dwarf ending), L1 and L2 (the explosion), C7 (neutrinos).
+
+## B12. Constellations in motion, and stars that brush past the Sun ★☆☆
+
+**Science question.** The constellations look fixed, but every star is moving. Can we run the sky forward and backward a hundred thousand years and watch familiar shapes dissolve, and find the stars that have passed, or will pass, closest to the Sun?
+
+**Background.** A proper motion of a fraction of an arcsecond per year adds up to degrees over 100,000 years, so constellations change shape. In the Big Dipper, five stars (Merak, Phecda, Megrez, Alioth and Mizar) belong to the Ursa Major moving group and travel together, while Dubhe and Alkaid move differently, so the dipper bends. Distance and radial velocity give full 3D motions, and so close approaches. Of 33 million Gaia DR3 stars with full 3D motions, 61 pass within 1 pc of the Sun within a few million years (42 of them with high confidence). The closest is the K dwarf Gliese 710, which will pass 0.064 pc (~13,000 au) away in 1.3 Myr, through the Oort cloud (Bailer-Jones 2022). Scholz's Star passed about 0.25 pc away ~70,000 years ago (Mamajek et al. 2015).
+
+**Data.** B2's Gaia DR3 + Hipparcos sample (Hipparcos for the brightest stars, which saturate Gaia). The Bailer-Jones (2022) encounter table (VizieR `J/ApJ/935/L9`). Constellation lines from Stellarium's open data. Radial velocities from Gaia DR3 and SIMBAD.
+
+**Method + visualizations.**
+- The keeper: animations of the Big Dipper, Orion and the Southern Cross from −100,000 to +100,000 years, using full 3D motions rather than straight-line proper motions.
+- The whole night sky 1 Myr ago, today, and 1 Myr from now.
+- An encounter timeline: distance from the Sun against time for the 61 stars; Gliese 710's path through the Oort cloud.
+- The Sun's nearest neighbour through time: which star was closest at each epoch?
+
+**Check against.** Bailer-Jones 2022: Gliese 710 at 0.0636 pc (90%: 0.0595–0.0678 pc) in 1.3 Myr.
+
+**Watch out for.** Straight-line motion fails over long spans: integrate the 3D orbits, in a Galactic potential beyond ~1 Myr. Radial velocities for bright stars come from SIMBAD and vary in quality. The orbital motion of binary stars contaminates their proper motions, the main source of spurious encounters.
+
+**Builds on.** B2 (the 3D neighbourhood), H3 (orbits in a potential), E4 (comets from the Oort cloud).
 
 ---
 
@@ -978,6 +1084,112 @@ The **D-criterion** (Southworth & Hawkins 1963) measures how similar two orbits 
 
 **Builds on.** E1 (the asteroid belt supplies the impactors), E3 (today's impact rate).
 
+*E6–E10 are chosen for their visuals: Saturn's rings, Jupiter's storms, eclipse shadows, asteroid shapes and comet tails.*
+
+## E6. Saturn's rings in radio light ★★☆
+
+**Science question.** From Earth Saturn's rings look smooth, but they are countless orbiting ice particles arranged in thousands of ringlets, gaps and waves. Cassini shone radio waves through the rings to Earth. Can we read their structure, find the moons that sculpt them, and weigh the rings from the waves those moons raise?
+
+**Background.** During a radio occultation, Cassini transmitted at 0.94, 3.6 and 13 cm wavelengths while passing behind the rings as seen from Earth. The dimming of the signal gives the optical depth along a track across the rings, reconstructed to ~1 km radial resolution. Moons sculpt the rings through resonances, just as Jupiter carves E1's Kirkwood gaps. Ring particles near 117,560 km orbit twice for every orbit of Mimas, and that 2:1 resonance holds the sharp outer edge of the B ring, the inner edge of the Cassini Division. Small moons clear the Encke gap (Pan) and the Keeler gap (Daphnis). At weaker resonances, moons launch spiral **density waves**. A wave's wavelength shrinks with distance from the resonance at a rate set by the ring's surface density, so the waves weigh the rings: tens of grams per cm² in the A ring. All the rings together weigh ~1.5 × 10¹⁹ kg, about 0.4 Mimas masses (Iess et al. 2019).
+
+**Data.** The PDS Ring-Moon Systems Node's Cassini RSS ring occultation archive (`pds-rings.seti.org`, volumes `CORSS_8xxx`, data set CO-SR-RSS-4/5-OCC-V2.0): radial optical-depth profiles from occultations between 2005 and 2010. Cassini UVIS stellar occultations, also at the Rings Node, for finer resolution. Saturn's gravity field (J2, J4) and the moons' orbits from JPL for resonance locations.
+
+**Method + visualizations.**
+- The keeper: the whole ring system as one optical-depth profile from the C ring to the F ring, every named gap and ringlet labelled, and the same profile wrapped into a face-on image of the rings.
+- Compute moon resonances (Mimas, Janus/Epimetheus, Prometheus, Pandora…) and mark where they fall: which edges and waves line up?
+- Zoom on one A-ring density wave and fit its wavelength against radius → surface density.
+- Compare the three radio wavelengths: differences in optical depth reveal how many centimetre-sized particles there are.
+- Ingress against egress of one occultation, and different occultations against each other: some ringlets are eccentric.
+
+**Check against.** The Mimas 2:1 resonance at the B ring's outer edge; published A-ring surface densities from density waves (e.g. Tiscareno et al. 2007); the ring mass of Iess et al. 2019.
+
+**Watch out for.** Optical depth depends on the viewing geometry: convert to normal optical depth using the ring opening angle. Resolution varies between occultations. The densest parts of the B ring block the signal completely. Radius scales differ by a few km between occultations; align them on sharp edges.
+
+**Builds on.** E1 (resonances), E2 (orbits), C1 (signal processing).
+
+## E7. Jupiter's weather from a decade of Hubble maps ★★☆
+
+**Science question.** Jupiter's clouds race around the planet in alternating bands, and the Great Red Spot, a storm wider than Earth, has been shrinking for over a century. Hubble has mapped the whole planet every year since 2014. Can we measure the winds ourselves and watch the Red Spot change?
+
+**Background.** Jupiter's atmosphere is organized into east–west jets that alternate with latitude; the fastest, near 24°N, blows at ~150 m/s. Jupiter rotates in under 10 hours, so Hubble maps the whole planet on two consecutive rotations. Cross-correlating the two maps shows how far each cloud moved in ~10 hours, giving the wind at every latitude. The Great Red Spot was about 40,000 km long in the 1880s, 23,300 km when Voyager passed in 1979, and ~16,500 km in 2015, while also becoming rounder (Simon et al. 2015, 2018). OPAL (Outer Planet Atmospheres Legacy) has mapped Jupiter every year since 2014, and Saturn, Uranus and Neptune too.
+
+**Data.** OPAL global maps of Jupiter for every year (MAST High Level Science Product `opal`): cylindrical maps from two rotations (A and B) in several filters, from the ultraviolet (F275W) to the near-infrared. JunoCam images (public) for optional close-ups.
+
+**Method + visualizations.**
+- The keeper: a decade of Jupiter maps as an animation, and the same maps wrapped onto spinning globes.
+- The wind profile: cross-correlate each year's two maps in latitude strips → wind speed against latitude; compare the years.
+- The Great Red Spot: fit an ellipse each year → length, width and drift in longitude; extend the series back in time with published historical sizes.
+- Colour changes in the belts and zones, and new storms appearing.
+- The same tools on OPAL's Saturn maps.
+
+**Check against.** OPAL wind profiles (Simon et al. 2015) and Great Red Spot sizes (Simon et al. 2018).
+
+**Watch out for.** The map projection stretches high latitudes; mask the distorted limb. Cross-correlation fails where features change shape or have no contrast. Longitudes are given in System III (tied to Jupiter's magnetic field), not to the clouds.
+
+**Builds on.** E2 (planets), F2 (rotation from cross-correlation), G1 (colour images).
+
+## E8. Total eclipses: draw the Moon's shadow ★★☆
+
+**Science question.** On 12 August 2026 the Moon's shadow crossed Greenland, Iceland and Spain. On 2 August 2027 it will cross southern Spain, North Africa and Egypt, giving up to 6 minutes 23 seconds of totality near Luxor. Can we compute these paths ourselves from the planetary ephemeris, animate the shadow sweeping across Earth, and predict the Baily's beads from the mountains on the Moon's edge?
+
+**Background.** A total eclipse happens where the Moon's umbra, its cone of full shadow, touches Earth. Its track follows from the positions of the Sun and Moon and from Earth's rotation. Bessel's method boils each eclipse down to a few polynomials (the "Besselian elements"). The Moon's distance varies, so sometimes the umbra falls short and the eclipse is annular. Eclipses repeat in Saros cycles of 18 years, 11 days and 8 hours: the 2027 eclipse belongs to Saros 136, which also gave the long eclipses of 1991 and 2009. The Moon's edge is not smooth. Its mountains and valleys break the last sliver of Sun into Baily's beads and shift contact times by seconds. NASA's maps do not include that, but the laser altimeter on the Lunar Reconnaissance Orbiter (LRO) has mapped the edge.
+
+**Data.** JPL's DE440 ephemeris (via `skyfield`); Earth's shape (WGS84) and rotation (IERS); LRO LOLA topography (PDS Geosciences Node) for the lunar limb profile. NASA's eclipse predictions (Espenak, `eclipse.gsfc.nasa.gov`) and the Five Millennium Canon for checking.
+
+**Method + visualizations.**
+- Compute the umbra's track for the 2026 and 2027 eclipses: the central line, path limits and duration.
+- The keeper: an animation of the shadow sweeping the globe, with the partial phases fading around it.
+- Duration along each path; why the 2026 shadow, falling at a grazing angle, is stretched near Iceland.
+- The lunar limb seen from one site, built from LOLA heights for that moment's libration → Baily's beads and corrected contact times.
+- The whole Saros 136 family on one world map.
+
+**Check against.** NASA's greatest durations: 2 min 18.2 s (2026) and 6 min 23.2 s (2027); Espenak & Meeus's Five Millennium Canon.
+
+**Watch out for.** Time scales: mixing TT and UT (ΔT ≈ 69 s) shifts the path by tens of kilometres. The Moon's centre of figure is offset from its centre of mass by about half a kilometre. Refraction changes the observed contact times near the horizon.
+
+**Builds on.** E2 (ephemerides), E5 (lunar topography), F2 (the Sun).
+
+## E9. Asteroids in 3D ★★☆
+
+**Science question.** Asteroids are not round. Their brightness changes as they spin, and from those changes we can recover their shapes. Spacecraft have seen some up close. Can we build a 3D gallery, find the spin rate at which rubble-pile asteroids would fly apart, and measure how much NASA's DART impact changed a small moon's orbit?
+
+**Background.** An elongated asteroid brightens and fades twice per rotation. Light curves taken from many viewing angles can be inverted into a convex 3D shape and spin axis (Kaasalainen & Torppa 2001). DAMIT, a database run by Charles University in Prague, holds 16,098 such models of 10,758 asteroids. Plotting rotation period against size shows a sharp limit: almost no asteroid larger than a few hundred metres spins faster than once every ~2.2 hours, the rate at which a loose rubble pile would fly apart (Pravec & Harris 2000). Spacecraft confirmed that Itokawa, Ryugu and Bennu are rubble piles. In September 2022 NASA's DART spacecraft hit Dimorphos, the ~150 m moon of Didymos. The impact shortened its 11.9-hour orbit by 33.0 ± 1.0 minutes, far more than the ~7 minutes from the spacecraft's momentum alone: the ejected debris pushed too (Thomas et al. 2023).
+
+**Data.** DAMIT (`astro.troja.mff.cuni.cz/projects/damit/`): downloadable shape models and spin states. The Asteroid Lightcurve Database (LCDB, Warner et al. 2009; `minplanobs.org`) for periods and sizes. Spacecraft shape models from the PDS Small Bodies Node (Eros, Itokawa, Bennu, Ryugu, Didymos and Dimorphos).
+
+**Method + visualizations.**
+- The keeper: a 3D gallery of asteroid shapes at true relative scale, from DAMIT and spacecraft, as interactive meshes.
+- Make a light curve from a shape: render a model under sunlight as it rotates, and compare with a measured light curve.
+- The spin barrier: period against diameter for tens of thousands of asteroids from the LCDB, with the 2.2-hour line. The fast spinners below ~200 m must be held together by strength.
+- DART: Dimorphos's orbit before and after the impact, and the momentum enhancement factor β from the period change (Cheng et al. 2023).
+
+**Check against.** Thomas et al. 2023: −33.0 ± 1.0 min (3σ); the ~2.2-hour spin barrier (Pravec & Harris 2000).
+
+**Watch out for.** Light-curve inversion gives only convex shapes (concavities are invisible), and the pole has a mirror ambiguity. LCDB periods carry quality codes; use only reliable ones. Small, fast, bright asteroids are easier to measure, which biases the sample.
+
+**Builds on.** E1 and E3 (asteroids), E5 (impacts), G1 (rendering).
+
+## E10. Comet tails sculpted by sunlight ★★☆
+
+**Science question.** A comet's dust tail curves away from the Sun because sunlight pushes on every grain. In October 2024 comet C/2023 A3 (Tsuchinshan–ATLAS) swept through the field of view of SOHO's coronagraph as the second-brightest comet SOHO had ever recorded. Can we reproduce the shape of its tail from physics, and read off when the dust left the nucleus and how big the grains are?
+
+**Background.** Radiation pressure pushes dust outward with a force that, like gravity, falls off as 1/r². Each grain therefore moves as if the Sun were lighter by a factor (1 − β), where β, the ratio of radiation force to gravity, is larger for smaller grains: β ≈ 0.57/(ρ s) for density ρ in g/cm³ and radius s in µm. Grains released at the same moment but with different β lie along a **synchrone**; grains with the same β released at different times lie along a **syndyne** (Finson & Probstein 1968). Laid over an image, the two families read the tail like a clock and a sieve at once. C/2023 A3 passed 3° from the Sun on 9–10 October 2024 at a phase angle of 173°. Forward scattering by its dust made it shine at about magnitude −4 in SOHO's LASCO C3 coronagraph; only C/2006 P1 (McNaught, −5.5) had been brighter in SOHO's images.
+
+**Data.** SOHO LASCO C3 images from 7–13 October 2024 (and of other comets, e.g. C/2011 W3 Lovejoy), via `sunpy` (the Virtual Solar Observatory) or the Helioviewer API. The comet's orbit from JPL Horizons (E2). Optionally STEREO's heliospheric imagers.
+
+**Method + visualizations.**
+- Register the LASCO C3 frames, subtract a model of the corona, and make a movie of the comet's passage.
+- Compute syndynes and synchrones from the comet's orbit as seen from SOHO, and project them onto the images.
+- The keeper: the tail with the best-fitting syndyne–synchrone grid overlaid → when the bright dust left the nucleus, and the grain sizes.
+- The anti-tail: why dust appeared to point toward the Sun when Earth crossed the comet's orbital plane in mid-October.
+- Brightness against phase angle: the forward-scattering surge.
+
+**Check against.** SOHO's reported peak of about magnitude −4; Finson & Probstein's original analysis of comet Arend–Roland.
+
+**Watch out for.** LASCO images are dominated by the corona and stray light, so subtract a background model. Compute the geometry for SOHO's position, not Earth's. Gas (ion) tails follow the solar wind, not syndynes: separate them by colour or shape. Near the Sun brightness is boosted by forward scattering, so don't read it as dust production.
+
+**Builds on.** E2 (orbits), E4 (comets and meteor streams), F2 (solar spacecraft data), G1 (image processing).
+
 ---
 
 # F. The Sun
@@ -998,6 +1210,48 @@ The **D-criterion** (Southworth & Hawkins 1963) measures how similar two orbits 
 **Data.** SDO (Solar Dynamics Observatory) imagery via `sunpy` — actual near-real-time images of the Sun in extreme UV; GOES X-ray flux for flare monitoring.
 
 **Method + visualizations.** Multi-wavelength grid of today's Sun (AIA 171/193/304 Å — different temperatures show corona, loops, prominences); overlay GOES X-ray flux to catch flares; if a big active region is present, track it across the disk over days (solar rotation, live).
+
+## F3. The Gannon storm: the May 2024 superstorm from Sun to aurora ★★☆
+
+**Science question.** On 10–11 May 2024 auroras were seen as far south as Mexico and southern Europe during the strongest geomagnetic storm in more than 20 years. Can we follow the event from the flares and coronal mass ejections on the Sun, through the solar wind at L1, to the shaking of Earth's magnetic field measured on the ground?
+
+**Background.** In early May 2024, active region AR 13664 produced a series of X-class flares and fast coronal mass ejections (CMEs). Several CMEs merged on the way and reached Earth on 10 May. At L1 the solar wind jumped to 750–950 km/s and its magnetic field reached 73 nT, with a southward component of −50 nT. A southward field is the orientation that lets solar-wind energy into Earth's magnetosphere. On the ground the Kp index reached 9, the top of its scale. Dst, which tracks the ring of current around Earth, fell to −412 nT: the strongest storm since the 2003 Halloween storms, and the sixth-largest since 1957. The 1989 storm that blacked out Québec reached −589 nT; the 1859 Carrington event is estimated at between about −850 and −1,750 nT.
+
+**Data.** SDO AIA images and GOES X-ray flux (F2's pipeline); SOHO LASCO coronagraph images and the CDAW CME catalogue (speeds); 1-minute solar wind data at L1 from OMNIWeb (NASA SPDF); Kp from GFZ Potsdam and provisional Dst from the Kyoto WDC; 1-minute magnetometer data from INTERMAGNET observatories at many latitudes (e.g. via the BGS GIN web service, no registration).
+
+**Method + visualizations.**
+- The keeper: one multi-panel animation on a shared clock: the Sun in AIA 131 and 171 Å, the CMEs in LASCO, the solar wind's speed, density and Bz at L1, and ground magnetometers from the Arctic to the equator.
+- CME transit times: departure speed (CDAW) against arrival time at L1 → how much the solar wind slowed them.
+- A chain of magnetometers: how far toward the equator the auroral currents reached, from where the largest field swings were.
+- Dst against time, with the 1989 and 2003 storms and the Carrington estimates on one scale.
+- Predict Dst from the solar wind with Burton et al.'s (1975) empirical model, and compare.
+
+**Check against.** Kp 9; provisional Dst −412 nT; solar wind 750–950 km/s and Bz −50 nT at L1.
+
+**Watch out for.** Provisional Dst is revised later; quote the version used. OMNI data are time-shifted to Earth's bow shock, not raw L1 times. Remove each magnetometer's quiet-day baseline. Merged CMEs make one-to-one associations between eruptions and arrivals ambiguous.
+
+**Builds on.** F1 (the solar cycle), F2 (flares, SDO data), C1 (time series).
+
+## F4. The Sun's spectrum as one image ★☆☆
+
+**Science question.** Spread sunlight through a fine enough spectrograph and the rainbow is crossed by thousands of dark lines, each the fingerprint of an element in the Sun's atmosphere. Can we turn one of the most detailed solar spectra ever measured into a single poster, and identify the elements behind the lines?
+
+**Background.** Fraunhofer mapped hundreds of dark lines in sunlight in 1814; in 1859–60 Kirchhoff and Bunsen matched them to elements heated in the laboratory. In 1868 a yellow line seen during an eclipse matched no known element: helium was found in the Sun before it was found on Earth. Each line's depth and width depend on how much of the element there is and on the temperature and pressure where the line forms, which is how solar abundances are measured (Asplund et al. 2021). Fourier-transform spectrometers at Kitt Peak resolved the solar spectrum in extraordinary detail. The famous NOAO poster of the visible spectrum, wrapped into rows, was made from such scans.
+
+**Data.** Kurucz's 2005 solar flux atlas, built from spliced Kitt Peak FTS scans (`kurucz.harvard.edu/sun/fluxatlas2005/`: 13 files, ~40 MB in all). Line lists from the NIST Atomic Spectra Database or VALD. Optionally the IAG solar atlas (Reiners et al. 2016) for comparison.
+
+**Method + visualizations.**
+- The keeper: 380–700 nm wrapped into ~50 rows, each pixel coloured by its wavelength and darkened by the measured flux: the classic poster, rebuilt from the data.
+- Identify the strongest lines (hydrogen Balmer, Na D, Mg b, Ca II H & K, iron) from NIST/VALD and colour-code the poster by element.
+- Which dark bands come from Earth's own atmosphere (O₂, H₂O) rather than the Sun?
+- A curve of growth from Fe I line strengths → the classic estimate of the Sun's iron abundance.
+- Extension: the Sun's gravitational redshift (~0.6 km/s) hides under convective blueshifts of similar size; González Hernández et al. (2020) measured it with a laser frequency comb.
+
+**Check against.** Line identifications in Moore, Minnaert & Houtgast (1966); the solar iron abundance log ε(Fe) = 7.46 (Asplund et al. 2021).
+
+**Watch out for.** Read the atlas documentation on how the scans were spliced and normalized. Lines overlap heavily, especially in the blue. A curve-of-growth abundance is a teaching estimate (±0.2 dex), not a modern 3D non-LTE result.
+
+**Builds on.** B7 (stellar spectra), F2 (the Sun), K1 (abundances).
 
 ---
 
@@ -1108,6 +1362,56 @@ Optional: APOGEE DR17 chemistry ([Fe/H], [α/Fe]); accreted stars are chemically
 **Watch out for.** The signal is hundreds of times smaller than a single quasar's proper-motion error, so only the average over a million sources reveals it. Gaia's own systematics also have large-scale patterns; the fit must separate the glide from frame rotation and magnitude-dependent effects. Some "quasars" are stars: reject sources with significant parallax or proper motion.
 
 **Builds on.** H1 (R₀), H2 (V₀), I3 (quasars), B1–B3 (Gaia astrometry).
+
+## H5. The Milky Way across the spectrum ★☆☆
+
+**Science question.** Our galaxy looks completely different at each wavelength. Radio shows fast electrons spiralling in magnetic fields; 21 cm shows atomic hydrogen; far-infrared shows warm dust; near-infrared shows old stars that visible light cannot reach through the dust; X-rays show million-degree gas; gamma rays show cosmic rays striking gas. Can we put a dozen all-sky maps on one grid and see what each one reveals?
+
+**Background.** NASA's "Multiwavelength Milky Way" posters stacked the Galactic plane in many bands. Each band traces something different:
+- synchrotron radio emission (Haslam et al. 1982, 408 MHz);
+- the CMB and Galactic foregrounds (WMAP, Planck);
+- atomic hydrogen (HI4PI) and molecular gas through CO (Dame et al. 2001, updated 2022);
+- dust (IRAS, Planck 857 GHz);
+- stars (2MASS near-infrared, optical);
+- ionized gas (Hα; Finkbeiner 2003);
+- hot gas (ROSAT X-rays);
+- gamma rays (Fermi LAT), where the Fermi bubbles reach 50° above and below the Galactic Centre (Su, Slatyer & Finkbeiner 2010).
+
+**Data.** CDS's hips2fits service (`alasky.cds.unistra.fr/hips-image-services/hips2fits`, also wrapped in `astroquery`). It cuts any HiPS survey into an all-sky Mollweide FITS image in Galactic coordinates in a single request. The surveys: Haslam 408 MHz, WMAP K–V, Planck HFI 857 GHz and colour, HI4PI, Dame CO (2022), IRAS/IRIS, 2MASS, Mellinger optical, Finkbeiner Hα, GALEX ultraviolet, ROSAT RASS and Fermi LAT. A few MB each.
+
+**Method + visualizations.**
+- The keeper: strips of the Galactic plane (|b| < 10°) in every band, stacked and aligned in longitude: the classic poster, made from data.
+- All-sky maps with a slider or a fade animation through the wavelengths.
+- Dust against gas: IRAS or Planck dust against HI4PI + CO column density → the gas-to-dust ratio, and "dark gas" that neither hydrogen nor CO traces (Grenier et al. 2005).
+- Structures that appear only in some bands: Loop I and the North Polar Spur (radio, X-ray), the Fermi bubbles (gamma rays), Orion and Taurus (CO, dust), the Magellanic Stream (hydrogen).
+- RGB composites of three bands (e.g. radio, Hα, X-ray), captioned honestly (G1's rules).
+
+**Check against.** Each survey's own published maps; NASA's multiwavelength Milky Way poster.
+
+**Watch out for.** HiPS maps are resampled; for numbers, use the original HEALPix maps (LAMBDA, the Planck Legacy Archive, HI4PI). Every survey has its own resolution, units and artefacts (zodiacal residuals in Planck, stripes in ROSAT, gaps in IRAS). Colour scales are choices: state the stretch of each panel.
+
+**Builds on.** D3 (Planck maps), H2 (HI4PI), B1 (Gaia star counts), G1 (honest colour), C6 (Fermi).
+
+## H6. Fly through the dust clouds around the Sun ★★☆
+
+**Science question.** Gaia measured the distances and the dimming of 54 million stars near the Sun, enough to map the dust between them in three dimensions. Can we fly through the clouds around us, see the Local Bubble we live in, and trace the Radcliffe Wave, a 2.7 kpc ripple of star-forming clouds?
+
+**Background.** Dust dims and reddens starlight. Knowing the distance and the extinction of many stars along each line of sight places the dust in 3D. Edenhofer et al. (2024) built such a map out to 1.25 kpc: Nside 256 (~14′) on the sky, 516 distance bins, parsec-scale in distance. The Sun sits inside the **Local Bubble**, a cavity a few hundred parsecs across blown out by supernovae over the past ~14 Myr. Most young stars nearby formed on its surface (Zucker et al. 2022). Many nearby clouds (Orion, Perseus, Taurus, Cepheus…) line up along the **Radcliffe Wave**, 2.7 kpc long with an amplitude of ~160 pc (Alves et al. 2020), which is also oscillating (Konietzka et al. 2024).
+
+**Data.** The Edenhofer et al. (2024) map on Zenodo (DOI 10.5281/zenodo.8187942): the mean map and its uncertainty, a 3.3 GB HEALPix FITS file. The record also holds 12 posterior samples (123 GB in all; not needed). The map is also available through the `dustmaps` package. Cloud distances and the Radcliffe Wave model (Zucker et al. 2020; Alves et al. 2020). Young stars from Gaia DR3 (B8).
+
+**Method + visualizations.**
+- The keeper: a volume-rendered 3D fly-through (plotly or a WebGL viewer) starting at the Sun and passing Taurus and Orion.
+- Face-on and edge-on maps of the dust density, with the walls of the Local Bubble.
+- The Radcliffe Wave: fit a damped sine wave to the cloud positions and overlay it on the map.
+- Young stars (younger than ~20 Myr, from B8) over the dust: star formation on the bubble's surface.
+- Integrated extinction to any distance → a dereddening tool for B1 and B8.
+
+**Check against.** Alves et al. 2020 (length 2.7 kpc, amplitude ~160 pc); Zucker et al. 2022 (the bubble's history); a second map (Bayestar19 or Vergely et al. 2022).
+
+**Watch out for.** Uncertain stellar distances smear dust along lines of sight. The map starts at 69 pc, so the very nearest clouds are missing. Maps from different teams disagree in detail; compare two. Rendering choices (opacity, colour) can create apparent structures.
+
+**Builds on.** B1–B3 (Gaia), B8 (young clusters), H2 (gas), H5 (dust at all wavelengths), L3 (the supernovae that blew the bubble).
 
 ---
 
@@ -1486,6 +1790,27 @@ The same method has turned up ~20 neutron star candidates in wide orbits (El-Bad
 
 **Builds on.** I2 (reverberation: the same flicker, echoed), I3 (black hole masses), D6 (ZTF data), I10 (nuclear transients).
 
+## I18. Giant radio galaxies: the largest structures black holes build ★★☆
+
+**Science question.** Some supermassive black holes launch jets that run far beyond their galaxy and inflate radio lobes millions of light-years across. LOFAR's sky survey found that such "giants" are common, and in 2024 one of them, Porphyrion, turned out to span 7 Mpc, the longest jets known. Can we find giants in the radio maps, measure them, and see them over images of their host galaxies?
+
+**Background.** At low radio frequencies the old, extended lobes of radio galaxies are brightest. LOFAR's LoTSS DR2 imaged 27% of the northern sky at 144 MHz with 6″ resolution and catalogued 4,396,228 sources (Shimwell et al. 2022). A radio galaxy counts as a "giant" if it spans more than 0.7 Mpc. Machine learning plus citizen science raised the number of known giants above 11,000 (Oei et al. 2024). Porphyrion (Oei et al. 2024, *Nature*) spans 7 Mpc, from a galaxy seen when the universe was ~6.3 Gyr old. The lengths are projections, so true sizes are larger. The population tells us how long jets stay switched on and how the cosmic web confines them.
+
+**Data.** LoTSS DR2 images and source catalogue (`lofar-surveys.org`: mosaics as FITS, plus a cutout service). The giant radio galaxy catalogues of Oei et al. (2023, 2024). Host galaxies and redshifts from the Legacy Survey and SDSS (G1, B7). NVSS at 1.4 GHz for spectral indices.
+
+**Method + visualizations.**
+- The keeper: a gallery of giants as radio contours over Legacy Survey colour images, with the Milky Way and Andromeda drawn to scale beside them.
+- Angular sizes → projected lengths with D3's cosmology; the length distribution against Oei et al.'s.
+- Spectral index from LoTSS's in-band images, or against NVSS → the lobes' ages from synchrotron ageing.
+- Where the hosts sit on I1 and I3's black hole mass scale, and where the giants sit in D2's cosmic web.
+- Porphyrion in full, with its host galaxy marked.
+
+**Check against.** The length distributions of Oei et al. (2023, 2024); Porphyrion's 7 Mpc.
+
+**Watch out for.** Matching separate lobes to one host is hard, which is why the catalogues needed citizen scientists. LoTSS's resolution and surface-brightness limit miss the faintest, largest lobes. Projected lengths underestimate true sizes.
+
+**Builds on.** I16 (jets at parsec scale), I3 (quasars), D2 (the cosmic web), G1 (colour images).
+
 ---
 
 # J. Galaxies
@@ -1657,6 +1982,27 @@ D2 mapped where galaxies are and D4 showed what holds them together. This sectio
 **Watch out for.** Photometric redshifts are contaminated by dusty z ~ 4–5 galaxies and brown dwarfs. The effective survey volume (completeness) is the hard part, so show the published luminosity functions as the primary result. Deep fields are small, so cosmic variance is large.
 
 **Builds on.** G1 (imaging), B7 (spectra), J3 (the start of cosmic star formation), D3 (cosmology).
+
+## J9. Fly into the Hubble Ultra Deep Field ★★☆
+
+**Science question.** The Hubble Ultra Deep Field shows thousands of galaxies in a patch of sky about the size of a grain of sand held at arm's length. They are spread across most of cosmic history, but the picture flattens them onto one plane. Can we use measured redshifts to put each galaxy back at its true distance and fly into the field in 3D?
+
+**Background.** Hubble's eXtreme Deep Field (XDF; Illingworth et al. 2013) combines about two million seconds of exposure on this patch. MUSE on ESO's Very Large Telescope then took a spectrum at every pixel. Its second data release measured secure redshifts for 2,221 sources (Bacon et al. 2023): 25 nearby galaxies, 677 [O II] emitters at z = 0.25–1.5, 201 galaxies at z = 1.5–2.8, and 1,308 Lyman-α emitters at z = 2.8–6.7. Many of the Lyman-α emitters are invisible in Hubble's images. Redshift turns into distance through D3's cosmology, giving a 3D cone that reaches back to ~800 million years after the Big Bang.
+
+**Data.** The XDF images (MAST High Level Science Product `xdf`: ACS and WFC3 mosaics at 30 or 60 mas). The MUSE HUDF DR2 catalogue (Bacon et al. 2023; VizieR `J/A+A/670/A4`, full products at AMUSED, `amused.univ-lyon1.fr`). Optionally JADES photometric redshifts (J8) for galaxies without a MUSE redshift.
+
+**Method + visualizations.**
+- Cut a stamp of every galaxy with a MUSE redshift from an XDF colour image (G1's methods).
+- Place each stamp at its comoving distance in a 3D scene (plotly or a WebGL viewer), scaled to its true physical size.
+- The keeper: a fly-through movie from the Milky Way out to z ≈ 6.7, with a clock showing lookback time.
+- The redshift histogram, with MUSE's harder range (z = 1.5–2.8, where few strong emission lines fall in its band) and the Lyman-α emitters invisible to Hubble marked.
+- Galaxy sizes and colours against cosmic time.
+
+**Check against.** Bacon et al. 2023's redshift counts; STScI's published visualizations of the field.
+
+**Watch out for.** Comoving distance and light-travel distance differ: pick one and label it. The MUSE sample is selected by emission lines, so it is not a complete census. At different redshifts the same filter shows different rest-frame light.
+
+**Builds on.** G1 (colour images), J8 (the JWST deep field), D3 (distances), J3 (galaxy evolution).
 
 ---
 
@@ -1943,6 +2289,9 @@ Every project produces at least one **publication-quality static figure** (matpl
 | A1 Exoplanet transit | **done** — [01-exoplanet-transit/](01-exoplanet-transit/). HAT-P-7 b and Kepler-10 b recovered from Kepler photometry; both periods correct to ~4 parts in 10⁶, radii bracketing the published values. Also recovers HAT-P-7 b's orbital phase curve and 48 ppm secondary eclipse. |
 | A2 Exoplanet atlas | **done** — [02-exoplanet-population/](02-exoplanet-population/). 6,372 planets from the NASA Exoplanet Archive, with the archive's formula-filled masses (47% of the table) and radii excluded. Radius valley measured at 1.82 R⊕ (68%: 1.80–1.85), tilting with period at slope −0.10 vs Van Eylen et al.'s −0.09; 96% of small planets below it fit bare rock, 90% above it are too big for rock. Of 275 habitable-zone planets, 17 are rocky-sized — 15 around red dwarfs, none around a Sun-like star. |
 | A3 Radial velocities | **done** — [20-radial-velocities/](20-radial-velocities/). 2,328 velocities from ELODIE, Lick, Keck and HARPS (1989–2019), fitted with our own multi-instrument periodogram, Keplerian fitter and a noise model that treats each night's exposures as one measurement. 51 Peg b: P = 4.2307860 ± 0.0000064 d, K = 55.36 ± 0.32 m/s, m sin i = 0.461 ± 0.015 M_Jup (true mass 0.463 ± 0.023 with the planet's own CRIRES orbital speed); the 21 archived ELODIE spectra from before the 1995 announcement alone give 4.2305 d. 55 Cnc: five planets found blind; e's true 0.7365-d period beats its 2.817-d alias (none of 500 simulations with the alias as truth reproduce the data), and the velocities predict the TESS transits 6,700 orbits later to 66 ± 26 min: 7.75 ± 0.37 M⊕, 1.87 ± 0.05 R⊕, 6.5 g/cm³, pure rock. Proxima b: K = 1.22 ± 0.16 m/s, m sin i = 1.05 ± 0.14 M⊕, absent from all seven activity indicators. GJ 581 "d" found blind at 66.9 d, then traced to half the star's 137-d rotation in H-alpha. Plus an offline fold-it-yourself page. |
+| A4 Earth as an exoplanet | not started |
+| A5 ALMA protoplanetary discs | not started |
+| A6 Directly imaged orbits | not started |
 | B1 HR diagram | **done** — [02-hr-diagram/](02-hr-diagram/). 215,844 Gaia DR3 stars within 100 pc. Twin-binary sequence 0.75 ± 0.02 mag above the main sequence (0.753 predicted); red clump M_G 0.51 ± 0.02; the Jao gap confirmed at 5.6σ; the white dwarf A/B split; Parenago's discontinuity at BP−RP 0.84. Plus an all-sky star-count map of 1.8 billion sources. |
 | B2 3D solar neighborhood | **done** — [06-solar-neighborhood/](06-solar-neighborhood/). 300,338 stars within 100 pc: 299,525 from Gaia DR3 (72,701 spurious sources removed with the Rybizki et al. fidelity classifier, 71% of them toward the crowded inner Galaxy) plus 813 from Hipparcos that are too bright or too binary for Gaia. Interactive 3D map in true star colours, with SIMBAD names for every star within 20 pc. Red dwarfs are 74% of the stars within 20 pc and none of the 205 visible to the naked eye; only 46% of the naked-eye sky lies inside 100 pc. The Hyades found blind as the densest clump, at 46.8 pc (literature 47.5), and Coma Berenices at 85.5 pc (85.9); both beat an isotropic null (142 and 48 neighbours vs 25). Photometric classes match SIMBAD spectral letters for 96% of dwarfs; 99.3% of the Gaia Catalogue of Nearby Stars recovered. Of 477 objects known within 10 pc, 330 found: every missed star is in a binary, and 70 of the 79 missed brown dwarfs are too faint. 2.0 ± 0.5% more stars below the Sun than above (4.4σ), the sign expected for a Sun ~20 pc above the disc. |
 | B3 Cluster hunting | **done** — [02-cluster-hunting/](02-cluster-hunting/). The Pleiades, Praesepe and M67 found blind as knots in Gaia DR3 proper motions (1,358 / 953 / 1,208 members); distances within 0.2% of Hunt & Reffert (2023), Pleiades at 135.0 ± 0.2 pc; members' main sequences 2.3–6.5× thinner than the field's; perspective and depth effects of a shared 3D velocity confirmed. Isochrone age fitting is the open extension. |
@@ -1954,6 +2303,7 @@ Every project produces at least one **publication-quality static figure** (matpl
 | B9 Eclipsing binaries | not started |
 | B10 White dwarfs | not started |
 | B11 MESA to core collapse | not started |
+| B12 Constellations in motion | not started |
 | C1 GW150914 chirp | **done** — [02-gravitational-waves/](02-gravitational-waves/). An hour of H1/L1 strain from GWOSC, processed from raw with our own whitening, matched filter and Q-transform (plus WAV audio). The discovery paper's Figure 1 reproduced at correlation 0.995 (H1) / 0.983 (L1); network SNR 23.8 (published 23.6–25.2); Hanford 7.10 ± 0.19 ms after Livingston (published 6.9), inverted as the arm geometry predicts. Zero-crossing chirp mass 35.2 M☉ (the LIGO authors' same method: ~37); calibrated by 461 injections into real noise, 31.8 M☉ (68%: 28.3–36.0) vs GWTC-1's 31.2 detector-frame — which leaves only black holes compact enough. Louder than all 4,015 time slides (187 days of background): FAR < 2/yr from one hour of data. |
 | C2 Pulsar P–Ṗ | **done** — [03-pulsar-ppdot/](03-pulsar-ppdot/). 2,764 neutron stars from ATNF catalogue v2.8.1 (plus an interactive version). Recycling: 81% of millisecond pulsars have a companion vs 2.7% of ordinary ones, and spin tracks companion type (He white dwarf 4.1 ms → CO white dwarf 19.5 ms → neutron star 62.5 ms). 47 radio pulsars shine beyond the death valley. The 716 Hz record holder implies density > 7×10¹³ g/cm³ and radius < 14.4 km. Crab's characteristic age is 34% too old against SN 1054, implying a 17–20 ms birth spin. Pulsar heights grow from 29 to 374 pc above the plane with age. 40% of cluster pulsars appear to spin *up*. The sky map is partly survey footprint: one FAST survey found 32% of field millisecond pulsars. |
 | C3 Fast radio bursts | **done** — [04-fast-radio-bursts/](04-fast-radio-bursts/). The Second CHIME/FRB Catalog (Jan 2026; 4,539 bursts from 3,641 sources) plus 80 host-localized FRBs, with ATNF pulsars as a control sample inside the Galaxy. Dispersion law measured on single bursts: delay ∝ ν^−2 to within 0.0003 in the index, timing residuals 0.05–0.1 ms over 4–10 s sweeps. The median FRB has 10× the DM that the whole Milky Way disk holds in its direction; 99.4% exceed disk plus a generous halo. FRBs mildly *avoid* the Galactic plane (12% within 10° vs 17% isotropic; pulsars 73%). Repeater bursts are 2.2× wider with half the bandwidth (p ~ 10⁻⁸). Macquart relation: diffuse baryon fraction f_d = 1.04 (+0.16/−0.12), so the "missing" baryons are there; run with Macquart et al.'s own set-up, the same data give Ω_b h₇₀ = 0.051, matching the published values. |
@@ -1979,14 +2329,23 @@ Every project produces at least one **publication-quality static figure** (matpl
 | E3 NEO approaches | **done** — [11-neo-close-approaches/](11-neo-close-approaches/). JPL close-approach, Sentry, fireball and Horizons data. In the 30 days to 29 Sep 2026, 165 known asteroids passed within 0.05 au but only 28 are predicted for the next 60: 146 of the 165 were unknown a month earlier. Near misses become impact rates through the d² law, which holds for large asteroids (k = 2.16, 1.97) and fails for small ones (k = 0.62), measuring discovery bias: one ≥1 km impact per 0.88 Myr (published 0.6 Myr), ≥140 m per 33,000 yr; against the fireball record, surveys catch ~27% of 10 m and ~3% of 3 m rocks passing inside the Moon's orbit. All 2,206 Sentry objects rate Torino 0 (recomputed, matching all 46,129 dated ratings). Apophis 2029: 38,011 km ± 3 km, path bent 27°, Aten → Apollo (323- to 423-day year). |
 | E4 Meteor showers | not started |
 | E5 Crater dating | not started |
+| E6 Saturn's rings | not started |
+| E7 Jupiter's weather | not started |
+| E8 Eclipse shadows | not started |
+| E9 Asteroids in 3D | not started |
+| E10 Comet tails | not started |
 | F1 Solar cycles | **done** — [15-solar-cycles/](15-solar-cycles/). The SILSO sunspot number 1749–2026 plus all 260,240 daily records of 45,376 sunspot groups since 1874 (Greenwich, then USAF/NOAA). Our own smoothing and cycle finder reproduce SILSO's official table: all 25 maxima exact, 23 of 25 minima (the other two are ties). Cycles last 9.0–13.6 yr (mean 11.03 ± 1.18) and peak at 81–285; Gnevyshev–Ohl holds in 9 of 11 pairs, broken exactly where the literature says (4→5, 22→23). Butterfly: daily spot areas identical to Hathaway's derived file on all 55,509 days; the zones drift as 28.0° × exp(−t/97 months) (Hathaway 2011: 28°, 90), and stronger cycles start higher (r = 0.69, p = 0.007, as Solanki et al. 2008 found, against Hathaway's "no dependence"). Differential rotation from 93,496 day-to-day moves: Ω = 14.554 − 2.80 sin²φ °/day (Balthasar et al. 1986, same plates: 14.551 − 2.87). Cycle 25 peaked at 160.9 in Oct 2024 (SILSO's value, reproduced), 40% above the 2019 forecast and 9 months early, yet only 15th of 25; its early rise had ruled out the forecast by mid-2023, and the late peak came from the south, 1.5 yr after the north. Maunder minimum: no spot seen in 34 of 71 years despite a median 822 observations each; reconstructions differ 20× on its depth. Plus an offline zoomable explorer. |
 | F2 The Sun today | **done** — [16-sun-today/](16-sun-today/). SDO's near-real-time images of 29 Sep 2026 20:00 UTC in all ten AIA channels plus an HMI magnetogram, and the week before (57 magnetograms, 57 AIA frames, GOES-18 X-rays). 35 flares, 15 of them C-class, none above C3.1. The week's most energetic, a C2.4 on the west limb from NOAA 4536, reached 10.6 MK 4 min before its X-ray peak (emission measure 1.1×10⁴⁸ cm⁻³ a minute after), about 1.7×10²⁹ erg; its loops then cooled through AIA's channels in temperature order (131 Å +2 min, 94 Å +9, 335 Å +87, the cooler ones still rising at +104). Differential rotation from magnetogram cross-correlation: ω = 14.47 − 1.81 sin²φ − 2.05 sin⁴φ °/day (Komm et al. 1993: 14.42 − 2.00 − 2.09), 2.8% faster than the surface gas; the equator turns in 24.9 days (26.7 seen from Earth). Hale's law: 10 of 10 regions lead with Cycle 25's polarity. Limb darkening within 2.4% of Allen's law, giving 4,990 K at τ = 0.1 to 6,010 K at τ = 1. Coronal scale heights give 0.9/1.2/1.7 MK in 171/193/211 Å. Plus a week-long time-lapse and an offline explorer page; `run.py --epoch now` redoes it all for today. |
+| F3 Gannon storm | not started |
+| F4 Solar spectrum poster | not started |
 | G1 Galaxy composites | **done** — [13-galaxy-composites/](13-galaxy-composites/). Twelve galaxies (M51, M101, M74, M63, M81, M64, M104, NGC 5866, NGC 4631, M82, the Mice, M87) built from calibrated SDSS g, r, i with one physical recipe: Lupton et al.'s arcsinh stretch fixed in surface-brightness units, and white = the Sun's measured colour (the survey viewer's default whitens a colour no star has). Checked first: the survey's own JPEGs reproduced (99.995% of 7.2 M values within ±1); 278 stars within 0.004 mag of Gaia's synthetic photometry; whole galaxies within 0.006 mag of Brown et al. 2014 (colours 0.003) once foreground stars are filled rather than dropped. True colour: a g, r, i → CIE XYZ matrix fitted to 129 galaxy spectra (leave-one-out error Δu′v′ 0.003, one just-noticeable difference) makes every galaxy a shade of white, 4,570 K (M104, M82) to 6,330 K (M101), matching their spectra to ≤ 0.007. Too faint for colour anyway: the brightest core (M104) reaches 0.08 cd/m², and at most 1.5% of any galaxy's area passes the 0.005 cd/m² cone threshold; no telescope can raise surface brightness. M51 on one grid from seven telescopes (FUV to 21 cm, ≤ 0.24″ from Gaia once stray SIP keywords are removed); Hubble's mosaic registered (0.84″ offset) and cross-calibrated against SDSS (−2/+9/+4% of the spectrum's prediction). Legacy Surveys DR9-north keeps only 36% of M51's z light. Plus an offline make-your-own-composite explorer. |
 | G2 Meteorite map | **done** — [14-meteorite-landings/](14-meteorite-landings/). All 45,716 meteorites of the Meteoritical Society catalogue (NASA's 2013 snapshot; the old Socrata link is dead, the file moved to `data.nasa.gov/docs/legacy/`), on our own equal-area Equal Earth maps. Repaired first: 13,748 without usable coordinates (incl. 6,214 at a dummy 0°,0° and 223 Yamato meteorites whose zeroed latitude would put Antarctica in Kenya), one found on Mars, and every year before 1583 one too small (a Gregorian 1 January read back in the Julian calendar — all 8 match the arithmetic). 72% of located finds come from Antarctica (8% of the land); Oman yields 9,900 per million km², 150× the rest of the land. Against camera-network flux (58 falls ≥100 g per million km² per year), only 1 fall in ~1,500 is recorded, and recovery ∝ population density^0.59 (95%: 0.44–0.75) — 1 in 170 above 300 people/km², ~1 in 4,000 below 10; yet falls held at ~6/yr since 1900 while population grew. Evatt et al.'s iron table reproduced from the independent snapshot (falls 60/1,107 vs 60/1,097; Antarctica 0.74% vs 0.68%), and extended: individual finds are 40% metal vs 5% of falls; desert meteorites bought through dealers are 18% achondrites vs 4% where the find site was recorded. Plus an offline interactive map of all 31,893 located meteorites with filters. |
 | H1 Sgr A* mass | **done** — [17-galactic-centre/](17-galactic-centre/). S2's orbit from both teams' raw measurements: 45 Keck and 145 NTT/VLT positions (1992–2018) plus 116 velocities — UCLA's Do et al. 2019 release (its page is gone; fetched from the Internet Archive) and Gillessen et al. 2017 via VizieR — fitted by MCMC with each team's reference frame free (one shared frame: χ² worse by 1,537). Each team's own analysis reproduced first: all 16 of Do et al.'s Newtonian posteriors within 0.15σ, their GR mass and distance within 0.04σ; Gillessen et al.'s VLT fit within 0.3σ on every number. Both teams together: M = 3.96 ± 0.04 ± 0.02 million M☉, R₀ = 7.93 ± 0.04 ± 0.03 kpc (Kepler by hand: 126.9 mas = 1,006 AU, P = 16.045 yr → 3.96 million suns). At GRAVITY's distance our banana gives 4.289 ± 0.010 million M☉ (GRAVITY: 4.297); their 4% larger R₀ is the known Keck–VLTI tension. Einstein's redshift detected: f = 0.82 ± 0.16 on Keck positions (Do et al.: 0.88), 0.70 ± 0.15 adding the VLT's, Newton excluded at 5σ; a Newtonian fit overstates M and R₀ by 5% and fakes Gillessen et al.'s 28 km/s "recession" (1.5 GM/ac = 17.5 km/s). A free precession fit claims 5× Einstein at 5σ — a false signal from 1990s speckle positions; adaptive-optics data alone cannot measure it. Pericentre 115 AU (16 light-hours, 1,470 horizon radii) at 7,590 km/s: > 5.5 × 10¹⁵ M☉/pc³, where the longest-lived dark cluster (Maoz 1998, reproduced) lasts 8 × 10⁵ yr. For I5: predicted shadow 51.2 ± 0.3 µas (EHT ring 51.8 ± 2.3). Next pericentre 5 June 2034. Plus an offline orbit explorer. |
 | H2 21-cm rotation curve | **done** — [18-milky-way-rotation/](18-milky-way-rotation/). The HI4PI 21-cm survey: 25 cubes, of which only the \|v\| ≤ 350 km/s channels were fetched by HTTP byte range (3.8 of 6.6 GB). Terminal velocities from McClure-Griffiths & Dickey's two-error-function edge fit match the VLA survey at all 748 first-quadrant longitudes (median −0.24 km/s, rms 0.57), although HI4PI has a 16′ beam against the VLA's 1′. Their linear fits reproduced (v_circ 172.7 / 178.1 vs 172.5 / 177.7), as is the north–south asymmetry (−5.13 vs −5.2 km/s at \|l\| = 55–67°); an outward drift of the LSR explains none of it. Rotation curve from the tangent points with the LSRK convention handled explicitly (the Sun's angular speed, 30.32 km/s/kpc, from Sgr A*): 207–217 km/s at 2.6–3.6 kpc rising to 236–245 at 6–7.6 kpc, with ~10 km/s arm bumps; 63 of 1,442 longitudes with ambiguous edges dropped. The 3D orbits of 144 masers, computed from Reid et al.'s astrometry, lag rotation by 4.7 km/s and fall inward at 4.7 (published 4.3 ± 5.6, 6.0 ± 1.4); Perseus kinematic distances are 1.17× the parallaxes (up to 4.7×). Mass 1.06 × 10¹¹ M☉ inside the Sun's orbit; the Milky Way rotates faster than 89% of SPARC galaxies. Outer disc mapped face-on to 30 kpc after re-deriving LBH06's elliptical-orbit correction (with their constants α = 7.9, β = −1.06 vs published 8.67, −1.08; anticentre mismatch χ² 1137 → 0.6). HI scale length 4.05 kpc with the IAU constants (Kalberla & Dedes: 4.0 for co-rotating gas), 3.2 kpc with ours. Warp tilt W1 = 1.62 kpc at 20.5 kpc (LBH06: 1.74), maximum at φ ≈ 80–90°. The disc flares from 0.6 to 3.3 kpc thick. The plane cubes alone would have cut off the northern warp's top in 20–44% of cells beyond 16 kpc, so 7 cubes above the plane were added. |
 | H3 Galactic archaeology | **done** — [19-galactic-archaeology/](19-galactic-archaeology/). Gaia DR3 only: 7.5 million rows from ESA's archive as small sky-patch queries, each all-sky sample checked against a server count. **GD-1** found blind among 3.8 million stars, with the ancient cluster M92 (same age, metallicity and distance) as the colour–magnitude filter and the stream's motion found in the data (up to 89σ): 3,464 members over 90° of sky; distance 7.8 → 11.6 kpc, gradient 0.0098 ± 0.0012 mag/deg (Koposov 2010: ~0.012), confirmed by the members' mean parallax (−0.004 ± 0.008 mas); gap G-20 78% deep (5.6σ), a 65% gap at −6.5°, the densest point at −14.5° (PWB2018's progenitor candidate: −13.5°); the spur 33 stars vs 2 in the mirror box; 65 of 66 spectroscopic members (Huang+2019) recovered. **Gaia-Sausage-Enceladus**: 74,938 halo stars within 2.5 kpc (0.41%); with no velocity cut at all, using Gaia's own RVS metallicities of cool giants, the halo's anisotropy jumps from β = 0.26–0.34 below [M/H] ≈ −2.2 to 0.74–0.83 above −2.0 (Belokurov+2018: 0.2–0.4 → ~0.9); the usual velocity cut finds only ~half of the round metal-poor halo. GSE median [M/H] −1.16 (Feuillet+2021: −1.17), 0.037 ± 0.010 dex poorer in α than the thick disc; its stars form the halo's blue sequence. Found on the way: half of GSP-Spec's "[M/H] < −1.66" stars are hot disc stars with wrong metallicities. **Phase spiral**: 2.5 million stars (Antoja+2018: 0.94 million); the snail shell in counts, v_R and v_φ once each star is compared with a phase-mixed disc; the disturbance dated to 250–560 Myr (median 360) in the McMillan 2017 potential, whose local disc matches the measured surface density (76 vs 68 ± 4 M☉/pc²); Antoja: 300–900 Myr. Plus an offline halo explorer. |
 | H4 Sun's acceleration from quasars | not started |
+| H5 Multiwavelength Milky Way | not started |
+| H6 3D dust fly-through | not started |
 | I1 M–σ relation | not started |
 | I2 Reverberation mapping | not started |
 | I3 Quasars | not started |
@@ -2004,6 +2363,7 @@ Every project produces at least one **publication-quality static figure** (matpl
 | I15 Reionization from quasar spectra | not started |
 | I16 Superluminal jets | not started |
 | I17 Quasar variability | not started |
+| I18 Giant radio galaxies | not started |
 | J1 Velocity fields | not started |
 | J2 Galaxy morphology | not started |
 | J3 Galaxy life cycle | not started |
@@ -2012,6 +2372,7 @@ Every project produces at least one **publication-quality static figure** (matpl
 | J6 Local Group dwarfs | not started |
 | J7 Andromeda collision | not started |
 | J8 First galaxies (JWST) | not started |
+| J9 Hubble Ultra Deep Field in 3D | not started |
 | K1 Big Bang nucleosynthesis | not started |
 | K2 Cluster masses | not started |
 | K3 Bullet Cluster | not started |
