@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contact Binary Explorer</title>
+<style>
+:root {
+  --surface: #fcfcfb; --panel: #f4f3ef; --ink: #0b0b0b; --ink2: #52514e; --muted: #898781;
+  --grid: #e1e0d9; --axis: #c3c2b7; --blue: #2a78d6; --orange: #eb6834; --violet: #4a3aa7; --aqua: #1baf7a;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --surface: #161614; --panel: #201f1c; --ink: #f0efea; --ink2: #b9b7ae; --muted: #8f8d85;
+    --grid: #2e2d29; --axis: #4a4943; --blue: #5598e7; --orange: #f08055; --violet: #8f82e0; --aqua: #34c590;
+  }
+}
+:root[data-theme="dark"] {
+  --surface: #161614; --panel: #201f1c; --ink: #f0efea; --ink2: #b9b7ae; --muted: #8f8d85;
+  --grid: #2e2d29; --axis: #4a4943; --blue: #5598e7; --orange: #f08055; --violet: #8f82e0; --aqua: #34c590;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--surface); color: var(--ink);
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, "DejaVu Sans", sans-serif; }
+main { max-width: 1120px; margin: 0 auto; padding: 20px 16px 40px; }
+h1 { font-size: 22px; margin: 0 0 4px; }
+p.lede { color: var(--ink2); margin: 0 0 18px; max-width: 800px; }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 18px; }
+@media (max-width: 820px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.card { background: var(--panel); border-radius: 10px; padding: 14px; }
+canvas { width: 100%; height: auto; display: block; border-radius: 6px; }
+#star { background: #0b0b0b; aspect-ratio: 1 / 1; }
+#lc { aspect-ratio: auto; }
+.controls { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 12px; }
+label { display: grid; grid-template-columns: 150px 1fr 64px; align-items: center; gap: 10px; font-size: 14px; color: var(--ink2); }
+@media (max-width: 480px) { label { grid-template-columns: 110px 1fr 56px; } }
+input[type=range] { width: 100%; accent-color: var(--blue); }
+output { font-variant-numeric: tabular-nums; color: var(--ink); text-align: right; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 10px; }
+select, button { font: inherit; font-size: 14px; color: var(--ink); background: var(--surface); border: 1px solid var(--axis);
+  border-radius: 6px; padding: 5px 10px; }
+button { cursor: pointer; }
+.facts { font-size: 13px; color: var(--ink2); margin-top: 10px; }
+.facts b { color: var(--ink); font-weight: 600; }
+.note { font-size: 13px; color: var(--muted); margin-top: 14px; max-width: 900px; }
+.legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--ink2); margin-top: 6px; }
+.sw { display: inline-block; width: 18px; height: 3px; vertical-align: middle; margin-right: 6px; border-radius: 2px; }
+#status { font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+<h1>Build a contact binary</h1>
+<p class="lede">Two stars that share one envelope: choose their mass ratio, how far they overfill their Roche lobes,
+and the angle we see them from. The image is ray-traced from the Roche potential; the light curve is the sum of the
+image around the orbit. Lay it over real stars below.</p>
+<div class="grid">
+  <div class="card">
+    <canvas id="star" width="360" height="360" aria-label="Rendered image of the binary"></canvas>
+    <div class="row">
+      <button id="play" type="button">Pause</button>
+      <span id="status"></span>
+    </div>
+    <div class="facts" id="facts"></div>
+  </div>
+  <div class="card">
+    <canvas id="lc" width="640" height="400" aria-label="Light curve"></canvas>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--blue)"></span>model (this page)</span>
+      <span id="leg-data"><span class="sw" style="background:var(--orange)"></span><span id="leg-data-text">data</span></span>
+      <span><span class="sw" style="background:var(--ink2)"></span>current phase</span>
+    </div>
+    <div class="controls">
+      <label>mass ratio q <input id="q" type="range" min="0.05" max="1" step="0.001" value="0.228"><output id="qv"></output></label>
+      <label>fill-out f <input id="f" type="range" min="0" max="0.98" step="0.01" value="0.43"><output id="fv"></output></label>
+      <label>inclination <input id="i" type="range" min="20" max="90" step="0.1" value="53.2"><output id="iv"></output></label>
+      <label>T2 / T1 <input id="tr" type="range" min="0.8" max="1.2" step="0.001" value="1.021"><output id="trv"></output></label>
+      <label>phase <input id="ph" type="range" min="0" max="1" step="0.005" value="0.12"><output id="phv"></output></label>
+    </div>
+    <div class="row">
+      <select id="preset" aria-label="Preset">
+        <option value="kic">KIC 9832227 (Molnar et al. 2017)</option>
+        <option value="v1309">V1309 Sco progenitor, 2002 (Zhu et al. 2016)</option>
+        <option value="twins">equal twins, deep contact</option>
+        <option value="extreme">extreme mass ratio, q = 0.07</option>
+      </select>
+      <select id="data" aria-label="Compare with">
+        <option value="kic">compare: KIC 9832227, Kepler 2009-13</option>
+        <option value="v2002">compare: V1309 Sco, OGLE 2002</option>
+        <option value="v2004">compare: V1309 Sco, OGLE 2004</option>
+        <option value="v2006">compare: V1309 Sco, OGLE 2006</option>
+        <option value="v2007">compare: V1309 Sco, OGLE 2007</option>
+        <option value="none">no data</option>
+      </select>
+    </div>
+  </div>
+</div>
+<p class="note">How it is computed: Kopal's Roche potential for a circular, synchronised orbit; the surface is the
+equipotential with fill-out f between the inner (L1) and outer (L2) critical surfaces. Each pixel's ray is marched to the
+surface, where temperature follows gravity (T ∝ g<sup>0.08</sup>, Lucy 1967) from each star's polar temperature
+(5800 K for the heavier star), intensity is Planck's law at 640 nm (Kepler band) or 800 nm (OGLE I, chosen with the V1309 Sco data), with
+quadratic limb darkening. No starspots, no reflection: the real stars' unequal maxima (spots) are the part the model
+cannot reproduce. V1309 Sco preset: Zhu et al.'s q = 0.094 and f = 0.90; the inclination, 69°, is our match to the 2002
+amplitude. The same code (roche.py) reproduces Kepler's KIC 9832227 amplitude to 0.002 mag with Molnar et al.'s parameters.
+Data: Kepler long cadence (our 14-harmonic template); OGLE-III I band (Tylenda et al. 2011), folded on our exponential
+ephemeris, magnitudes relative to each season's median.</p>
+</main>
+<script>
+const DATA = {"curves":{"kic":{"label":"KIC 9832227, Kepler 2009-2013 (mean)","ph":[0.0,0.005,0.01,0.015,0.02,0.025,0.03,0.035,0.04,0.045,0.05,0.055,0.06,0.065,0.07,0.075,0.08,0.085,0.09,0.095,0.1,0.105,0.11,0.115,0.12,0.125,0.13,0.135,0.14,0.145,0.15,0.155,0.16,0.165,0.17,0.175,0.18,0.185,0.19,0.195,0.2,0.205,0.21,0.215,0.22,0.225,0.23,0.235,0.24,0.245,0.25,0.255,0.26,0.265,0.27,0.275,0.28,0.285,0.29,0.295,0.3,0.305,0.31,0.315,0.32,0.325,0.33,0.335,0.34,0.345,0.35,0.355,0.36,0.365,0.37,0.375,0.38,0.385,0.39,0.395,0.4,0.405,0.41,0.415,0.42,0.425,0.43,0.435,0.44,0.445,0.45,0.455,0.46,0.465,0.47,0.475,0.48,0.485,0.49,0.495,0.5,0.505,0.51,0.515,0.52,0.525,0.53,0.535,0.54,0.545,0.55,0.555,0.56,0.565,0.57,0.575,0.58,0.585,0.59,0.595,0.6,0.605,0.61,0.615,0.62,0.625,0.63,0.635,0.64,0.645,0.65,0.655,0.66,0.665,0.67,0.675,0.68,0.685,0.69,0.695,0.7,0.705,0.71,0.715,0.72,0.725,0.73,0.735,0.74,0.745,0.75,0.755,0.76,0.765,0.77,0.775,0.78,0.785,0.79,0.795,0.8,0.805,0.81,0.815,0.82,0.825,0.83,0.835,0.84,0.845,0.85,0.855,0.86,0.865,0.87,0.875,0.88,0.885,0.89,0.895,0.9,0.905,0.91,0.915,0.92,0.925,0.93,0.935,0.94,0.945,0.95,0.955,0.96,0.965,0.97,0.975,0.98,0.985,0.99,0.995],"mag":[0.1948,0.1945,0.1936,0.192,0.1899,0.1872,0.184,0.1802,0.1761,0.1715,0.1666,0.1615,0.1562,0.1507,0.1452,0.1397,0.1342,0.1287,0.1232,0.1178,0.1125,0.1071,0.1019,0.0966,0.0914,0.0862,0.081,0.0759,0.0708,0.0658,0.0609,0.0561,0.0514,0.0468,0.0424,0.0381,0.0339,0.0299,0.0261,0.0225,0.0192,0.016,0.0131,0.0105,0.0082,0.0062,0.0044,0.003,0.0018,0.0009,0.0003,0.0,-0.0,0.0003,0.0008,0.0017,0.0029,0.0044,0.0062,0.0084,0.0109,0.0137,0.0168,0.0201,0.0238,0.0276,0.0317,0.0359,0.0403,0.0449,0.0496,0.0545,0.0595,0.0647,0.07,0.0755,0.081,0.0867,0.0924,0.0982,0.104,0.1099,0.1157,0.1215,0.1273,0.133,0.1387,0.1443,0.1497,0.1551,0.1602,0.165,0.1696,0.1738,0.1776,0.181,0.1838,0.1861,0.1879,0.1891,0.1897,0.1898,0.1892,0.1882,0.1865,0.1844,0.1817,0.1786,0.175,0.171,0.1667,0.162,0.157,0.1519,0.1466,0.1411,0.1357,0.1301,0.1246,0.1192,0.1137,0.1083,0.1029,0.0976,0.0923,0.0871,0.0819,0.0768,0.0717,0.0668,0.0621,0.0574,0.053,0.0487,0.0447,0.0409,0.0372,0.0339,0.0307,0.0278,0.0251,0.0227,0.0205,0.0186,0.0169,0.0156,0.0146,0.0138,0.0134,0.0133,0.0135,0.014,0.0148,0.0159,0.0172,0.0188,0.0207,0.0229,0.0252,0.0279,0.0307,0.0339,0.0372,0.0407,0.0445,0.0484,0.0524,0.0567,0.061,0.0654,0.0699,0.0745,0.0792,0.0838,0.0886,0.0934,0.0982,0.1031,0.108,0.1129,0.1179,0.123,0.1281,0.1332,0.1384,0.1435,0.1487,0.1538,0.1588,0.1637,0.1684,0.1729,0.1771,0.181,0.1845,0.1875,0.1901,0.1921,0.1936,0.1945],"dense":true},"v2002":{"label":"V1309 Sco, OGLE 2002 (52 points)","ph":[0.7504,0.419,0.7165,0.2099,0.8031,0.3302,0.3687,0.7862,0.4148,0.1271,0.9396,0.2372,0.6616,0.0367,0.4506,0.5156,0.8237,0.9049,0.5539,0.4395,0.9256,0.3668,0.2787,0.5108,0.8108,0.204,0.6199,0.7836,0.939,0.3945,0.1531,0.2133,0.6539,0.1033,0.5966,0.0048,0.4186,0.6607,0.4062,0.9129,0.5284,0.5998,0.6488,0.9486,0.1837,0.8206,0.2061,0.7308,0.5392,0.9847,0.5197,0.1703],"mag":[0.0872,0.0908,0.0872,0.0601,0.0409,-0.0082,0.0367,0.0099,0.0817,0.1252,0.1486,0.0258,0.131,0.2393,0.1575,0.2853,0.0796,0.1444,0.2743,0.1703,0.1304,0.0476,-0.0115,0.2703,0.0366,0.0578,0.23,-0.0035,0.1723,0.0895,0.0749,0.0317,0.1489,0.1851,0.2548,0.287,0.1552,0.0929,0.1733,0.1433,0.316,0.2469,0.1329,0.1812,0.0328,0.0155,0.0226,0.0376,0.293,0.2731,0.308,0.0666],"dense":false},"v2004":{"label":"V1309 Sco, OGLE 2004 (170 points)","ph":[0.754,0.6254,0.1247,0.8936,0.9555,0.4036,0.4216,0.2475,0.3115,0.7435,0.0908,0.4542,0.2274,0.5631,0.5752,0.5904,0.6057,0.6182,0.6368,0.6476,0.2345,0.2455,0.262,0.288,0.3405,0.0203,0.0404,0.0138,0.056,0.0725,0.1055,0.128,0.7098,0.748,0.7565,0.7935,0.8264,0.3996,0.4423,0.484,0.4964,0.523,0.0823,0.1241,0.1705,0.1948,0.218,0.7951,0.8198,0.8576,0.9166,0.4873,0.5475,0.6101,0.1648,0.2255,0.2664,0.3083,0.896,0.9837,0.5739,0.6932,0.0176,0.685,0.3675,0.0828,0.807,0.5274,0.2055,0.9258,0.5599,0.3141,0.4471,0.2225,0.2825,0.9996,0.6306,0.3401,0.0193,0.3345,0.4806,0.5624,0.2473,0.6936,0.3097,0.0372,0.7392,0.0576,0.4656,0.8438,0.3169,0.0163,0.165,0.7159,0.4552,0.8367,0.2795,0.0257,0.6955,0.3633,0.1099,0.8679,0.0524,0.2881,0.8432,0.5942,0.3565,0.9483,0.3162,0.0196,0.1528,0.8588,0.4948,0.9354,0.6034,0.2777,0.0833,0.434,0.2072,0.9435,0.6709,0.2166,0.2981,0.4112,0.7928,0.0074,0.71,0.4913,0.161,0.9567,0.5892,0.7101,0.3688,0.1177,0.2437,0.9403,0.7083,0.4234,0.1551,0.4886,0.8744,0.591,0.315,0.943,0.66,0.8494,0.8568,0.9378,0.5258,0.5887,0.2763,0.9727,0.6873,0.4625,0.1704,0.4611,0.2471,0.3337,0.413,0.4989,0.011,0.8592,0.9603,0.7292,0.8073,0.8317,0.1292,0.5267,0.3179,0.3884],"mag":[0.071,0.1168,0.0724,0.1569,0.1912,0.1505,0.1688,0.0453,0.0726,0.0299,0.0891,0.1703,-0.0215,0.1787,0.1517,0.1317,0.1177,0.1048,0.0778,0.0858,0.0017,-0.0032,0.0018,0.0278,0.0649,0.165,0.176,0.2182,0.1413,0.1163,0.0834,0.0484,0.0373,0.0404,0.0664,0.0715,0.0875,0.1404,0.1915,0.2296,0.2156,0.2036,0.1115,0.0916,0.0367,0.0547,0.0048,0.0647,0.0837,0.1318,0.1829,0.2538,0.1779,0.109,0.0359,-0.002,0.043,0.0741,0.1531,0.1972,0.1491,0.0403,0.1705,0.0395,0.1386,0.1038,0.0579,0.2021,0.0212,0.1633,0.1644,0.0936,0.238,0.0295,0.0158,0.1959,0.0549,0.0591,0.1772,0.0283,0.1847,0.1569,-0.03,0.0363,0.0263,0.1664,0.0006,0.1327,0.2,0.0872,0.0517,0.2009,0.0231,0.021,0.2002,0.0924,0.0367,0.1771,0.0302,0.0963,0.0795,0.1177,0.1646,0.025,0.0829,0.1161,0.0873,0.1813,0.0385,0.2296,0.034,0.1501,0.2412,0.2055,0.1165,0.0006,0.1239,0.1805,0.0408,0.2149,0.0651,0.003,0.0321,0.1543,0.0485,0.2405,0.0576,0.2269,-0.0761,0.2142,0.1752,0.0176,0.0777,0.0429,-0.0405,0.1776,0.0139,0.0922,0.0324,0.1865,0.0778,0.1639,0.0251,0.1561,0.0752,0.061,0.071,0.2131,0.2281,0.1792,0.0143,0.1874,0.0737,0.201,0.0131,0.2102,0.0015,0.0418,0.1792,0.2185,0.1774,0.0069,0.1853,0.0757,0.0791,0.0771,0.1584,0.3407,0.0262,0.1267],"dense":false},"v2006":{"label":"V1309 Sco, OGLE 2006 (367 points)","ph":[0.87,0.0544,0.1404,0.2313,0.3502,0.7461,0.1144,0.5045,0.2675,0.6343,0.3519,0.0387,0.7138,0.4377,0.7774,0.4907,0.1996,0.8706,0.5719,0.3023,0.9987,0.6922,0.3766,0.0858,0.2076,0.9264,0.5667,0.2453,0.9449,0.6737,0.3422,0.0538,0.7653,0.448,0.1611,0.8419,0.566,0.2106,0.91,0.6244,0.3292,0.0154,0.7103,0.8404,0.4295,0.5468,0.1055,0.226,0.8102,0.5105,0.6414,0.2229,0.3294,0.8964,0.0502,0.6815,0.6928,0.822,0.3786,0.1458,0.8137,0.5107,0.1723,0.293,0.343,0.8828,0.997,0.5744,0.7343,0.2657,0.383,0.433,0.9768,0.3572,0.4736,0.2228,0.7958,0.5391,0.2499,0.847,0.9219,0.5501,0.6833,0.7348,0.261,0.4147,0.9527,0.0864,0.6932,0.7937,0.8419,0.359,0.4566,0.5113,0.0689,0.1988,0.774,0.8748,0.9307,0.4578,0.5855,0.6945,0.2607,0.3597,0.4099,0.996,0.1177,0.6737,0.7764,0.3166,0.07,0.0962,0.1287,0.1474,0.1741,0.1991,0.2259,0.2385,0.4247,0.428,0.4385,0.6282,0.6334,0.6386,0.6413,0.0987,0.1012,0.1089,0.1254,0.1665,0.1694,0.176,0.1833,0.2217,0.2465,0.2566,0.2819,0.3119,0.3362,0.8027,0.806,0.8342,0.8991,0.9588,0.9849,0.0175,0.4841,0.5233,0.5533,0.6307,0.6824,0.7304,0.1881,0.2142,0.2607,0.3521,0.2848,0.4255,0.4782,0.0221,0.1105,0.1834,0.2338,0.4312,0.6235,0.8372,0.9224,0.9799,0.5835,0.7157,0.1928,0.3653,0.9328,0.0834,0.2874,0.4675,0.0359,0.1656,0.2246,0.2726,0.746,0.8693,0.9238,0.9749,0.4539,0.5848,0.6292,0.6551,0.6637,0.6869,0.6974,0.7081,0.2118,0.218,0.2287,0.2369,0.2492,0.2595,0.2697,0.2803,0.2949,0.3041,0.3082,0.3145,0.3228,0.3291,0.3378,0.345,0.3535,0.3599,0.3665,0.3729,0.3794,0.3838,0.3922,0.3984,0.407,0.853,0.9667,0.0153,0.0662,0.5356,0.5506,0.615,0.674,0.7231,0.7711,0.2558,0.3908,0.442,0.504,0.9796,0.1093,0.1684,0.636,0.7663,0.8206,0.8785,0.3356,0.4605,0.5268,0.5825,0.0497,0.4315,0.5655,0.6294,0.6909,0.1264,0.2676,0.3345,0.8444,0.0064,0.5273,0.6703,0.7345,0.2584,0.943,0.1339,0.6575,0.8301,0.3252,0.4879,0.0179,0.1555,0.2129,0.7177,0.856,0.9178,0.5557,0.0171,0.209,0.7064,0.4284,0.6212,0.1151,0.248,0.3009,0.803,0.9547,0.0031,0.5379,0.6578,0.7059,0.2053,0.321,0.3746,0.9096,0.1057,0.6085,0.7442,0.8023,0.3557,0.1385,0.2301,0.8368,0.5179,0.6596,0.6987,0.2188,0.3513,0.4084,0.0225,0.1664,0.7196,0.8823,0.6377,0.2418,0.9153,0.3131,0.44,0.0106,0.136,0.1865,0.7603,0.1339,0.2581,0.8237,0.9692,0.5156,0.6504,0.2367,0.3439,0.9239,0.0618,0.6103,0.7307,0.7791,0.3305,0.4383,0.0171,0.1438,0.7452,0.8673,0.1631,0.8178,0.9431,0.5199,0.6426,0.2178,0.3349,0.3207,0.4624,0.1263,0.2715,0.9213,0.034,0.6237,0.1162,0.5665,0.2658,0.3825,0.7345,0.1495,0.8402,0.2382,0.8083,0.4746,0.2398,0.6585,0.058,0.1599,0.5747,0.9793,0.0753,0.2659,0.0553,0.4778],"mag":[0.2004,0.3179,0.1796,0.0824,0.1251,0.1426,0.2211,0.2506,-0.0032,0.1983,-0.0044,0.2498,0.125,0.1253,0.1378,0.25,0.0573,0.1575,0.2827,0.006,0.2862,0.1745,0.0507,0.272,0.0467,0.219,0.3142,0.0364,0.2467,0.1959,0.0982,0.3564,0.1427,0.2589,0.1672,0.1144,0.3437,0.0199,0.1921,0.2424,0.0026,0.2939,0.0871,0.0752,0.0994,0.2874,0.1886,-0.0203,0.1249,0.2071,0.1272,-0.0586,-0.0456,0.1086,0.1657,0.1709,0.0806,0.0746,0.0338,0.0821,0.0863,0.1786,0.0288,-0.0542,0.0039,0.1851,0.2661,0.2693,0.1504,0.0485,0.1426,0.2166,0.3098,0.0893,0.2403,0.0526,0.1348,0.318,0.0813,0.1755,0.2485,0.3348,0.2108,0.1658,0.06,0.2391,0.3242,0.3193,0.1685,0.1465,0.2006,0.1277,0.2768,0.3558,0.31,0.079,0.1342,0.2123,0.2743,0.2845,0.3015,0.1273,-0.0625,-0.0125,0.0695,0.2857,0.1608,0.124,0.086,-0.0488,0.2035,0.1715,0.1035,0.0775,0.0225,-0.0045,-0.0275,-0.0545,0.0919,0.1109,0.1319,0.172,0.175,0.149,0.126,0.1962,0.1972,0.1622,0.1412,0.0692,0.0782,0.0672,0.0472,-0.0038,-0.0248,-0.0298,-0.0218,-0.0088,0.0042,0.1314,0.1444,0.1654,0.2014,0.2225,0.2565,0.2515,0.1817,0.2687,0.2557,0.1847,0.1337,0.0937,0.0179,0.0129,-0.0421,0.021,-0.0424,0.1687,0.2407,0.2659,0.2029,0.049,-0.009,0.1604,0.1965,0.1699,0.2429,0.2639,0.2671,0.1272,0.0614,0.0564,0.2536,0.2817,0.0401,0.2832,0.3431,0.1201,0.0741,0.0581,0.1623,0.2024,0.2584,0.3014,0.2446,0.2806,0.2136,0.1806,0.1656,0.1526,0.1446,0.1307,0.0638,0.0468,0.0368,0.0298,0.0358,0.0268,0.0249,0.0289,0.0349,0.0319,0.0449,0.0449,0.0509,0.0779,0.0719,0.0739,0.0839,0.1059,0.1149,0.1199,0.1379,0.1429,0.1619,0.1639,0.1929,0.1991,0.3181,0.3531,0.3161,0.3133,0.2753,0.2293,0.1773,0.1364,0.1254,0.0295,0.1496,0.2336,0.3146,0.3038,0.2338,0.1029,0.24,0.1471,0.1651,0.2021,0.0603,0.2393,0.3003,0.2704,0.2955,0.145,0.2561,0.1741,0.0821,0.1473,-0.0097,0.0203,0.1575,0.2766,0.2918,0.1578,0.1348,-0.062,0.2353,0.1203,0.1105,0.1026,0.0137,0.2388,0.265,0.071,-0.027,0.1182,0.1263,0.1933,0.2545,0.3114,0.0275,0.1407,0.1469,0.222,0.1832,0.0132,0.0142,0.1414,0.2945,0.3075,0.3647,0.2377,0.1917,0.0789,0.048,0.123,0.2272,0.2402,0.2824,0.1215,0.1735,0.0487,0.1849,0.066,0.1559,0.3111,0.1462,0.1352,-0.0006,0.0674,0.1384,0.3064,0.0794,0.1576,0.1877,0.1656,0.0118,0.2071,0.0006,0.1936,0.2478,0.1079,0.0319,0.1131,0.1386,-0.0054,0.1878,0.2949,0.294,0.1881,0.0083,0.0653,0.2995,0.3056,0.2688,0.1368,0.1328,0.058,0.2111,0.3533,0.1673,0.1115,0.1896,0.108,0.1463,0.2943,0.3625,0.2366,0.0448,0.0648,0.0115,0.1992,0.1415,-0.0898,0.2035,0.2345,0.1597,0.1242,0.2654,-0.0463,0.0944,0.1319,0.1144,0.1726,0.0341,0.1974,0.2366,-0.0574,0.1961,0.2596,0.0223,0.2038,0.2273,0.172,-0.0485,0.1865,0.24],"dense":false},"v2007":{"label":"V1309 Sco, OGLE 2007 (262 points)","ph":[0.1152,0.7411,0.5377,0.6274,0.0442,0.1266,0.5119,0.2236,0.9816,0.3878,0.7938,0.3072,0.6891,0.0171,0.7602,0.5177,0.8524,0.5796,0.3099,0.9948,0.8234,0.1989,0.8414,0.2448,0.6419,0.8408,0.5345,0.664,0.2283,0.9307,0.3274,0.4504,0.045,0.1601,0.9755,0.5602,0.9574,0.6296,0.7651,0.3357,0.0548,0.772,0.4319,0.1637,0.991,0.5722,0.3056,0.0403,0.203,0.7389,0.8773,0.9206,0.4481,0.5801,0.6234,0.1394,0.2626,0.3278,0.8998,0.0172,0.6326,0.2764,0.1067,0.3717,0.1005,0.203,0.7259,0.4683,0.5606,0.6549,0.5492,0.6169,0.6826,0.7652,0.2347,0.3021,0.3674,0.932,0.9978,0.0632,0.6757,0.741,0.8065,0.3661,0.4822,0.53,0.2828,0.6656,0.7688,0.8375,0.3906,0.0815,0.1677,0.2347,0.377,0.2114,0.2959,0.7699,0.855,0.9187,0.4695,0.923,0.0278,0.078,0.6095,0.7366,0.7786,0.307,0.4156,0.4571,0.0046,0.1279,0.169,0.2119,0.6966,0.3599,0.4831,0.5256,0.5667,0.0865,0.218,0.2694,0.5623,0.7101,0.2617,0.4236,0.4674,0.5131,0.9634,0.0983,0.1438,0.1914,0.669,0.8731,0.7806,0.9348,0.9805,0.0275,0.5189,0.2938,0.3798,0.8742,0.9994,0.0413,0.0826,0.1276,0.5774,0.7222,0.7635,0.818,0.2799,0.9839,0.1269,0.1682,0.226,0.6878,0.8202,0.887,0.4054,0.5466,0.6204,0.1328,0.2071,0.2729,0.8237,0.8893,0.9541,0.0175,0.5208,0.6078,0.6756,0.2199,0.2847,0.3527,0.422,0.9762,0.0408,0.7304,0.3527,0.4297,0.7507,0.8466,0.6204,0.4157,0.957,0.0942,0.1628,0.0905,0.814,0.4626,0.8755,0.0544,0.5949,0.7833,0.5523,0.2044,0.3289,0.915,0.019,0.0604,0.6271,0.7333,0.3165,0.4337,0.0043,0.7295,0.8428,0.4141,0.4828,0.2279,0.9451,0.0655,0.6969,0.3387,0.0628,0.7439,0.89,0.4745,0.1538,0.8634,0.5803,0.2816,0.688,0.3741,0.1112,0.7866,0.5104,0.2074,0.8952,0.6575,0.3311,0.0129,0.4577,0.1159,0.2674,0.6583,0.3872,0.0973,0.7857,0.4709,0.1639,0.9138,0.3119,0.7466,0.3872,0.102,0.8141,0.5025,0.2689,0.9201,0.6501,0.7573,0.957,0.7016,0.3857,0.0987,0.7739,0.4835,0.2128,0.8885,0.3073,0.0123],"mag":[0.3104,0.3722,0.4757,0.3836,0.3128,0.1837,0.2709,0.0355,0.323,0.0992,0.3295,0.0245,0.3318,0.3561,0.3107,0.3872,0.4055,0.3791,0.0827,0.3673,0.2627,0.011,0.2987,0.0119,0.2642,0.3019,0.2915,0.3252,0.0021,0.3537,0.027,0.1937,0.2666,0.0884,0.3378,0.3256,0.3399,0.3195,0.2583,-0.0009,0.2367,0.2673,0.139,0.0295,0.2509,0.2318,-0.1537,0.1699,-0.0854,0.1575,0.2202,0.2332,0.0991,0.2389,0.2538,0.0188,-0.1085,-0.0816,0.2612,0.224,0.2978,-0.0795,0.1349,0.0174,0.1109,-0.0423,0.2547,0.1602,0.2811,0.2739,0.3021,0.318,0.3029,0.2767,-0.0272,-0.0374,0.0225,0.3104,0.2923,0.2051,0.3119,0.2998,0.3117,0.0296,0.2513,0.3733,0.0048,0.3201,0.3439,0.3628,0.0537,0.1893,0.0442,-0.034,0.0459,0.0312,-0.0179,0.3371,0.369,0.3698,0.1998,0.4009,0.3197,0.2336,0.3375,0.3293,0.3652,0.0282,0.1119,0.1799,0.3618,0.2085,0.1634,0.1214,0.4004,0.0761,0.2809,0.3418,0.3537,0.2827,0.1244,0.0973,0.4218,0.4645,0.1034,0.1991,0.256,0.3399,0.449,0.2938,0.2397,0.1806,0.3876,0.4122,0.3565,0.3522,0.3211,0.275,0.162,0.0075,0.0293,0.3703,0.3111,0.265,0.2069,0.1368,0.1889,0.2787,0.2896,0.3095,-0.0424,0.2882,0.1269,0.0708,0.0337,0.2898,0.3715,0.3854,0.0524,0.2331,0.2869,0.1969,0.1158,0.0497,0.4196,0.4484,0.4043,0.3482,0.2282,0.337,0.3909,0.1148,0.0687,0.0665,0.1184,0.4293,0.3722,0.4108,0.0926,0.1554,0.4098,0.4826,0.3601,0.2136,0.5355,0.3803,0.2721,0.3823,0.4639,0.2376,0.4688,0.3965,0.2074,0.2781,0.0966,0.1333,0.0301,0.4409,0.4167,0.3386,0.1575,0.2563,0.0622,0.0409,0.4268,0.2994,0.4312,0.058,0.1009,0.0935,0.3651,0.2908,0.2126,-0.0067,0.3259,0.2505,0.3783,0.0661,0.1958,0.3234,0.1339,0.0166,0.1568,-0.0236,0.21,0.2666,0.0622,0.0688,0.3655,0.159,-0.0273,0.3163,0.0395,0.1992,0.0489,0.2102,0.0087,0.1833,0.233,0.0806,0.1193,0.3448,0.057,0.1932,0.0699,0.1495,0.1961,0.1168,0.0513,0.289,0.1985,0.2564,0.3021,0.2566,0.1293,0.2359,0.2716,0.1722,0.1797,0.4354,0.2026,0.3692],"dense":false}},"presets":{"kic":{"q":0.228,"f":0.43,"i":53.19,"tr":1.021,"data":"kic"},"v1309":{"q":0.094,"f":0.9,"i":69.0,"tr":1.0,"data":"v2002"},"twins":{"q":1.0,"f":0.6,"i":85.0,"tr":1.0,"data":"none"},"extreme":{"q":0.07,"f":0.8,"i":80.0,"tr":1.0,"data":"none"}}};
+const $ = (id) => document.getElementById(id);
+const HC_K = 1.438776877e-2, BETA = 0.32;
+
+function omega(x, y, z, q) {
+  const r1 = Math.sqrt(x * x + y * y + z * z), r2 = Math.sqrt((x - 1) * (x - 1) + y * y + z * z);
+  return 1 / r1 + q * (1 / r2 - x) + 0.5 * (1 + q) * (x * x + y * y);
+}
+function grad(x, y, z, q) {
+  const r1 = Math.sqrt(x * x + y * y + z * z), r2 = Math.sqrt((x - 1) * (x - 1) + y * y + z * z);
+  const a = r1 * r1 * r1, b = r2 * r2 * r2;
+  return [-x / a - q * (x - 1) / b - q + (1 + q) * x, -y / a - q * y / b + (1 + q) * y, -z / a - q * z / b];
+}
+function dOdx(x, q) {
+  return -Math.sign(x) / (x * x) - q * Math.sign(x - 1) / ((x - 1) * (x - 1)) - q + (1 + q) * x;
+}
+function bisect(fn, lo, hi) {
+  let flo = fn(lo);
+  for (let k = 0; k < 100; k++) {
+    const mid = 0.5 * (lo + hi), fm = fn(mid);
+    if ((fm > 0) === (flo > 0)) { lo = mid; flo = fm; } else { hi = mid; }
+  }
+  return 0.5 * (lo + hi);
+}
+function lagrange(q) {
+  const e = 1e-9;
+  const x1 = bisect((x) => dOdx(x, q), e, 1 - e), x2 = bisect((x) => dOdx(x, q), 1 + e, 3), x3 = bisect((x) => dOdx(x, q), -3, -e);
+  return { L1: x1, L2: x2, L3: x3, o1: omega(x1, 0, 0, q), o2: omega(x2, 0, 0, q), o3: omega(x3, 0, 0, q) };
+}
+function surfaceRadius(q, om, cx, ux, uy, uz, rmax) {
+  // step outwards from the star centre to the first exit (the outer centrifugal region also has Omega > om)
+  let lo = 1e-6, r = 0.004;
+  while (r < rmax) {
+    if (omega(cx + r * ux, r * uy, r * uz, q) < om) break;
+    lo = r; r += 0.004;
+  }
+  if (r >= rmax) return rmax;
+  let hi = r;
+  for (let k = 0; k < 40; k++) {
+    const mid = 0.5 * (lo + hi);
+    if (omega(cx + mid * ux, mid * uy, mid * uz, q) > om) lo = mid; else hi = mid;
+  }
+  return 0.5 * (lo + hi);
+}
+function makeModel(q, f, t1, t2, lam) {
+  const lp = lagrange(q);
+  const om = lp.o1 - f * (lp.o1 - lp.o2);
+  const xr = 1 + surfaceRadius(q, om, 1, 1, 0, 0, lp.L2 - 1);
+  const xl = -surfaceRadius(q, om, 0, -1, 0, 0, -lp.L3);
+  const cx = 0.5 * (xl + xr);
+  // radius: the farthest surface point from (cx, 0, 0), sampled over directions from each star
+  let rb = 0.5 * (xr - xl);
+  for (const c of [0, 1]) {
+    for (let a = 0; a < 24; a++) for (let b = 1; b < 12; b++) {
+      const th = Math.PI * b / 12, phi = 2 * Math.PI * a / 24;
+      const ux = Math.cos(th), uy = Math.sin(th) * Math.cos(phi), uz = Math.sin(th) * Math.sin(phi);
+      const r = surfaceRadius(q, om, c, ux, uy, uz, 1.2);
+      const px = c + r * ux - cx, py = r * uy, pz = r * uz;
+      rb = Math.max(rb, Math.sqrt(px * px + py * py + pz * pz));
+    }
+  }
+  rb += 0.03;
+  const gp = (c) => { const r = surfaceRadius(q, om, c, 0, 0, 1, 1.5); const g = grad(c, 0, r, q); return Math.hypot(g[0], g[1], g[2]); };
+  return { q, f, om, lp, cx, rb, t1, t2, lam: lam * 1e-9, g1: gp(0), g2: gp(1), ld: lam > 700 ? [0.55, 0.20] : [0.40, 0.26] };
+}
+function view(incl, phase) {
+  const i = incl * Math.PI / 180, p = 2 * Math.PI * phase;
+  const s = [Math.sin(i) * Math.cos(p), -Math.sin(i) * Math.sin(p), Math.cos(i)];
+  let e2 = [-s[0] * s[2], -s[1] * s[2], 1 - s[2] * s[2]];
+  const n2 = Math.hypot(e2[0], e2[1], e2[2]);
+  e2 = n2 > 1e-12 ? e2.map((v) => v / n2) : [1, 0, 0];
+  const e1 = [e2[1] * s[2] - e2[2] * s[1], e2[2] * s[0] - e2[0] * s[2], e2[0] * s[1] - e2[1] * s[0]];
+  return { s, e1, e2 };
+}
+function render(M, incl, phase, npix, out) {
+  const { s, e1, e2 } = view(incl, phase);
+  const q = M.q, om = M.om, rb = M.rb, step = Math.max(0.004, 2 * rb / 260), c2 = HC_K / M.lam;
+  let total = 0;
+  for (let j = 0; j < npix; j++) {
+    const v = -rb + (2 * rb) * (j + 0.5) / npix;
+    for (let k = 0; k < npix; k++) {
+      const u = -rb + (2 * rb) * (k + 0.5) / npix;
+      const d2 = u * u + v * v;
+      let val = 0;
+      if (d2 < rb * rb) {
+        const h = Math.sqrt(rb * rb - d2);
+        const ox = M.cx + u * e1[0] + v * e2[0] + h * s[0], oy = u * e1[1] + v * e2[1] + h * s[1], oz = u * e1[2] + v * e2[2] + h * s[2];
+        const nst = Math.floor(2 * h / step) + 2;
+        let tp = 0, t = 0, hit = false;
+        for (let n = 1; n < nst; n++) {
+          t = Math.min(n * step, 2 * h);
+          if (omega(ox - t * s[0], oy - t * s[1], oz - t * s[2], q) >= om) {
+            let lo = tp, hi = t;
+            for (let b = 0; b < 22; b++) { const mid = 0.5 * (lo + hi);
+              if (omega(ox - mid * s[0], oy - mid * s[1], oz - mid * s[2], q) >= om) hi = mid; else lo = mid; }
+            t = 0.5 * (lo + hi); hit = true; break;
+          }
+          tp = t;
+        }
+        if (hit) {
+          const px = ox - t * s[0], py = oy - t * s[1], pz = oz - t * s[2];
+          const g = grad(px, py, pz, q), gm = Math.hypot(g[0], g[1], g[2]);
+          let mu = -(g[0] * s[0] + g[1] * s[1] + g[2] * s[2]) / gm;
+          if (mu <= 0) mu = 1e-6;
+          const temp = px < M.lp.L1 ? M.t1 * Math.pow(gm / M.g1, 0.25 * BETA) : M.t2 * Math.pow(gm / M.g2, 0.25 * BETA);
+          const ld = 1 - M.ld[0] * (1 - mu) - M.ld[1] * (1 - mu) * (1 - mu);
+          val = ld / (Math.exp(c2 / temp) - 1);
+        }
+      }
+      if (out) out[j * npix + k] = val;
+      total += val;
+    }
+  }
+  return total * (2 * rb / npix) * (2 * rb / npix);
+}
+
+// ---- drawing ------------------------------------------------------------------
+const starCv = $("star"), sctx = starCv.getContext("2d");
+const lcCv = $("lc"), lctx = lcCv.getContext("2d");
+const NP = 240;
+let model = null, curve = null, imgMax = 1, playing = true, lastT = 0;
+const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+function starColour(x) {
+  // dark -> warm white, the same ramp as the project's figures
+  const stops = [[11, 11, 11], [61, 42, 28], [168, 117, 74], [242, 201, 154], [255, 246, 234]];
+  const t = Math.max(0, Math.min(1, x)) * (stops.length - 1), k = Math.min(stops.length - 2, Math.floor(t)), f = t - k;
+  return stops[k].map((a, n) => Math.round(a + f * (stops[k + 1][n] - a)));
+}
+function drawStar(phase) {
+  const buf = new Float64Array(NP * NP);
+  render(model, +$("i").value, phase, NP, buf);
+  const im = sctx.createImageData(NP, NP);
+  for (let j = 0; j < NP; j++) for (let k = 0; k < NP; k++) {
+    const v = buf[(NP - 1 - j) * NP + k] / imgMax;
+    const c = v > 0 ? starColour(v) : [11, 11, 11];
+    const p = 4 * (j * NP + k);
+    im.data[p] = c[0]; im.data[p + 1] = c[1]; im.data[p + 2] = c[2]; im.data[p + 3] = 255;
+  }
+  const off = document.createElement("canvas"); off.width = NP; off.height = NP;
+  off.getContext("2d").putImageData(im, 0, 0);
+  sctx.imageSmoothingEnabled = true;
+  sctx.drawImage(off, 0, 0, starCv.width, starCv.height);
+}
+function computeCurve() {
+  const n = 41, ph = [], fl = [];
+  for (let k = 0; k < n; k++) { const p = 0.5 * k / (n - 1); ph.push(p); fl.push(render(model, +$("i").value, p, 84, null)); }
+  const mx = Math.max(...fl);
+  curve = { ph, mag: fl.map((f) => -2.5 * Math.log10(f / mx)) };
+  // brightest image for the colour scale
+  const buf = new Float64Array(NP * NP);
+  render(model, +$("i").value, 0.25, NP, buf);
+  imgMax = Math.max(...buf) || 1;
+}
+function curveAt(p) {
+  p = ((p % 1) + 1) % 1; if (p > 0.5) p = 1 - p;
+  const x = p / 0.5 * (curve.ph.length - 1), k = Math.min(curve.ph.length - 2, Math.floor(x)), f = x - k;
+  return curve.mag[k] * (1 - f) + curve.mag[k + 1] * f;
+}
+function sizeCurveCanvas() {
+  // draw in CSS pixels at the device's resolution, so text stays legible on phones
+  const dpr = window.devicePixelRatio || 1, w = lcCv.clientWidth || 640, h = Math.round(w * 0.62);
+  lcCv.width = Math.round(w * dpr); lcCv.height = Math.round(h * dpr);
+  lctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return [w, h];
+}
+let LCW = 640, LCH = 400;
+function drawCurve(phase) {
+  const W = LCW, H = LCH, m = { l: 62, r: 12, t: 14, b: 40 };
+  lctx.clearRect(0, 0, W, H);
+  lctx.fillStyle = css("--panel"); lctx.fillRect(0, 0, W, H);
+  const sel = $("data").value, d = DATA.curves[sel];
+  let lo = 0, hi = Math.max(0.05, ...curve.mag);
+  if (d) { hi = Math.max(hi, ...d.mag); lo = Math.min(lo, ...d.mag); }
+  hi += 0.03; lo -= 0.03;
+  const X = (p) => m.l + (W - m.l - m.r) * p / 2, Y = (v) => m.t + (H - m.t - m.b) * (v - lo) / (hi - lo);
+  lctx.strokeStyle = css("--grid"); lctx.lineWidth = 1; lctx.font = "12px system-ui, sans-serif"; lctx.fillStyle = css("--muted");
+  for (let p = 0; p <= 2.0001; p += 0.25) { lctx.beginPath(); lctx.moveTo(X(p), m.t); lctx.lineTo(X(p), H - m.b); lctx.stroke();
+    if (Math.abs(p * 2 - Math.round(p * 2)) < 1e-9) lctx.fillText(p.toFixed(1), X(p) - 8, H - m.b + 16); }
+  const stepv = (hi - lo) > 0.5 ? 0.1 : 0.05;
+  lctx.textAlign = "right";
+  for (let v = Math.ceil(lo / stepv) * stepv; v <= hi; v += stepv) { lctx.beginPath(); lctx.moveTo(m.l, Y(v)); lctx.lineTo(W - m.r, Y(v)); lctx.stroke();
+    lctx.fillText(v.toFixed(2), m.l - 6, Y(v) + 4); }
+  lctx.textAlign = "left";
+  lctx.fillStyle = css("--ink2");
+  lctx.fillText("orbital phase", W / 2 - 40, H - 8);
+  lctx.save(); lctx.translate(13, H / 2 + 55); lctx.rotate(-Math.PI / 2); lctx.fillText("mag below maximum", 0, 0); lctx.restore();
+  if (d) {
+    lctx.fillStyle = css("--orange");
+    for (let k = 0; k < d.ph.length; k++) for (const sft of [0, 1]) {
+      lctx.beginPath(); lctx.arc(X(d.ph[k] + sft), Y(d.mag[k]), d.dense ? 1.2 : 2.4, 0, 2 * Math.PI); lctx.fill(); }
+  }
+  lctx.strokeStyle = css("--blue"); lctx.lineWidth = 2.2; lctx.beginPath();
+  for (let n = 0; n <= 400; n++) { const p = 2 * n / 400, x = X(p), y = Y(curveAt(p)); if (n) lctx.lineTo(x, y); else lctx.moveTo(x, y); }
+  lctx.stroke();
+  lctx.strokeStyle = css("--ink2"); lctx.lineWidth = 1; lctx.beginPath(); lctx.moveTo(X(phase), m.t); lctx.lineTo(X(phase), H - m.b); lctx.stroke();
+  lctx.fillStyle = css("--ink"); lctx.beginPath(); lctx.arc(X(phase), Y(curveAt(phase)), 5, 0, 2 * Math.PI); lctx.fill();
+}
+function facts() {
+  const lp = model.lp, amp = Math.max(...curve.mag);
+  const dmin = curveAt(0) - curveAt(0.5);
+  $("facts").innerHTML = `L1 at <b>${lp.L1.toFixed(3)}</b>, L2 at <b>${lp.L2.toFixed(3)}</b> separations; ` +
+    `amplitude <b>${amp.toFixed(3)} mag</b>; deeper minimum at phase ${dmin >= 0 ? "0" : "0.5"} ` +
+    `(${Math.abs(dmin).toFixed(3)} mag deeper). Phase 0: the heavier star is eclipsed.`;
+}
+function setOut() {
+  $("qv").value = (+$("q").value).toFixed(3); $("fv").value = (+$("f").value).toFixed(2);
+  $("iv").value = (+$("i").value).toFixed(1) + "°"; $("trv").value = (+$("tr").value).toFixed(3); $("phv").value = (+$("ph").value).toFixed(2);
+}
+let pending = null;
+function rebuild() {
+  setOut();
+  $("status").textContent = "computing...";
+  clearTimeout(pending);
+  pending = setTimeout(() => {
+    const lam = $("data").value.startsWith("v") ? 800 : 640;
+    model = makeModel(+$("q").value, +$("f").value, 5800, 5800 * +$("tr").value, lam);
+    computeCurve(); facts(); redraw(); $("status").textContent = "";
+  }, 60);
+}
+function redraw() { const p = +$("ph").value; drawStar(p); drawCurve(p); }
+const PRESETS = DATA.presets;
+function applyPreset(k) {
+  const p = PRESETS[k];
+  $("q").value = p.q; $("f").value = p.f; $("i").value = p.i; $("tr").value = p.tr;
+  if (p.data) $("data").value = p.data;
+  $("leg-data-text").textContent = DATA.curves[$("data").value] ? DATA.curves[$("data").value].label : "";
+  rebuild();
+}
+for (const id of ["q", "f", "i", "tr"]) $(id).addEventListener("input", rebuild);
+$("ph").addEventListener("input", () => { setOut(); redraw(); });
+$("preset").addEventListener("change", (e) => applyPreset(e.target.value));
+$("data").addEventListener("change", () => { $("leg-data-text").textContent = DATA.curves[$("data").value] ? DATA.curves[$("data").value].label : ""; rebuild(); });
+$("play").addEventListener("click", () => { playing = !playing; $("play").textContent = playing ? "Pause" : "Play"; });
+function tick(ts) {
+  if (playing && model && ts - lastT > 90) {
+    lastT = ts;
+    $("ph").value = ((+$("ph").value + 0.01) % 1).toFixed(3); setOut(); redraw();
+  }
+  requestAnimationFrame(tick);
+}
+[LCW, LCH] = sizeCurveCanvas();
+window.addEventListener("resize", () => { [LCW, LCH] = sizeCurveCanvas(); if (curve) drawCurve(+$("ph").value); });
+applyPreset("kic");
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>
