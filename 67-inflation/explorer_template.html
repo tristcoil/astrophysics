@@ -1,0 +1,509 @@
+<title>Inflation on trial</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root {
+  color-scheme: light;
+  --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink2: #52514e; --muted: #898781;
+  --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,0.10);
+  --s0: #8b8a84; --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a;
+  --s1-95: #b7d3f6; --s1-68: #6da7ec; --s2-95: #f8c9b4; --s2-68: #f19a74;
+  --good: #0ca30c; --warn: #fab219; --crit: #d03b3b;
+  --good-bg: #e2f3e2; --warn-bg: #fdf1d6; --crit-bg: #f8e1e1;
+  --band: rgba(139,138,132,0.16); --tip-bg: #ffffff; --warn-ink: #9a6a00;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink2: #c3c2b7; --muted: #898781;
+    --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
+    --s0: #a3a29b; --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+    --s1-95: #1c3a63; --s1-68: #2a5fa6; --s2-95: #4d2414; --s2-68: #8a3a1a;
+    --good-bg: #16301a; --warn-bg: #3a2d0c; --crit-bg: #3a1616;
+    --band: rgba(163,162,155,0.14); --tip-bg: #242423; --warn-ink: #fab219;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink2: #c3c2b7; --muted: #898781;
+  --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
+  --s0: #a3a29b; --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+  --s1-95: #1c3a63; --s1-68: #2a5fa6; --s2-95: #4d2414; --s2-68: #8a3a1a;
+  --good-bg: #16301a; --warn-bg: #3a2d0c; --crit-bg: #3a1616;
+  --band: rgba(163,162,155,0.14); --tip-bg: #242423; --warn-ink: #fab219;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink);
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 1180px; margin: 0 auto; padding-block: 20px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; }
+h1 { font-size: 24px; margin: 0 0 4px; }
+.lead { color: var(--ink2); margin: 0 0 12px; max-width: 760px; }
+.seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+  background: var(--surface); flex-wrap: wrap; }
+.seg button { font: inherit; font-size: 13px; padding: 6px 10px; border: 0; background: transparent;
+  color: var(--ink2); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+.seg button:focus-visible, input:focus-visible, summary:focus-visible { outline: 2px solid var(--s1); outline-offset: 2px; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin: 8px 0 14px; }
+.controls .label { font-size: 12px; color: var(--muted); margin-right: 6px; }
+.toggles { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+.toggles label { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink); cursor: pointer; }
+.chip { width: 14px; height: 10px; border-radius: 2px; display: inline-block; border: 1.5px solid; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
+@media (max-width: 860px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
+.chart-card { position: relative; }
+#plane { display: block; width: 100%; touch-action: none; }
+#plane text { font: 12px system-ui, -apple-system, "Segoe UI", sans-serif; fill: var(--muted); }
+#plane .axis-title { fill: var(--ink2); font-size: 12.5px; }
+#plane .gridline { stroke: var(--grid); stroke-width: 1; }
+#plane .axisline { stroke: var(--axis); stroke-width: 1; }
+.tooltip { position: absolute; pointer-events: none; background: var(--tip-bg); color: var(--ink);
+  border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 12.5px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.12); max-width: 300px; display: none; z-index: 5; }
+.tooltip .row { display: flex; gap: 6px; align-items: center; white-space: nowrap; }
+.readout h2 { font-size: 16px; margin: 0 0 2px; }
+.readout .sub { color: var(--muted); font-size: 12.5px; margin: 0 0 10px; }
+.big { display: flex; gap: 18px; margin-bottom: 8px; }
+.big div { display: flex; flex-direction: column; }
+.big .k { font-size: 12px; color: var(--muted); }
+.big .v { font-size: 26px; font-weight: 600; }
+dl.kv { display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; margin: 0 0 10px; font-size: 13px; }
+dl.kv dt { color: var(--muted); }
+dl.kv dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.verdicts { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+.verdict { border-radius: 8px; padding: 6px 8px; font-size: 13px; display: grid;
+  grid-template-columns: 18px 1fr auto; gap: 6px; align-items: center; }
+.verdict .icon { font-weight: 700; text-align: center; }
+.verdict .name { color: var(--ink); }
+.verdict .val { font-variant-numeric: tabular-nums; color: var(--ink2); }
+.verdict.good { background: var(--good-bg); } .verdict.good .icon { color: var(--good); }
+.verdict.warn { background: var(--warn-bg); } .verdict.warn .icon { color: var(--warn-ink); }
+.verdict.crit { background: var(--crit-bg); } .verdict.crit .icon { color: var(--crit); }
+.verdict .status { font-weight: 600; }
+.reheat { font-size: 12.5px; color: var(--ink2); }
+.reheat button { font: inherit; font-size: 12px; margin: 2px 4px 2px 0; padding: 2px 7px; border-radius: 6px;
+  border: 1px solid var(--border); background: transparent; color: var(--ink); cursor: pointer; }
+.sliders { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; margin-top: 14px; }
+@media (max-width: 860px) { .sliders { grid-template-columns: minmax(0, 1fr); } }
+.slider-row label { font-size: 13px; color: var(--ink2); display: flex; justify-content: space-between; gap: 8px; }
+.slider-row output { font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 600; }
+.slider-wrap { position: relative; padding-bottom: 22px; }
+input[type=range] { width: 100%; accent-color: var(--ink); margin: 6px 0 0; }
+.band-bg { position: absolute; top: 12px; height: 8px; border-radius: 4px; background: var(--band); pointer-events: none; }
+.ticks { position: absolute; left: 0; right: 0; top: 30px; height: 16px; font-size: 11px; color: var(--muted); }
+.ticks span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+.ticks span::before { content: ""; position: absolute; left: 50%; top: -6px; height: 5px; border-left: 1px solid var(--muted); }
+.hint { font-size: 12px; color: var(--muted); margin: 4px 0 0; }
+details { margin-top: 16px; }
+summary { cursor: pointer; color: var(--ink2); font-size: 14px; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; margin-top: 8px; }
+th, td { padding: 5px 8px; border-bottom: 1px solid var(--grid); text-align: right; font-variant-numeric: tabular-nums; }
+th:first-child, td:first-child { text-align: left; }
+th { color: var(--ink2); font-weight: 600; }
+.notes { margin-top: 18px; color: var(--ink2); font-size: 14px; max-width: 860px; }
+.notes h3 { color: var(--ink); font-size: 15px; margin: 14px 0 4px; }
+.footnote { margin-top: 18px; font-size: 12px; color: var(--muted); max-width: 900px; }
+</style>
+<main>
+  <header>
+    <div>
+      <h1>Inflation on trial</h1>
+      <p class="lead">Pick a model of the inflaton field, slide how many e-folds before the end of inflation the
+        CMB's scales left the horizon (N*), and see where its exact predictions land among today's CMB
+        constraints &mdash; with a live verdict from each data set.</p>
+    </div>
+<!--THEME_BUTTONS-->
+  </header>
+  <div class="controls">
+    <div><span class="label">Model</span><div class="seg" id="models" role="group" aria-label="Inflation model"></div></div>
+    <div><span class="label">r axis</span><div class="seg" id="scale" role="group" aria-label="Scale of the r axis">
+      <button type="button" data-scale="lin" aria-pressed="true">linear</button>
+      <button type="button" data-scale="log" aria-pressed="false">log</button></div></div>
+  </div>
+  <div class="controls"><span class="label">Data</span><div class="toggles" id="toggles"></div></div>
+  <div class="layout">
+    <div class="card chart-card" id="chartcard">
+      <svg id="plane" role="img" aria-label="The n_s versus r plane with data regions and the model's prediction"></svg>
+      <div class="tooltip" id="tip" role="status"></div>
+    </div>
+    <aside class="card readout" aria-live="polite">
+      <h2 id="r-title"></h2>
+      <p class="sub" id="r-sub"></p>
+      <div class="big"><div><span class="k">spectral index n<sub>s</sub></span><span class="v" id="r-ns"></span></div>
+        <div><span class="k">tensor ratio r</span><span class="v" id="r-r"></span></div></div>
+      <dl class="kv" id="r-kv"></dl>
+      <div class="verdicts" id="r-verdicts"></div>
+      <div class="reheat" id="r-reheat"></div>
+    </aside>
+  </div>
+  <div class="sliders">
+    <div class="card slider-row">
+      <label for="nstar"><span>N* — e-folds between the pivot leaving the horizon and the end of inflation</span><output id="nstar-out"></output></label>
+      <div class="slider-wrap"><div class="band-bg" id="nband"></div>
+        <input type="range" id="nstar" min="40" max="80" step="0.1" value="55">
+        <div class="ticks" id="nticks"></div></div>
+      <p class="hint">Shaded: the usual 50–60. Ticks: N* this model would have for different reheating histories.</p>
+    </div>
+    <div class="card slider-row" id="paramcard">
+      <label for="param"><span id="param-label"></span><output id="param-out"></output></label>
+      <div class="slider-wrap"><input type="range" id="param" min="0" max="1000" step="1" value="500"></div>
+      <p class="hint" id="param-hint"></p>
+    </div>
+  </div>
+  <details id="tableview">
+    <summary>Table view: this model's predictions and verdicts</summary>
+    <div id="table"></div>
+  </details>
+  <section class="notes">
+    <h3>What the two numbers mean</h3>
+    <p><b>n<sub>s</sub></b> measures how the strength of the primordial ripples changes with scale: 1 would be
+      the same on every scale; inflation predicts slightly less than 1 because the field is slowly rolling.
+      <b>r</b> compares gravitational waves with density ripples. Its size fixes the energy at which inflation
+      happened, V<sup>1/4</sup> ≈ 1.02×10<sup>16</sup> GeV × (r/0.01)<sup>1/4</sup>.</p>
+    <h3>Why N* is a slider</h3>
+    <p>Which point of the potential we see in the CMB depends on how long ago, in e-folds of expansion, our
+      scales left the horizon. That depends on how the universe reheated after inflation, which we do not know:
+      a model is a track, not a point. Faster or more radiation-like reheating gives larger N*; only an
+      exotic 'stiff' phase pushes N* well beyond 60.</p>
+    <h3>What the verdict means</h3>
+    <p>For each data set we find the smallest region of the n<sub>s</sub>–r plane holding a given share of the
+      posterior that still contains the model's point, and express that share as Gaussian σ: inside the 68%
+      region is "1σ", the 95% region "2σ". Below 2σ: allowed; 2–3σ: under pressure; beyond 3σ: ruled out.</p>
+  </section>
+  <p class="footnote" id="footnote"></p>
+</main>
+<script>
+const D = __DATA__;
+const NS_LO = 0.94, NS_HI = 0.99;
+const STATUS = [[2, "good", "✓", "allowed"], [3, "warn", "!", "under pressure"], [1e9, "crit", "✗", "ruled out"]];
+const PARAM_LABEL = {f: "f (decay constant)", mu: "μ (hilltop scale)", alpha: "α (attractor curvature)"};
+const PARAM_UNIT = {f: " M_Pl", mu: " M_Pl", alpha: ""};
+const state = {model: "starobinsky", nstar: 55, pfrac: 0.5, scale: "lin",
+  show: Object.fromEntries(D.planes.map(p => [p.key, true]))};
+
+// ---------- small maths ----------
+function erf(x) {  // Abramowitz & Stegun 7.1.26
+  const s = Math.sign(x); x = Math.abs(x);
+  const t = 1 / (1 + 0.3275911 * x);
+  const y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x);
+  return s * y;
+}
+function sigmaOf(cred) {  // two-sided Gaussian sigma with the same probability
+  const p = Math.min(Math.max(cred, 0), 0.9999);
+  let lo = 0, hi = 6;
+  for (let i = 0; i < 60; i++) { const m = (lo + hi) / 2; if (erf(m / Math.SQRT2) < p) lo = m; else hi = m; }
+  return (lo + hi) / 2;
+}
+function credibility(plane, ns, r) {
+  const g = D.grid;
+  const fx = (ns - g.x0) / g.dx;
+  let fy = (r - g.y0) / g.dy;
+  if (fy < 0) fy = 0;  // below the first row the density is flat in r
+  if (fx < 0 || fx > g.nx - 1 || fy > g.ny - 1) return 1;
+  const i = Math.min(Math.floor(fx), g.nx - 2), j = Math.min(Math.floor(fy), g.ny - 2);
+  const tx = fx - i, ty = fy - j, c = plane.cred;
+  const v = (1 - tx) * (1 - ty) * c[i][j] + tx * (1 - ty) * c[i + 1][j] + (1 - tx) * ty * c[i][j + 1] + tx * ty * c[i + 1][j + 1];
+  return v / 1000;
+}
+function status(sig) { return STATUS.find(s => sig < s[0]); }
+function fmt(v, d) { return Number.isFinite(v) ? v.toFixed(d) : "—"; }
+function fmtSci(v) {
+  if (!Number.isFinite(v)) return "—";
+  const e = Math.floor(Math.log10(Math.abs(v))), m = v / Math.pow(10, e);
+  return m.toFixed(2) + "×10" + String(e).split("").map(ch => "⁰¹²³⁴⁵⁶⁷⁸⁹⁻"["0123456789-".indexOf(ch)]).join("");
+}
+function fmtR(r) { return r >= 0.01 ? r.toFixed(3) : r >= 0.001 ? r.toFixed(4) : fmtSci(r); }
+
+// ---------- model interpolation ----------
+const MODELS = Object.fromEntries(D.models.map(m => [m.key, m]));
+function paramAt(m) {
+  if (!m.param) return null;
+  const v = m.param.values, lo = Math.log(v[0]), hi = Math.log(v[v.length - 1]);
+  return Math.exp(lo + state.pfrac * (hi - lo));
+}
+function interp(m, field, nstar, pfrac) {
+  const ns = D.n_star, A = m[field];
+  let k = 0; while (k < ns.length - 2 && ns[k + 1] < nstar) k++;
+  const tn = Math.min(Math.max((nstar - ns[k]) / (ns[k + 1] - ns[k]), 0), 1);
+  const rowAt = (i) => (1 - tn) * A[i][k] + tn * A[i][k + 1];
+  if (!m.param) return rowAt(0);
+  const fp = pfrac * (A.length - 1), i = Math.min(Math.floor(fp), A.length - 2), tp = fp - i;
+  if (field === "r" || field === "V_star_quarter_gev") {  // interpolate positive quantities in log
+    return Math.exp((1 - tp) * Math.log(rowAt(i)) + tp * Math.log(rowAt(i + 1)));
+  }
+  return (1 - tp) * rowAt(i) + tp * rowAt(i + 1);
+}
+function reheating(m, pfrac) {
+  const R = m.reheating;
+  if (!m.param) return R[0];
+  const fp = pfrac * (R.length - 1), i = Math.min(Math.floor(fp), R.length - 2), tp = fp - i;
+  return R[i].map((v, s) => (v === null || R[i + 1][s] === null) ? null : (1 - tp) * v + tp * R[i + 1][s]);
+}
+
+// ---------- the plot ----------
+const svg = document.getElementById("plane");
+const NS = "http://www.w3.org/2000/svg";
+let geo = null;
+function el(name, attrs, parent) {
+  const e = document.createElementNS(NS, name);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function cssVar(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+function layout() {
+  const w = Math.max(300, document.getElementById("chartcard").clientWidth - 24);
+  const h = Math.round(Math.max(300, Math.min(560, w * 0.72)));
+  const m = {l: 58, r: 14, t: 12, b: 46};
+  const log = state.scale === "log";
+  const y0 = log ? -5 : 0, y1 = log ? Math.log10(0.3) : 0.2;
+  geo = {w, h, m, log,
+    X: ns => m.l + (ns - NS_LO) / (NS_HI - NS_LO) * (w - m.l - m.r),
+    Y: r => { const v = log ? Math.log10(Math.max(r, 1e-7)) : r; return h - m.b - (v - y0) / (y1 - y0) * (h - m.t - m.b); },
+    invX: px => NS_LO + (px - m.l) / (w - m.l - m.r) * (NS_HI - NS_LO),
+    invY: py => { const v = y0 + (h - m.b - py) / (h - m.t - m.b) * (y1 - y0); return log ? Math.pow(10, v) : v; }};
+}
+function ringPath(rings) {
+  return rings.map(ring => "M" + ring.map(p => geo.X(p[0]).toFixed(1) + "," + geo.Y(p[1]).toFixed(1)).join("L") + "Z").join("");
+}
+function draw() {
+  layout();
+  const {w, h, m, log} = geo;
+  svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+  svg.setAttribute("height", h);
+  svg.replaceChildren();
+  const defs = el("defs", {}, svg);
+  const clip = el("clipPath", {id: "plotclip"}, defs);
+  el("rect", {x: m.l, y: m.t, width: w - m.l - m.r, height: h - m.t - m.b}, clip);
+  // grid and ticks
+  const g = el("g", {}, svg);
+  for (let ns = 0.94; ns <= 0.9901; ns += 0.01) {
+    const x = geo.X(ns);
+    el("line", {x1: x, x2: x, y1: m.t, y2: h - m.b, class: "gridline"}, g);
+    const t = el("text", {x, y: h - m.b + 16, "text-anchor": "middle"}, g); t.textContent = ns.toFixed(2);
+  }
+  const yt = log ? [1e-5, 1e-4, 1e-3, 1e-2, 1e-1] : [0, 0.05, 0.1, 0.15, 0.2];
+  for (const r of yt) {
+    const y = geo.Y(r);
+    el("line", {x1: m.l, x2: w - m.r, y1: y, y2: y, class: "gridline"}, g);
+    const t = el("text", {x: m.l - 6, y: y + 4, "text-anchor": "end"}, g);
+    t.textContent = log ? "10" + String(Math.round(Math.log10(r))).replace("-", "⁻").replace(/\d/g, d => "⁰¹²³⁴⁵⁶⁷⁸⁹"[d]) : r.toFixed(2);
+  }
+  el("line", {x1: m.l, x2: w - m.r, y1: h - m.b, y2: h - m.b, class: "axisline"}, g);
+  el("line", {x1: m.l, x2: m.l, y1: m.t, y2: h - m.b, class: "axisline"}, g);
+  let t = el("text", {x: (m.l + w - m.r) / 2, y: h - 8, "text-anchor": "middle", class: "axis-title"}, g);
+  t.textContent = "spectral index nₛ";
+  t = el("text", {x: 14, y: (m.t + h - m.b) / 2, "text-anchor": "middle", class: "axis-title",
+    transform: `rotate(-90 14 ${(m.t + h - m.b) / 2})`}, g);
+  t.textContent = "tensor-to-scalar ratio r" + (log ? " (log)" : "");
+  // data regions
+  const data = el("g", {"clip-path": "url(#plotclip)"}, svg);
+  const view = log ? "log" : "lin";
+  for (const p of D.planes) {
+    if (!state.show[p.key]) continue;
+    const col = cssVar("--s" + p.slot);
+    if (p.outline) {
+      for (const lvl of ["r95", "r68"]) {
+        el("path", {d: ringPath(p[view][lvl]), fill: "none", stroke: col,
+          "stroke-width": p.slot === 0 ? 1.2 : 1.8, "fill-rule": "evenodd"}, data);
+      }
+    } else {
+      el("path", {d: ringPath(p[view].r95), fill: cssVar(`--s${p.slot}-95`), "fill-opacity": 0.75,
+        stroke: col, "stroke-width": 1, "fill-rule": "evenodd"}, data);
+      el("path", {d: ringPath(p[view].r68), fill: cssVar(`--s${p.slot}-68`), "fill-opacity": 0.8,
+        stroke: col, "stroke-width": 1, "fill-rule": "evenodd"}, data);
+    }
+  }
+  // D3's own n_s (fitted with r = 0): pinned just above the bottom axis
+  const yd = h - m.b - 8;
+  el("line", {x1: geo.X(D.d3.ns - D.d3.err), x2: geo.X(D.d3.ns + D.d3.err), y1: yd, y2: yd,
+    stroke: cssVar("--ink2"), "stroke-width": 1.5}, data);
+  el("rect", {x: geo.X(D.d3.ns) - 4, y: yd - 4, width: 8, height: 8, transform: `rotate(45 ${geo.X(D.d3.ns)} ${yd})`,
+    fill: cssVar("--surface"), stroke: cssVar("--ink2"), "stroke-width": 1.4}, data);
+  const dl = el("text", {x: geo.X(D.d3.ns - D.d3.err) - 5, y: yd + 4, "text-anchor": "end",
+    style: `fill:${cssVar("--ink2")};font-size:11px`}, data);
+  dl.textContent = "D3 (ours, r = 0)";
+  // the model
+  const mdl = MODELS[state.model];
+  const ink = cssVar("--ink");
+  const mg = el("g", {"clip-path": "url(#plotclip)"}, svg);
+  if (mdl.param) {  // the family's locus at this N*
+    const pts = [];
+    for (let i = 0; i <= 60; i++) { const f = i / 60;
+      pts.push([interp(mdl, "ns", state.nstar, f), interp(mdl, "r", state.nstar, f)]); }
+    el("polyline", {points: pts.map(p => geo.X(p[0]).toFixed(1) + "," + geo.Y(p[1]).toFixed(1)).join(" "),
+      fill: "none", stroke: cssVar("--muted"), "stroke-width": 1.2, "stroke-dasharray": "2 3"}, mg);
+  }
+  const track = (a, b, n) => { const pts = []; for (let i = 0; i <= n; i++) { const N = a + (b - a) * i / n;
+    pts.push([interp(mdl, "ns", N, state.pfrac), interp(mdl, "r", N, state.pfrac)]); } return pts; };
+  const toPts = pts => pts.map(p => geo.X(p[0]).toFixed(1) + "," + geo.Y(p[1]).toFixed(1)).join(" ");
+  el("polyline", {points: toPts(track(40, 80, 80)), fill: "none", stroke: ink, "stroke-width": 1, "stroke-dasharray": "4 3", opacity: 0.7}, mg);
+  el("polyline", {points: toPts(track(50, 60, 30)), fill: "none", stroke: ink, "stroke-width": 3, "stroke-linecap": "round"}, mg);
+  for (const [N, filled] of [[50, false], [60, true]]) {
+    const ns = interp(mdl, "ns", N, state.pfrac), r = interp(mdl, "r", N, state.pfrac);
+    el("circle", {cx: geo.X(ns), cy: geo.Y(r), r: 3.5, fill: filled ? ink : cssVar("--surface"), stroke: ink, "stroke-width": 1.3}, mg);
+  }
+  const ns = interp(mdl, "ns", state.nstar, state.pfrac), r = interp(mdl, "r", state.nstar, state.pfrac);
+  const cx = geo.X(ns), cy = geo.Y(r);
+  el("circle", {cx, cy, r: 9, fill: "none", stroke: cssVar("--surface"), "stroke-width": 4}, svg);
+  el("circle", {cx, cy, r: 7, fill: cssVar("--surface"), stroke: ink, "stroke-width": 2.2}, svg);
+  el("circle", {cx, cy, r: 2.2, fill: ink}, svg);
+  const lab = el("text", {x: Math.min(cx + 12, w - m.r - 4), y: Math.max(cy - 10, m.t + 12),
+    "text-anchor": cx + 12 > w - m.r - 80 ? "end" : "start",
+    style: `fill:${ink};font-weight:600;paint-order:stroke;stroke:${cssVar("--surface")};stroke-width:4px;stroke-linejoin:round`}, svg);
+  lab.textContent = `N* = ${state.nstar.toFixed(1)}`;
+  // pointer layer
+  el("rect", {x: m.l, y: m.t, width: w - m.l - m.r, height: h - m.t - m.b, fill: "transparent", id: "hit"}, svg);
+}
+
+// ---------- readout ----------
+function verdictRows(ns, r) {
+  return D.planes.filter(p => p.slot > 0).map(p => {
+    const cred = credibility(p, ns, r), sig = sigmaOf(cred), st = status(sig);
+    return {p, cred, sig, st};
+  });
+}
+function readout() {
+  const mdl = MODELS[state.model];
+  const ns = interp(mdl, "ns", state.nstar, state.pfrac), r = interp(mdl, "r", state.nstar, state.pfrac);
+  const par = paramAt(mdl);
+  document.getElementById("r-title").textContent = mdl.label;
+  document.getElementById("r-sub").textContent = (par === null ? "" :
+    `${mdl.param.name === "alpha" ? "α" : mdl.param.name === "mu" ? "μ" : "f"} = ${par.toPrecision(3)}${PARAM_UNIT[mdl.param.name]} · `) +
+    `N* = ${state.nstar.toFixed(1)} · exact (Mukhanov–Sasaki)`;
+  document.getElementById("r-ns").textContent = ns.toFixed(4);
+  document.getElementById("r-r").textContent = fmtR(r);
+  const kv = [["running dnₛ/dln k", fmtSci(interp(mdl, "alpha_s", state.nstar, state.pfrac))],
+    ["nₛ, first-order slow roll", interp(mdl, "ns_sr1", state.nstar, state.pfrac).toFixed(4)],
+    ["r, first-order slow roll", fmtR(interp(mdl, "r_sr1", state.nstar, state.pfrac))],
+    ["energy scale V*¹ᐟ⁴", fmtSci(interp(mdl, "V_star_quarter_gev", state.nstar, state.pfrac)) + " GeV"],
+    ["field travelled to the end", interp(mdl, "delta_phi", state.nstar, state.pfrac).toFixed(2) + " M_Pl"]];
+  document.getElementById("r-kv").innerHTML = kv.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
+  document.getElementById("r-verdicts").innerHTML = verdictRows(ns, r).map(v =>
+    `<div class="verdict ${v.st[1]}"><span class="icon" aria-hidden="true">${v.st[2]}</span>` +
+    `<span class="name"><span class="status">${v.st[3]}</span> · ${v.p.label.replace(" (our BK18 likelihood)", "").replace(", with our BK18 r", "")}</span>` +
+    `<span class="val">${v.cred > 0.999 ? "> 3.3" : v.sig.toFixed(1)}σ</span></div>`).join("");
+  const reh = reheating(mdl, state.pfrac);
+  const names = ["instant", "w = 0, 10⁹ GeV", "w = 0, 4 MeV", "w = 1, 4 MeV"];
+  document.getElementById("r-reheat").innerHTML = "N* for this model if reheating was: " + reh.map((v, i) =>
+    v === null ? "" : `<button type="button" data-n="${v.toFixed(2)}">${names[i]}: ${v.toFixed(1)}</button>`).join("");
+  document.getElementById("nstar-out").textContent = state.nstar.toFixed(1);
+  // reheating ticks under the slider
+  const ticks = document.getElementById("nticks");
+  ticks.innerHTML = reh.map((v, i) => (v === null || v < 40 || v > 80) ? "" :
+    `<span style="left:${(v - 40) / 40 * 100}%">${["inst.", "10⁹", "4 MeV", "kin."][i]}</span>`).join("");
+  table(mdl);
+}
+function table(mdl) {
+  const rows = [[50, "N* = 50"], [55, "N* = 55"], [60, "N* = 60"]];
+  const reh = reheating(mdl, state.pfrac);
+  if (reh[0] !== null) rows.push([reh[0], `instant reheating (N* = ${reh[0].toFixed(1)})`]);
+  const heads = D.planes.filter(p => p.slot > 0).map(p => p.label.split(":")[0].replace(" (our BK18 likelihood)", ""));
+  let html = `<table><thead><tr><th>${mdl.label}${paramAt(mdl) === null ? "" : " (" + paramAt(mdl).toPrecision(3) + ")"}</th><th>nₛ</th><th>r</th>` +
+    heads.map(h => `<th>${h}</th>`).join("") + "</tr></thead><tbody>";
+  for (const [N, lab] of rows) {
+    const ns = interp(mdl, "ns", N, state.pfrac), r = interp(mdl, "r", N, state.pfrac);
+    html += `<tr><td>${lab}</td><td>${ns.toFixed(4)}</td><td>${fmtR(r)}</td>` +
+      verdictRows(ns, r).map(v => `<td>${v.st[2]} ${v.cred > 0.999 ? "> 3.3" : v.sig.toFixed(1)}σ</td>`).join("") + "</tr>";
+  }
+  html += "</tbody></table><table><thead><tr><th>data set</th><th>r, 95% limit</th></tr></thead><tbody>" +
+    D.planes.map(p => `<tr><td>${p.label}</td><td>&lt; ${D.r95[p.key].toFixed(4)}</td></tr>`).join("") + "</tbody></table>";
+  document.getElementById("table").innerHTML = html;
+}
+
+// ---------- controls ----------
+function buildControls() {
+  const mbox = document.getElementById("models");
+  const short = {phi23: "φ^⅔", phi1: "φ", phi2: "φ²", phi4: "φ⁴", natural: "natural", starobinsky: "Starobinsky",
+    hilltop4: "hilltop", tmodel: "α-attractor"};
+  for (const m of D.models) {
+    const b = document.createElement("button");
+    b.type = "button"; b.dataset.model = m.key; b.textContent = short[m.key] || m.key; b.title = m.label;
+    b.setAttribute("aria-pressed", String(m.key === state.model));
+    b.addEventListener("click", () => { state.model = m.key; state.pfrac = 0.5; sync(); });
+    mbox.appendChild(b);
+  }
+  const tg = document.getElementById("toggles");
+  for (const p of D.planes) {
+    const lab = document.createElement("label");
+    const cb = document.createElement("input"); cb.type = "checkbox"; cb.checked = true; cb.id = "show-" + p.key;
+    cb.addEventListener("change", () => { state.show[p.key] = cb.checked; draw(); });
+    const chip = document.createElement("span"); chip.className = "chip";
+    chip.style.borderColor = `var(--s${p.slot})`;
+    chip.style.background = p.outline ? "transparent" : `var(--s${p.slot}-68)`;
+    lab.append(cb, chip, document.createTextNode(p.label));
+    tg.appendChild(lab);
+  }
+  document.querySelectorAll("#scale button").forEach(b => b.addEventListener("click", () => {
+    state.scale = b.dataset.scale;
+    document.querySelectorAll("#scale button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    draw();
+  }));
+  const ns = document.getElementById("nstar");
+  ns.addEventListener("input", () => { state.nstar = parseFloat(ns.value); draw(); readout(); });
+  const pr = document.getElementById("param");
+  pr.addEventListener("input", () => { state.pfrac = parseInt(pr.value, 10) / 1000; draw(); readout(); paramText(); });
+  document.getElementById("r-reheat").addEventListener("click", e => {
+    const b = e.target.closest("button[data-n]"); if (!b) return;
+    const v = Math.min(80, Math.max(40, parseFloat(b.dataset.n)));
+    state.nstar = v; ns.value = v; draw(); readout();
+  });
+  const band = document.getElementById("nband");
+  band.style.left = "25%"; band.style.width = "25%";
+  // theme buttons (standalone page only)
+  document.querySelectorAll("[data-theme-set]").forEach(b => b.addEventListener("click", () => {
+    document.documentElement.setAttribute("data-theme", b.dataset.themeSet);
+    document.querySelectorAll("[data-theme-set]").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    draw();
+  }));
+}
+function paramText() {
+  const mdl = MODELS[state.model];
+  const card = document.getElementById("paramcard");
+  if (!mdl.param) { card.style.visibility = "hidden"; return; }
+  card.style.visibility = "visible";
+  document.getElementById("param-label").textContent = PARAM_LABEL[mdl.param.name];
+  document.getElementById("param-out").textContent = paramAt(mdl).toPrecision(3) + PARAM_UNIT[mdl.param.name];
+  const hints = {f: "Large f approaches φ²; small f tilts nₛ far below 1.",
+    mu: "Large μ approaches a linear potential near the end; small μ tilts nₛ toward 1 − 3/N*.",
+    alpha: "α = 1 is Starobinsky's R² model; large α approaches φ², small α makes r tiny."};
+  document.getElementById("param-hint").textContent = `${mdl.param.range[0]}–${mdl.param.range[1]}${PARAM_UNIT[mdl.param.name]} (log scale). ` + hints[mdl.param.name];
+}
+function sync() {
+  document.querySelectorAll("#models button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.model === state.model)));
+  document.getElementById("param").value = Math.round(state.pfrac * 1000);
+  paramText(); draw(); readout();
+}
+
+// ---------- hover ----------
+const tip = document.getElementById("tip");
+function pointer(ev) {
+  if (!geo) return;
+  const rect = svg.getBoundingClientRect();
+  const sx = (ev.clientX - rect.left) * geo.w / rect.width, sy = (ev.clientY - rect.top) * geo.h / rect.height;
+  if (sx < geo.m.l || sx > geo.w - geo.m.r || sy < geo.m.t || sy > geo.h - geo.m.b) { tip.style.display = "none"; return; }
+  const ns = geo.invX(sx), r = geo.invY(sy);
+  const rows = verdictRows(ns, Math.max(r, 0));
+  tip.innerHTML = `<div class="row"><b>nₛ = ${ns.toFixed(4)}, r = ${fmtR(Math.max(r, 0))}</b></div>` +
+    rows.map(v => `<div class="row"><span class="chip" style="border-color:var(--s${v.p.slot});background:${v.p.outline ? "transparent" : `var(--s${v.p.slot}-68)`}"></span>` +
+      `${v.st[2]} ${v.cred > 0.999 ? "> 3.3" : v.sig.toFixed(1)}σ · ${v.p.label.split(":")[0].replace(" (our BK18 likelihood)", "")}</div>`).join("");
+  tip.style.display = "block";
+  const card = document.getElementById("chartcard").getBoundingClientRect();
+  let left = ev.clientX - card.left + 14, top = ev.clientY - card.top + 14;
+  if (left + tip.offsetWidth > card.width - 4) left = ev.clientX - card.left - tip.offsetWidth - 14;
+  if (top + tip.offsetHeight > card.height - 4) top = ev.clientY - card.top - tip.offsetHeight - 14;
+  tip.style.left = left + "px"; tip.style.top = top + "px";
+}
+svg.addEventListener("pointermove", pointer);
+svg.addEventListener("pointerdown", pointer);
+svg.addEventListener("pointerleave", () => { tip.style.display = "none"; });
+window.addEventListener("scroll", () => { tip.style.display = "none"; }, {passive: true});
+window.addEventListener("resize", () => draw());
+if (window.matchMedia) window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => draw());
+
+document.getElementById("footnote").textContent = D.footnote;
+buildControls();
+sync();
+</script>
