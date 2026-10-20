@@ -456,7 +456,7 @@ the uniform-disc and small-planet limits.
 ## Running it
 
 ```bash
-cd ~/Desktop/astrophysics/20-radial-velocities
+cd astrophysics/20-radial-velocities
 ../.venv/bin/python fetch_data.py     # 14 MB, a few minutes (ELODIE headers come one by one)
 ../.venv/bin/python run.py            # everything: numbers, figures, explorer
 ../.venv/bin/python test_physics.py   # 40 checks

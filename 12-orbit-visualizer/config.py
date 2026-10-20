@@ -41,10 +41,11 @@ for _d in (DATA_DIR, HORIZONS_DIR, FIGURE_DIR):
 #: light-day crossing), where the conversion is done explicitly.
 SNAPSHOT_DATE = "2026-09-29"
 
-#: Observing site for the "sky tonight" figure. Prague is a default, not a
-#: requirement: any latitude/longitude works. Elevation in km.
-OBSERVER = {"name": "Prague", "lat": 50.0875, "lon": 14.4213, "elevation_km": 0.25,
-            "utc_offset_hours": 2, "tz_label": "CEST"}
+#: Observing site for the "sky tonight" figure: the Airy transit circle at the
+#: Royal Observatory Greenwich, the prime meridian. It is a default, not a
+#: requirement: any latitude/longitude works (east positive). Elevation in km.
+OBSERVER = {"name": "Greenwich", "lat": 51.4778, "lon": -0.0015, "elevation_km": 0.046,
+            "utc_offset_hours": 1, "tz_label": "BST"}
 
 # --------------------------------------------------------------------------
 # The bodies

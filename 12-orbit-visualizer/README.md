@@ -245,21 +245,21 @@ light-minutes beyond, so the crossing is for good. It reaches one light-day **fr
 
 ### 6. What's up tonight
 
-![The sky tonight from Prague](figures/08_sky_tonight.png)
+![The sky tonight from Greenwich](figures/08_sky_tonight.png)
 
-The sky for the night of 29–30 September 2026, from Prague. The site is set in `config.py`;
-any latitude and longitude works.
+The sky for the night of 29–30 September 2026, from the Royal Observatory Greenwich (times in
+BST). The site is set in `config.py`; any latitude and longitude works.
 
-- **Saturn** (magnitude 0.4, in Cetus) rises at 19:01, is highest at 01:10, and is up all
+- **Saturn** (magnitude 0.4, in Cetus) rises at 18:58, is highest at 01:10, and is up all
   night: it reaches opposition in early October.
-- **Mars** (1.1, in Cancer) rises at 00:48 and **Jupiter** (−1.9, in Leo) at 02:33. Both are
+- **Mars** (1.1, in Cancer) rises at 00:40 and **Jupiter** (−1.9, in Leo) at 02:27. Both are
   high in the east by dawn.
 - **Uranus** (5.7, in Taurus) is at the naked-eye limit under dark skies. **Neptune** (7.7,
   in Pisces) needs binoculars.
-- A bright Moon rises in Aries at 19:27 and stays up the rest of the night.
+- A bright Moon rises in Aries at 19:19 and stays up the rest of the night.
 - **Mercury and Venus** stay below the horizon whenever the sky is dark.
 
-A cross-check against astropy's independent ephemeris puts Saturn in the same spot to 3″ in
+A cross-check against astropy's independent ephemeris puts Saturn in the same spot to 6″ in
 altitude and 16″ in azimuth.
 
 ---

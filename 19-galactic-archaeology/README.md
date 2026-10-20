@@ -247,7 +247,7 @@ ADQL strings with numpy and checks them against astropy (to 10⁻¹² km/s).
 ## Running it
 
 ```bash
-cd ~/Desktop/astrophysics
+cd astrophysics
 source .venv/bin/activate
 pip install gala galpy gaiadr3-zeropoint   # once; wheels exist for Python 3.14
 cd 19-galactic-archaeology
