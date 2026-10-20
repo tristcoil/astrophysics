@@ -1,0 +1,456 @@
+<title>Cosmic Light Cone Explorer</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+    --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,0.10);
+    --cone: #0b0b0b; --hubble: #2a78d6; --event: #eb6834; --particle: #1baf7a;
+    --world: #b5b3ab; --wash: rgba(42,120,214,0.08); --photon: #e34948; --focus: #2a78d6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
+      --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
+      --cone: #f0efec; --hubble: #3987e5; --event: #d95926; --particle: #199e70;
+      --world: #55544f; --wash: rgba(57,135,229,0.10); --photon: #e66767; --focus: #3987e5;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
+    --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
+    --cone: #f0efec; --hubble: #3987e5; --event: #d95926; --particle: #199e70;
+    --world: #55544f; --wash: rgba(57,135,229,0.10); --photon: #e66767; --focus: #3987e5;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink);
+         font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1180px; margin: 0 auto; padding-block: 20px 40px;
+         padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .layout > * { min-width: 0; }
+  h1 { font-size: 22px; margin: 0 0 4px; font-weight: 650; }
+  .lede { color: var(--ink-2); margin: 0 0 16px; max-width: 75ch; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+  .controls { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; margin-bottom: 12px; }
+  .seg { display: inline-flex; border: 1px solid var(--axis); border-radius: 8px; overflow: hidden; }
+  .seg button { border: 0; background: transparent; color: var(--ink-2); padding: 6px 11px; font: inherit;
+                font-size: 13px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+  .seg button + button { border-left: 1px solid var(--axis); }
+  button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  label { font-size: 13px; color: var(--ink-2); }
+  select { font: inherit; font-size: 13px; padding: 5px 8px; border-radius: 7px; border: 1px solid var(--axis);
+           background: var(--surface); color: var(--ink); max-width: 260px; }
+  .play { border: 1px solid var(--axis); background: var(--surface); color: var(--ink); border-radius: 7px;
+          padding: 5px 12px; font: inherit; font-size: 13px; cursor: pointer; }
+  .slider { display: flex; align-items: center; gap: 8px; flex: 1 1 280px; min-width: 0; max-width: 460px; }
+  .slider input { flex: 1 1 120px; min-width: 0; width: auto; }
+  .tobs { font-variant-numeric: tabular-nums; color: var(--ink); white-space: nowrap; }
+  .controls > * { min-width: 0; }
+  select { min-width: 0; }
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; }
+  @media (max-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+  svg { width: 100%; height: auto; display: block; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--ink-2); margin: 8px 0 0; }
+  .key { display: inline-flex; align-items: center; gap: 6px; }
+  .key i { display: inline-block; width: 18px; height: 0; border-top: 2px solid; }
+  .readout h2 { font-size: 15px; margin: 0 0 2px; }
+  .readout .kind { color: var(--muted); font-size: 12.5px; margin: 0 0 10px; }
+  .readout dl { display: grid; grid-template-columns: auto auto; gap: 4px 12px; margin: 0; font-size: 13px; }
+  .readout dt { color: var(--ink-2); }
+  .readout dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+  .readout .note { font-size: 12.5px; color: var(--ink-2); margin: 10px 0 0; }
+  .live { margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--grid); }
+  .live h3 { font-size: 13px; margin: 0 0 6px; }
+  .tip { position: fixed; pointer-events: none; background: var(--surface); color: var(--ink);
+         border: 1px solid var(--border); border-radius: 8px; padding: 7px 9px; font-size: 12.5px;
+         box-shadow: 0 4px 14px rgba(0,0,0,0.12); max-width: 280px; z-index: 5; }
+  .tip b { font-weight: 600; }
+  table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid var(--grid); text-align: right; white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--ink-2); font-weight: 600; }
+  td { font-variant-numeric: tabular-nums; }
+  .tablewrap { overflow-x: auto; }
+  details { margin-top: 16px; }
+  summary { cursor: pointer; color: var(--ink-2); font-size: 13.5px; }
+  .foot { color: var(--muted); font-size: 12px; margin-top: 18px; max-width: 95ch; }
+  .themebtn { margin-left: auto; }
+</style>
+<main>
+  <h1>The cosmic light cone</h1>
+  <p class="lede">Everything we see lies on our past light cone. Pick an object to see where its light set
+  out, how fast it was receding then and now, and whether a signal sent today could still reach it. Press
+  play to follow its photon: light from beyond the Hubble sphere first moves <em>away</em> from us. Slide the
+  moment of observation into the future to watch distant galaxies freeze at the edge of our event horizon.</p>
+
+  <div class="card">
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Spacetime coordinates">
+        <button type="button" data-view="proper" aria-pressed="true">Proper distance</button>
+        <button type="button" data-view="comoving" aria-pressed="false">Comoving distance</button>
+        <button type="button" data-view="conformal" aria-pressed="false">Conformal time</button>
+      </div>
+      <div class="seg" role="group" aria-label="Zoom">
+        <button type="button" data-zoom="close" aria-pressed="true">Close-up</button>
+        <button type="button" data-zoom="wide" aria-pressed="false">Whole diagram</button>
+      </div>
+      <label>Object
+        <select id="obj"></select>
+      </label>
+      <button type="button" class="play" id="play">▶ Follow its photon</button>
+      <div class="slider">
+        <label for="tobs">Observe at</label>
+        <input id="tobs" type="range" min="0" max="1000" step="1">
+        <span class="tobs" id="tobsval"></span>
+      </div>
+<!--THEME_BUTTONS-->
+    </div>
+    <div class="layout">
+      <div>
+        <svg id="chart" viewBox="0 0 820 560" role="img" aria-labelledby="charttitle">
+          <title id="charttitle">Spacetime diagram of our light cone and horizons</title>
+        </svg>
+        <div class="legend">
+          <span class="key"><i style="border-color: var(--cone)"></i>our past light cone</span>
+          <span class="key"><i style="border-color: var(--hubble)"></i>Hubble sphere (recession = c)</span>
+          <span class="key"><i style="border-color: var(--event)"></i>event horizon</span>
+          <span class="key"><i style="border-color: var(--particle)"></i>particle horizon</span>
+          <span class="key"><i style="border-color: var(--world)"></i>the object's worldline</span>
+          <span class="key"><i style="border-color: var(--photon); border-top-style: dotted"></i>its photon</span>
+        </div>
+      </div>
+      <aside class="readout" aria-live="polite">
+        <h2 id="r-name"></h2>
+        <p class="kind" id="r-kind"></p>
+        <dl id="r-dl"></dl>
+        <p class="note" id="r-note"></p>
+        <div class="live">
+          <h3>The photon on its way</h3>
+          <dl id="r-live"></dl>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <details>
+    <summary>All objects as a table</summary>
+    <div class="tablewrap"><table id="tbl"></table></div>
+  </details>
+
+  <p class="foot" id="foot"></p>
+</main>
+<div class="tip" id="tip" role="tooltip" hidden></div>
+
+<script>
+const DATA = __DATA__;
+
+// ---------- numerics on the precomputed expansion history ----------
+const T = DATA.grid.t, A = DATA.grid.a, ETA = DATA.grid.eta, H = DATA.grid.H;
+const ETA_INF = DATA.eta_inf, AGE = DATA.age, ETA0 = DATA.eta0;
+function interp(xs, ys, x) {
+  if (x <= xs[0]) return ys[0];
+  const n = xs.length;
+  if (x >= xs[n - 1]) return ys[n - 1];
+  let lo = 0, hi = n - 1;
+  while (hi - lo > 1) { const m = (lo + hi) >> 1; if (xs[m] > x) hi = m; else lo = m; }
+  const f = (x - xs[lo]) / (xs[hi] - xs[lo]);
+  return ys[lo] + f * (ys[hi] - ys[lo]);
+}
+// interpolate in log t for accuracy at early times
+const LT = T.map(Math.log);
+const LA = A.map(Math.log), LH = H.map(Math.log);
+const etaOfT = t => interp(LT, ETA, Math.log(t));
+const aOfT = t => Math.exp(interp(LT, LA, Math.log(t)));
+const HOfT = t => Math.exp(interp(LT, LH, Math.log(t)));
+const tOfEta = e => Math.exp(interp(ETA, LT, e));
+const aOfEta = e => aOfT(tOfEta(e));
+
+// ---------- state ----------
+let view = "proper", zoom = "close", sel = 0, tObs = AGE, anim = null, photonT = null;
+const OBJ = DATA.objects;
+const svg = document.getElementById("chart");
+let W = 820, Hh = 560;
+const M = {l: 62, r: 22, t: 18, b: 46};
+function sizeChart() {
+  const w = Math.round(svg.parentElement.getBoundingClientRect().width) || 820;
+  W = Math.max(460, Math.min(820, w));
+  Hh = Math.round(W * (W < 600 ? 0.9 : 0.68));
+  svg.setAttribute("viewBox", `0 0 ${W} ${Hh}`);
+}
+const NS = "http://www.w3.org/2000/svg";
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+// Close-up ranges follow the light cone seen at tObs: its widest proper distance,
+// or its comoving reach (the particle horizon at tObs).
+function coneWidth() {
+  const etaObs = etaOfT(tObs);
+  let w = 0;
+  for (let i = 0; i < T.length && T[i] <= tObs; i++) w = Math.max(w, A[i] * (etaObs - ETA[i]));
+  return w;
+}
+function ranges() {
+  const reach = etaOfT(tObs);
+  if (view === "conformal") return zoom === "close" ? {x: [-0.2 * reach, 1.1 * reach], y: [0, Math.min(ETA_INF, reach * 1.08)]} : {x: [-65, 65], y: [0, ETA_INF]};
+  if (view === "comoving") return zoom === "close" ? {x: [-0.2 * reach, 1.1 * reach], y: [0, Math.max(15, tObs * 1.08)]} : {x: [-65, 65], y: [0, Math.max(30, tObs * 1.1)]};
+  const w = coneWidth();
+  return zoom === "close" ? {x: [-0.2 * w, 1.5 * w], y: [0, Math.max(15, tObs * 1.08)]} : {x: [-65, 65], y: [0, Math.max(30, tObs * 1.1)]};
+}
+function scales() {
+  const r = ranges();
+  const sx = x => M.l + (x - r.x[0]) / (r.x[1] - r.x[0]) * (W - M.l - M.r);
+  const sy = y => Hh - M.b - (y - r.y[0]) / (r.y[1] - r.y[0]) * (Hh - M.t - M.b);
+  const ix = px => r.x[0] + (px - M.l) / (W - M.l - M.r) * (r.x[1] - r.x[0]);
+  const iy = py => r.y[0] + (Hh - M.b - py) / (Hh - M.t - M.b) * (r.y[1] - r.y[0]);
+  return {r, sx, sy, ix, iy};
+}
+function el(name, attrs, parent) {
+  const e = document.createElementNS(NS, name);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  (parent || svg).appendChild(e);
+  return e;
+}
+function pathD(pts, S) {
+  let d = "", pen = false;
+  for (const [x, y] of pts) {
+    if (!isFinite(x) || !isFinite(y)) { pen = false; continue; }
+    d += (pen ? "L" : "M") + S.sx(x).toFixed(1) + " " + S.sy(y).toFixed(1);
+    pen = true;
+  }
+  return d;
+}
+
+// The vertical coordinate: cosmic time t, or conformal time eta.
+function samplesY(S) {
+  const out = [];
+  if (view === "conformal") {
+    const top = Math.min(S.r.y[1], ETA_INF - 1e-3);
+    for (let i = 0; i <= 600; i++) out.push(1e-4 + (top - 1e-4) * i / 600);
+    return out.map(e => ({y: e, t: tOfEta(e), eta: e}));
+  }
+  const top = S.r.y[1];
+  for (let i = 0; i <= 240; i++) out.push(1e-5 * Math.pow(0.6 / 1e-5, i / 240));
+  for (let i = 1; i <= 500; i++) out.push(0.6 + (top - 0.6) * i / 500);
+  return out.map(t => ({y: t, t: t, eta: etaOfT(t)}));
+}
+// distance on the horizontal axis for a comoving distance chi at time t
+function X(chi, t) { return view === "proper" ? aOfT(t) * chi : chi; }
+function Yof(t) { return view === "conformal" ? etaOfT(t) : t; }
+
+// Where the light cone at tObs meets the worldline of an object at comoving distance chi.
+function emission(o) {
+  const etaObs = etaOfT(tObs);
+  const etaE = etaObs - o.chi;
+  if (etaE <= ETA[0]) return null;                  // not visible yet at tObs
+  const te = tOfEta(etaE);
+  return {t: te, eta: etaE, z: aOfT(tObs) / aOfT(te) - 1, d: aOfT(te) * o.chi,
+          vthen: HOfT(te) * aOfT(te) * o.chi, vnow: HOfT(tObs) * aOfT(tObs) * o.chi};
+}
+
+function fmt(x, d) { return (Math.abs(x) >= 1e4 || (Math.abs(x) < 1e-3 && x !== 0)) ? x.toExponential(2) : x.toFixed(d); }
+function fmtT(t) { return t < 0.001 ? (t * 1e6).toFixed(0) + " thousand yr" : t < 1 ? (t * 1000).toFixed(0) + " Myr" : t.toFixed(2) + " Gyr"; }
+function fmtD(g) { return g < 0.1 ? (g * 1000).toFixed(1) + " million ly" : g.toFixed(2) + " billion ly"; }
+
+function draw() {
+  sizeChart();
+  while (svg.lastChild && svg.lastChild.nodeName !== "title") svg.removeChild(svg.lastChild);
+  const S = scales();
+  const ys = samplesY(S);
+  // hover layer for the crosshair readout, under everything else
+  const hit = el("rect", {x: M.l, y: M.t, width: W - M.l - M.r, height: Hh - M.t - M.b, fill: "transparent"});
+  const defs = el("defs", {});
+  const cp = el("clipPath", {id: "plotclip"}, defs);
+  el("rect", {x: M.l, y: M.t, width: W - M.l - M.r, height: Hh - M.t - M.b}, cp);
+  const g = el("g", {"pointer-events": "none"});
+  // grid + axes
+  const nice = (lo, hi, n) => { const step = Math.pow(10, Math.floor(Math.log10((hi - lo) / n))); const c = [1, 2, 5, 10].map(m => m * step).find(s => (hi - lo) / s <= n) || step * 10; const out = []; for (let v = Math.ceil(lo / c) * c; v <= hi + 1e-9; v += c) out.push(+v.toFixed(6)); return out; };
+  for (const v of nice(S.r.x[0], S.r.x[1], 8)) {
+    el("line", {x1: S.sx(v), x2: S.sx(v), y1: M.t, y2: Hh - M.b, stroke: css("--grid"), "stroke-width": 1}, g);
+    el("text", {x: S.sx(v), y: Hh - M.b + 16, "text-anchor": "middle", "font-size": 11, fill: css("--muted")}, g).textContent = v;
+  }
+  for (const v of nice(S.r.y[0], S.r.y[1], 7)) {
+    el("line", {x1: M.l, x2: W - M.r, y1: S.sy(v), y2: S.sy(v), stroke: css("--grid"), "stroke-width": 1}, g);
+    el("text", {x: M.l - 8, y: S.sy(v) + 4, "text-anchor": "end", "font-size": 11, fill: css("--muted")}, g).textContent = v;
+  }
+  el("text", {x: (M.l + W - M.r) / 2, y: Hh - 8, "text-anchor": "middle", "font-size": 12, fill: css("--ink-2")}, g).textContent =
+    view === "proper" ? "proper distance at that moment (billion light-years)" : "comoving distance = proper distance today (billion light-years)";
+  el("text", {transform: `translate(16 ${(M.t + Hh - M.b) / 2}) rotate(-90)`, "text-anchor": "middle", "font-size": 12, fill: css("--ink-2")}, g).textContent =
+    view === "conformal" ? "conformal time (Gyr): light moves at 45°" : "cosmic time (billion years)";
+  const gp = el("g", {"clip-path": "url(#plotclip)", "pointer-events": "none"});
+  // superluminal wash (beyond the Hubble sphere)
+  const hs = ys.map(p => [view === "proper" ? 1 / HOfT(p.t) : 1 / (aOfT(p.t) * HOfT(p.t)), p.y]);
+  const right = S.r.x[1], left = S.r.x[0];
+  const washR = hs.map(([x, y]) => [Math.min(x, right), y]);
+  let d = pathD(washR, S) + `L${S.sx(right)} ${S.sy(ys[ys.length - 1].y)}L${S.sx(right)} ${S.sy(ys[0].y)}Z`;
+  el("path", {d, fill: css("--wash"), stroke: "none"}, gp);
+  const washL = hs.map(([x, y]) => [Math.max(-x, left), y]);
+  d = pathD(washL, S) + `L${S.sx(left)} ${S.sy(ys[ys.length - 1].y)}L${S.sx(left)} ${S.sy(ys[0].y)}Z`;
+  el("path", {d, fill: css("--wash"), stroke: "none"}, gp);
+  el("line", {x1: S.sx(0), x2: S.sx(0), y1: M.t, y2: Hh - M.b, stroke: css("--ink-2"), "stroke-width": 1}, gp);
+  // a few reference worldlines
+  for (const z of DATA.worldlines) {
+    const chi = z.chi;
+    for (const s of [1, -1]) el("path", {d: pathD(ys.map(p => [s * X(chi, p.t), p.y]), S), fill: "none", stroke: css("--world"), "stroke-width": 0.8}, gp);
+    const yTop = S.r.y[1] * 0.985;
+    const tTop = view === "conformal" ? tOfEta(Math.min(yTop, ETA_INF - 1e-3)) : yTop;
+    const xl = X(chi, tTop);
+    if (xl < S.r.x[1] - 0.04 * (S.r.x[1] - S.r.x[0]) && xl > S.r.x[0])
+      el("text", {x: S.sx(xl) + 3, y: S.sy(yTop) + 10, "font-size": 10.5, fill: css("--muted")}, g).textContent = "z = " + z.z;
+  }
+  const curve = (f, color, w, dash) => {
+    for (const s of [1, -1]) el("path", {d: pathD(ys.map(p => [s * f(p), p.y]), S), fill: "none", stroke: css(color), "stroke-width": w, "stroke-dasharray": dash || "", "stroke-linejoin": "round"}, gp);
+  };
+  curve(p => view === "proper" ? aOfT(p.t) * p.eta : p.eta, "--particle", 2);
+  if (isFinite(ETA_INF)) curve(p => (view === "proper" ? aOfT(p.t) : 1) * (ETA_INF - p.eta), "--event", 2);
+  curve(p => view === "proper" ? 1 / HOfT(p.t) : 1 / (aOfT(p.t) * HOfT(p.t)), "--hubble", 2);
+  // our past light cone at tObs
+  const etaObs = etaOfT(tObs);
+  curve(p => p.t <= tObs ? (view === "proper" ? aOfT(p.t) : 1) * (etaObs - p.eta) : NaN, "--cone", 2.4);
+  // now line, and the observing moment
+  const yNow = Yof(AGE), yObs = Yof(tObs);
+  el("line", {x1: M.l, x2: W - M.r, y1: S.sy(yNow), y2: S.sy(yNow), stroke: css("--ink-2"), "stroke-width": 0.8, "stroke-dasharray": "2 3"}, g);
+  el("text", {x: M.l + 6, y: S.sy(yNow) - 5, "font-size": 11, fill: css("--ink-2")}, g).textContent = "today";
+  if (Math.abs(tObs - AGE) > 0.05) {
+    el("line", {x1: M.l, x2: W - M.r, y1: S.sy(yObs), y2: S.sy(yObs), stroke: css("--ink"), "stroke-width": 1}, g);
+    el("text", {x: M.l + 6, y: S.sy(yObs) - 5, "font-size": 11, fill: css("--ink")}, g).textContent = "observing at t = " + tObs.toFixed(1) + " Gyr";
+  }
+  // selected object: worldline, photon path, emission point
+  const o = OBJ[sel];
+  const em = emission(o);
+  el("path", {d: pathD(ys.map(p => [X(o.chi, p.t), p.y]), S), fill: "none", stroke: css("--ink-2"), "stroke-width": 1.6}, gp);
+  if (em) {
+    const ph = ys.filter(p => p.t >= em.t && p.t <= tObs).map(p => [(view === "proper" ? aOfT(p.t) : 1) * (etaObs - p.eta), p.y]);
+    el("path", {d: pathD(ph, S), fill: "none", stroke: css("--photon"), "stroke-width": 2.2, "stroke-dasharray": "1 3.5", "stroke-linecap": "round"}, gp);
+  }
+  // all objects' emission points on the cone (hover for details)
+  OBJ.forEach((ob, i) => {
+    const e = emission(ob);
+    if (!e) return;
+    const x = view === "proper" ? e.d : ob.chi, y = view === "conformal" ? e.eta : e.t;
+    if (x < S.r.x[0] || x > S.r.x[1] || y < S.r.y[0] || y > S.r.y[1]) return;
+    const c = el("circle", {cx: S.sx(x), cy: S.sy(y), r: i === sel ? 6 : 4.2, fill: i === sel ? css("--photon") : css("--ink"), stroke: css("--surface"), "stroke-width": 2, "data-i": i, "pointer-events": "all"}, g);
+    c.style.cursor = "pointer";
+    c.addEventListener("click", () => { select(i); });
+    c.addEventListener("mousemove", ev => showTip(ev, `<b>${ob.name}</b><br>seen at z = ${fmt(e.z, 3)}<br>light set out at ${fmtT(e.t)}, ${fmtD(e.d)} away`));
+    c.addEventListener("mouseleave", hideTip);
+  });
+  // the moving photon
+  if (photonT !== null && em) {
+    const t = photonT;
+    const x = (view === "proper" ? aOfT(t) : 1) * (etaObs - etaOfT(t));
+    el("circle", {cx: S.sx(x), cy: S.sy(Yof(t)), r: 6.5, fill: css("--photon"), stroke: css("--surface"), "stroke-width": 2}, g);
+    const xs = X(o.chi, t);
+    if (xs <= S.r.x[1]) el("circle", {cx: S.sx(xs), cy: S.sy(Yof(t)), r: 5, fill: css("--ink-2"), stroke: css("--surface"), "stroke-width": 2}, g);
+  }
+  // crosshair readout
+  hit.addEventListener("mousemove", ev => {
+    const pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY;
+    const q = pt.matrixTransform(svg.getScreenCTM().inverse());
+    const x = S.ix(q.x), y = S.iy(q.y);
+    const t = view === "conformal" ? tOfEta(Math.min(y, ETA_INF - 1e-3)) : y;
+    if (!(t > 0)) { hideTip(); return; }
+    const a = aOfT(t), Ht = HOfT(t);
+    const D = view === "proper" ? Math.abs(x) : a * Math.abs(x);
+    showTip(ev, `t = ${fmtT(t)}, scale factor ${fmt(a, 3)}<br>${view === "proper" ? "proper" : "comoving"} distance ${fmt(Math.abs(x), 2)} billion ly<br>space there recedes from us at <b>${fmt(Ht * D, 2)} c</b>`);
+  });
+  hit.addEventListener("mouseleave", hideTip);
+  readout();
+}
+
+const tip = document.getElementById("tip");
+function showTip(ev, html) { tip.innerHTML = html; tip.hidden = false; tip.style.left = Math.max(8, Math.min(ev.clientX + 14, innerWidth - 290)) + "px"; tip.style.top = (ev.clientY + 14) + "px"; }
+function hideTip() { tip.hidden = true; }
+
+function readout() {
+  const o = OBJ[sel];
+  const em = emission(o);
+  document.getElementById("r-name").textContent = o.name;
+  document.getElementById("r-kind").textContent = o.kind_label + (o.ref ? " · " + o.ref : "");
+  const rows = [];
+  if (em) {
+    rows.push(["redshift we see", fmt(em.z, 4)]);
+    rows.push(["light set out at", fmtT(em.t)]);
+    rows.push(["distance then (proper)", fmtD(em.d)]);
+    rows.push(["distance at observation", fmtD(aOfT(tObs) * o.chi)]);
+    rows.push(["receding then", fmt(em.vthen, 2) + " c"]);
+    rows.push(["receding at observation", fmt(em.vnow, 2) + " c"]);
+  } else {
+    rows.push(["at this moment", "not yet visible"]);
+    rows.push(["comoving distance", fmtD(o.chi)]);
+  }
+  const reach = o.chi < ETA_INF - etaOfT(tObs);
+  rows.push(["a signal sent now arrives?", reach ? "yes" : "never"]);
+  rows.push(["last of it we will ever see", isFinite(o.t_last) ? "age " + fmtT(o.t_last) : "—"]);
+  document.getElementById("r-dl").innerHTML = rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
+  document.getElementById("r-note").textContent = o.note || "";
+  const live = document.getElementById("r-live");
+  if (photonT !== null && em) {
+    const t = photonT, a = aOfT(t), Ht = HOfT(t), etaObs = etaOfT(tObs);
+    const D = a * (etaObs - etaOfT(t));
+    const v = Ht * D - 1;
+    live.innerHTML = `<dt>cosmic time</dt><dd>${fmtT(t)}</dd><dt>photon's distance from us</dt><dd>${fmtD(D)}</dd>` +
+      `<dt>its speed relative to us</dt><dd>${v > 0 ? "+" : ""}${fmt(v, 2)} c ${v > 0 ? "(moving away!)" : "(approaching)"}</dd>` +
+      `<dt>source's distance</dt><dd>${fmtD(a * o.chi)}</dd>`;
+  } else {
+    live.innerHTML = `<dt>press "Follow its photon"</dt><dd></dd>`;
+  }
+}
+
+function select(i) { sel = i; stop(); document.getElementById("obj").value = String(i); draw(); }
+function stop() { if (anim) cancelAnimationFrame(anim); anim = null; photonT = null; document.getElementById("play").textContent = "▶ Follow its photon"; }
+function play() {
+  if (anim) { stop(); draw(); return; }
+  const em = emission(OBJ[sel]);
+  if (!em) return;
+  const e0 = em.eta, e1 = etaOfT(tObs), dur = 9000;
+  const t0 = performance.now();
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.getElementById("play").textContent = "■ Stop";
+  const step = now => {
+    let f = Math.min(1, (now - t0) / dur);
+    if (reduce && f < 1) f = Math.floor(f * 12) / 12;
+    photonT = tOfEta(e0 + (e1 - e0) * f);   // uniform in conformal time: light moves at constant comoving speed
+    draw();
+    if (f < 1) anim = requestAnimationFrame(step); else { anim = null; document.getElementById("play").textContent = "▶ Follow its photon"; }
+  };
+  anim = requestAnimationFrame(step);
+}
+
+// ---------- controls ----------
+const objSel = document.getElementById("obj");
+OBJ.forEach((o, i) => { const op = document.createElement("option"); op.value = String(i); op.textContent = `${o.name} (z = ${o.z_label})`; objSel.appendChild(op); });
+objSel.addEventListener("change", () => select(+objSel.value));
+document.getElementById("play").addEventListener("click", play);
+document.querySelectorAll("[data-view]").forEach(b => b.addEventListener("click", () => {
+  view = b.dataset.view; document.querySelectorAll("[data-view]").forEach(x => x.setAttribute("aria-pressed", String(x === b))); draw(); }));
+document.querySelectorAll("[data-zoom]").forEach(b => b.addEventListener("click", () => {
+  zoom = b.dataset.zoom; document.querySelectorAll("[data-zoom]").forEach(x => x.setAttribute("aria-pressed", String(x === b))); draw(); }));
+const slider = document.getElementById("tobs"), tval = document.getElementById("tobsval");
+const tMin = 2.0, tMax = 100.0;
+const toT = v => tMin * Math.pow(tMax / tMin, v / 1000), fromT = t => 1000 * Math.log(t / tMin) / Math.log(tMax / tMin);
+slider.value = String(Math.round(fromT(AGE)));
+const setT = () => { tObs = toT(+slider.value); if (Math.abs(tObs - AGE) < 0.12) tObs = AGE; tval.textContent = tObs === AGE ? "today (13.79 Gyr)" : tObs.toFixed(1) + " Gyr"; stop(); draw(); };
+slider.addEventListener("input", setT);
+document.querySelectorAll("[data-theme-set]").forEach(b => b.addEventListener("click", () => {
+  document.documentElement.setAttribute("data-theme", b.dataset.themeSet);
+  document.querySelectorAll("[data-theme-set]").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  try { localStorage.setItem("lc-theme", b.dataset.themeSet); } catch (e) {}
+  draw(); }));
+if (document.querySelector("[data-theme-set]")) {  // standalone file only; in a viewer the host sets the theme
+  try { const th = localStorage.getItem("lc-theme"); if (th) { document.documentElement.setAttribute("data-theme", th); document.querySelector(`[data-theme-set="${th}"]`).setAttribute("aria-pressed", "true"); } } catch (e) {}
+}
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", draw);
+new MutationObserver(draw).observe(document.documentElement, {attributes: true, attributeFilter: ["data-theme"]});
+let rz = null;
+addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(draw, 120); });
+
+// table view
+const tbl = document.getElementById("tbl");
+tbl.innerHTML = "<thead><tr><th>object</th><th>z</th><th>light set out</th><th>distance then</th><th>distance now</th><th>v then (c)</th><th>v now (c)</th><th>reachable</th><th>last seen at age</th></tr></thead><tbody>" +
+  OBJ.map(o => `<tr><td>${o.name}</td><td>${o.z_label}</td><td>${fmtT(o.t_emit)}</td><td>${fmtD(o.d_emit)}</td><td>${fmtD(o.chi)}</td><td>${fmt(o.v_then, 2)}</td><td>${fmt(o.v_now, 2)}</td><td>${o.reachable ? "yes" : "no"}</td><td>${isFinite(o.t_last) ? fmtT(o.t_last) : "—"}</td></tr>`).join("") + "</tbody>";
+document.getElementById("foot").textContent = DATA.footnote;
+setT();
+select(DATA.default_index);
+</script>
