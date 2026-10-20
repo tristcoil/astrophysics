@@ -1,0 +1,508 @@
+<title>Freeze-out Thermometer</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600&display=swap">
+<style>
+/* Layout: a lab instrument. Readout strip up top (the thermometer), two
+   linked charts below (yields | phase diagram), the table last. */
+:root {
+  --bg: #fcfcfb; --panel: #f3f2ee; --ink: #0b0b0b; --ink2: #52514e; --muted: #898781;
+  --grid: #e1e0d9; --axis: #c3c2b7;
+  --model: #2a78d6; --andronic: #eb6834; --star: #1baf7a; --lattice: #4a3aa7;
+  --lattice-wash: #dcd8f4; --other: #8b8a84; --universe: #2a78d6; --hot: #eb6834;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1a1a19; --panel: #232321; --ink: #ecebe6; --ink2: #b5b4ad; --muted: #8a8984;
+    --grid: #33322f; --axis: #4a4945;
+    --model: #3987e5; --andronic: #d95926; --star: #199e70; --lattice: #c3c2b7;
+    --lattice-wash: #3a3936; --other: #8f8e88; --universe: #3987e5; --hot: #d95926;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1a1a19; --panel: #232321; --ink: #ecebe6; --ink2: #b5b4ad; --muted: #8a8984;
+  --grid: #33322f; --axis: #4a4945;
+  --model: #3987e5; --andronic: #d95926; --star: #199e70; --lattice: #c3c2b7;
+  --lattice-wash: #3a3936; --other: #8f8e88; --universe: #3987e5; --hot: #d95926;
+  color-scheme: dark;
+}
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); }
+.wrap { max-width: 1240px; margin: 0 auto; padding-block: 20px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 18px; }
+header { display: grid; gap: 6px; }
+h1 { font-family: var(--font-display); font-weight: 600; font-size: clamp(1.6rem, 3.4vw, 2.3rem);
+  letter-spacing: 0.01em; margin: 0; text-wrap: balance; }
+.lede { margin: 0; color: var(--ink2); max-width: 70ch; line-height: 1.5; font-size: 0.95rem; }
+.controls { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: end;
+  background: var(--panel); border-radius: 6px; padding: 14px 16px; }
+.ctl { display: grid; gap: 4px; min-width: 0; }
+.nt { text-transform: none; }
+.ctl label { font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink2); }
+.ctl select { font: inherit; font-size: 0.9rem; padding: 4px 6px; background: var(--bg);
+  color: var(--ink); border: 1px solid var(--axis); border-radius: 4px; max-width: 100%; }
+.slider { display: grid; grid-template-columns: minmax(140px, 260px) 7.5ch; gap: 10px; align-items: center; }
+.slider input { width: 100%; accent-color: var(--hot); }
+.slider output { font-family: var(--font-data); font-size: 0.95rem; text-align: right;
+  font-variant-numeric: tabular-nums; }
+button { font: inherit; font-size: 0.88rem; padding: 6px 12px; border-radius: 4px; cursor: pointer;
+  border: 1px solid var(--ink); background: var(--ink); color: var(--bg); }
+button.ghost { background: transparent; color: var(--ink); border-color: var(--axis); }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--hot); outline-offset: 2px; }
+button[disabled] { opacity: 0.55; cursor: progress; }
+.readouts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px;
+  background: var(--grid); border: 1px solid var(--grid); border-radius: 6px; overflow: hidden; }
+.ro { background: var(--bg); padding: 10px 12px; display: grid; gap: 2px; min-width: 0; }
+.ro .k { font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink2); }
+.ro .v { font-family: var(--font-data); font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+.ro .s { font-size: 0.75rem; color: var(--muted); }
+.charts { display: grid; grid-template-columns: 1.35fr 1fr; gap: 18px; }
+@media (max-width: 900px) { .charts { grid-template-columns: 1fr; } }
+figure { margin: 0; min-width: 0; display: grid; gap: 6px; }
+figcaption { font-size: 0.8rem; color: var(--ink2); line-height: 1.45; }
+figcaption b { color: var(--ink); font-weight: 600; }
+.chart { position: relative; width: 100%; }
+.chart svg { display: block; width: 100%; height: auto; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.78rem; color: var(--ink2); }
+.legend span { display: inline-flex; align-items: center; gap: 5px; }
+.legend svg { width: 14px; height: 14px; flex: none; }
+.tip { position: absolute; pointer-events: none; background: var(--panel); color: var(--ink);
+  border: 1px solid var(--axis); border-radius: 4px; padding: 6px 8px; font-size: 0.78rem;
+  line-height: 1.4; max-width: 240px; z-index: 5; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+.tip b { font-weight: 600; }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; font-size: 0.82rem; min-width: 560px; width: 100%; }
+th, td { padding: 5px 10px; text-align: right; border-bottom: 1px solid var(--grid);
+  font-variant-numeric: tabular-nums; }
+th { font-weight: 500; color: var(--ink2); font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; }
+td:first-child, th:first-child { text-align: left; }
+td.num { font-family: var(--font-data); }
+tr.nofit td { color: var(--muted); }
+.foot { font-size: 0.78rem; color: var(--muted); line-height: 1.5; max-width: 90ch; }
+.busy { color: var(--hot); font-size: 0.8rem; min-height: 1.2em; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Freeze-out Thermometer</h1>
+    <p class="lede">A heavy-ion collision melts protons and neutrons into a drop of free quarks and gluons, the stuff that filled the universe for its first ten microseconds. As the drop cools, the quarks bind into hadrons. How many of each kind come out depends only on one temperature and one baryon chemical potential. Move them, and every yield below is recomputed from a gas of 459 hadrons and light nuclei; or press Fit.</p>
+  </header>
+
+  <section class="controls" aria-label="Controls">
+    <div class="ctl">
+      <label for="ds">Measurement</label>
+      <select id="ds"></select>
+    </div>
+    <div class="ctl">
+      <label for="T">Temperature T (MeV)</label>
+      <div class="slider"><input id="T" type="range" min="100" max="200" step="0.1"><output id="Tout" for="T"></output></div>
+    </div>
+    <div class="ctl">
+      <label for="mu">Baryon chemical potential <span class="nt">μ<sub>B</sub></span> (MeV)</label>
+      <div class="slider"><input id="mu" type="range" min="-30" max="650" step="0.5"><output id="muout" for="mu"></output></div>
+    </div>
+    <div class="ctl" style="grid-auto-flow: column; gap: 8px; align-items: end;">
+      <button id="fit" type="button">Fit T and μ<sub>B</sub></button>
+      <button id="reset" type="button" class="ghost">Back to our fit</button>
+    </div>
+    <div class="busy" id="busy" aria-live="polite"></div>
+  </section>
+
+  <section class="readouts" aria-label="Readouts" id="readouts"></section>
+
+  <section class="charts">
+    <figure>
+      <div class="legend" id="leg1"></div>
+      <div class="chart" id="c1"></div>
+      <figcaption id="cap1"></figcaption>
+    </figure>
+    <figure>
+      <div class="legend" id="leg2"></div>
+      <div class="chart" id="c2"></div>
+      <figcaption><b>Click anywhere</b> on the diagram to set T and μ<sub>B</sub>. The band is lattice QCD's crossover (HotQCD 2019), drawn where its expansion holds (μ<sub>B</sub> ≤ 300 MeV). The early universe crossed it at μ<sub>B</sub> ≈ 2 eV, on the left edge, and only drifted right once antimatter had annihilated, below 40 MeV.</figcaption>
+    </figure>
+  </section>
+
+  <section class="tablewrap" aria-label="Yields table"><table id="tab"></table></section>
+
+  <p class="foot">Data: ALICE (Pb–Pb, √s<sub>NN</sub> = 2.76 TeV, 0–10% central) and STAR (Au+Au, 0–5%) via HEPData and the papers. Model: ideal hadron resonance gas with quantum statistics, PDG 2025 hadron list (Thermal-FIST's tables), Breit–Wigner widths, strong and electromagnetic decays as each experiment defines its yields (STAR's protons include Λ decays), net strangeness zero and the nuclei's charge-to-baryon ratio. For ALICE, about ten charm–anticharm pairs add pions and kaons. Errors are statistical and systematic in quadrature; the volume is refitted at every step. The universe's age at each temperature is from project P2's calendar. Built for the Astrophysics Project Atlas (P6); every number here is reproduced by the project's Python code.</p>
+</div>
+
+<script type="application/json" id="payload">__PAYLOAD__</script>
+<script>
+(function () {
+"use strict";
+const P = JSON.parse(document.getElementById("payload").textContent);
+const HC3 = Math.pow(0.1973269804, 3);
+const X = P.quad.x, WQ = P.quad.w, NQ = X.length;
+const MASS = P.pts.mass, PREF = P.pts.pref, STAT = P.pts.stat, SP = P.pts.sp;
+const NP = MASS.length, B = P.species.B, Q = P.species.Q, S = P.species.S, NS = B.length;
+
+// ---------------------------------------------------------------- the gas
+let kT = NaN;
+const kE = new Float64Array(NP * NQ), kWn = new Float64Array(NP * NQ),
+      kWe = new Float64Array(NP * NQ), kWp = new Float64Array(NP * NQ);
+function kernels(T) {
+  if (T === kT) return;
+  for (let i = 0; i < NP; i++) {
+    const m = MASS[i], pr = PREF[i];
+    for (let k = 0; k < NQ; k++) {
+      const p = T * X[k], E = Math.sqrt(p * p + m * m), w = T * WQ[k] * pr, j = i * NQ + k;
+      kE[j] = E; kWn[j] = w * p * p; kWe[j] = w * p * p * E; kWp[j] = w * p * p * p * p / (3 * E);
+    }
+  }
+  kT = T;
+}
+function state(T, muB, muQ, muS, full) {
+  kernels(T);
+  const muI = new Float64Array(NS);
+  for (let s = 0; s < NS; s++) muI[s] = B[s] * muB + Q[s] * muQ + S[s] * muS;
+  const n = new Float64Array(NS), d = new Float64Array(NS);
+  let e = 0, p = 0, ok = true;
+  for (let i = 0; i < NP; i++) {
+    const mu = muI[SP[i]], st = STAT[i], base = i * NQ;
+    if (st < 0 && mu >= MASS[i]) { ok = false; continue; }
+    let sn = 0, sd = 0, se = 0, sp = 0;
+    for (let k = 0; k < NQ; k++) {
+      const j = base + k, ea = Math.exp(-(kE[j] - mu) / T), f = ea / (1 + st * ea);
+      sn += kWn[j] * f; sd += kWn[j] * f * (1 - st * f);
+      if (full) { se += kWe[j] * f; sp += kWp[j] * f; }
+    }
+    n[SP[i]] += sn / HC3; d[SP[i]] += sd / T / HC3; e += se / HC3; p += sp / HC3;
+  }
+  return { T, muB, muQ, muS, n, d, e, p, ok };
+}
+function dot3(d, a, b) { let s = 0; for (let i = 0; i < NS; i++) s += d[i] * a[i] * b[i]; return s; }
+function dot2(n, a) { let s = 0; for (let i = 0; i < NS; i++) s += n[i] * a[i]; return s; }
+const guess = { muS: 0, muQ: 0 };
+function solve(T, muB, qb, full) {
+  let muS = guess.muS, muQ = qb === null ? 0 : guess.muQ, st;
+  for (let it = 0; it < 60; it++) {
+    st = state(T, muB, muQ, muS, false);
+    const nB = dot2(st.n, B), nQ = dot2(st.n, Q), nS = dot2(st.n, S), d = st.d;
+    if (qb === null) {
+      const step = nS / dot3(d, S, S); muS -= step;
+      if (Math.abs(step) < 1e-13) break; continue;
+    }
+    const f0 = nS, f1 = nQ - qb * nB;
+    const a = dot3(d, S, S), b = dot3(d, S, Q), c = dot3(d, Q, S) - qb * dot3(d, B, S),
+          e = dot3(d, Q, Q) - qb * dot3(d, B, Q), det = a * e - b * c;
+    const s0 = (f0 * e - b * f1) / det, s1 = (a * f1 - c * f0) / det;
+    muS -= s0; muQ -= s1;
+    if (Math.max(Math.abs(s0), Math.abs(s1)) < 1e-13) break;
+  }
+  if (!isFinite(muS) || !isFinite(muQ)) { muS = 0; muQ = 0; }
+  else { guess.muS = muS; guess.muQ = muQ; }
+  return state(T, muB, muQ, muS, full);
+}
+function evaluate(ds, Tmev, muMev, full) {
+  const st = solve(Tmev / 1e3, muMev / 1e3, ds.qb, full);
+  const m = ds.A.map(row => { let s = 0; for (const [i, c] of row) s += c * st.n[i]; return s; });
+  let num = 0, den = 0;
+  ds.yields.forEach((y, o) => { if (!y.fitted) return; const w = 1 / (y.err * y.err);
+    num += (y.value - ds.charm[o]) * m[o] * w; den += m[o] * m[o] * w; });
+  const V = num / den;
+  let chi2 = 0, nfit = 0;
+  const model = m.map((v, o) => V * v + ds.charm[o]);
+  ds.yields.forEach((y, o) => { if (y.fitted) { chi2 += ((y.value - model[o]) / y.err) ** 2; nfit++; } });
+  return { st, V, model, chi2, ndf: nfit - 3 };
+}
+// a check hook for the build script: model yields at given parameters and V
+window.__model = function (di, T, mu, V) {
+  const ds = P.datasets[di];
+  const st = solve(T / 1e3, mu / 1e3, ds.qb, false);
+  return ds.A.map((row, o) => { let s = 0; for (const [i, c] of row) s += c * st.n[i]; return V * s + ds.charm[o]; });
+};
+
+// ---------------------------------------------------------------- fitting
+function fit(ds, T0, mu0) {
+  const f = (p) => evaluate(ds, p[0], p[1], false).chi2;
+  const dmu = ds.sqrt_s > 1000 ? 5 : 20;
+  let sx = [[T0, mu0], [T0 + 3, mu0], [T0, mu0 + dmu]].map(p => ({ p, v: f(p) }));
+  for (let it = 0; it < 160; it++) {
+    sx.sort((a, b) => a.v - b.v);
+    const [b, g, w] = sx;
+    if (Math.abs(w.v - b.v) < 1e-7 && Math.abs(w.p[0] - b.p[0]) < 1e-3) break;
+    const c = [(b.p[0] + g.p[0]) / 2, (b.p[1] + g.p[1]) / 2];
+    const at = (t) => { const p = [c[0] + t * (w.p[0] - c[0]), c[1] + t * (w.p[1] - c[1])];
+      p[0] = Math.min(220, Math.max(90, p[0])); return { p, v: f(p) }; };
+    const r = at(-1);
+    if (r.v < b.v) { const e = at(-2); sx[2] = e.v < r.v ? e : r; }
+    else if (r.v < g.v) sx[2] = r;
+    else { const k = at(0.5); if (k.v < w.v) sx[2] = k;
+      else sx = [b, { p: [(b.p[0] + g.p[0]) / 2, (b.p[1] + g.p[1]) / 2] }, { p: [(b.p[0] + w.p[0]) / 2, (b.p[1] + w.p[1]) / 2] }]
+        .map(q => q.v === undefined ? { p: q.p, v: f(q.p) } : q); }
+  }
+  sx.sort((a, b) => a.v - b.v);
+  return sx[0].p;
+}
+
+// ---------------------------------------------------------------- helpers
+const $ = (id) => document.getElementById(id);
+const NS_SVG = "http://www.w3.org/2000/svg";
+function el(tag, attrs, parent) {
+  const e = document.createElementNS(NS_SVG, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function svgLabel(textEl, html) {
+  // tiny parser for <sub>..</sub> in labels
+  const parts = html.split(/(<sub>.*?<\/sub>)/);
+  for (const part of parts) {
+    if (!part) continue;
+    const m = part.match(/^<sub>(.*)<\/sub>$/);
+    const t = el("tspan", m ? { "baseline-shift": "sub", "font-size": "75%" } : {}, textEl);
+    t.textContent = m ? m[1] : part;
+  }
+}
+const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+function fmt(v, d = 3) {
+  if (!isFinite(v)) return "–";
+  const a = Math.abs(v);
+  if (a !== 0 && (a < 1e-3 || a >= 1e5)) {
+    const e = Math.floor(Math.log10(a)), m = v / 10 ** e;
+    return m.toFixed(2) + "×10" + String(e).replace(/-/g, "⁻").replace(/\d/g, c => "⁰¹²³⁴⁵⁶⁷⁸⁹"[c]);
+  }
+  return v.toPrecision(d);
+}
+function ageAt(Tmev) {
+  const t = P.calendar.T, a = P.calendar.t_us;
+  if (Tmev <= t[0] || Tmev >= t[t.length - 1]) return NaN;
+  let i = 1; while (t[i] < Tmev) i++;
+  const f = Math.log(Tmev / t[i - 1]) / Math.log(t[i] / t[i - 1]);
+  return Math.exp(Math.log(a[i - 1]) + f * (Math.log(a[i]) - Math.log(a[i - 1])));
+}
+function plainLabel(html) { return html.replace(/<\/?sub>/g, ""); }
+
+// ---------------------------------------------------------------- state
+let di = 0, T = P.datasets[0].best.T, mu = P.datasets[0].best.muB, cur = null;
+const dsSel = $("ds"), Tin = $("T"), muIn = $("mu");
+P.datasets.forEach((d, i) => { const o = document.createElement("option"); o.value = i;
+  o.textContent = d.title.replace("√s_NN", "√sNN"); dsSel.appendChild(o); });
+
+function setParams(t, m, from) {
+  T = Math.min(200, Math.max(100, t)); mu = Math.min(650, Math.max(-30, m));
+  Tin.value = T; muIn.value = mu;
+  update();
+}
+function update() {
+  const ds = P.datasets[di];
+  cur = evaluate(ds, T, mu, true);
+  $("Tout").value = T.toFixed(1); $("muout").value = mu.toFixed(1);
+  renderReadouts(ds); renderYields(ds); renderPhase(); renderTable(ds);
+}
+
+function renderReadouts(ds) {
+  const r = cur, st = r.st, Tk = T * 1.160451812e10;
+  const ntot = st.n.reduce((a, b) => a + b, 0);
+  const age = ageAt(T);
+  const items = [
+    ["Fit quality", `χ² ${r.chi2.toFixed(1)} / ${r.ndf}`, `${ds.yields.filter(y => y.fitted).length} yields, T, μB and V free`],
+    ["Volume per unit rapidity", `${r.V.toFixed(0)} fm³`, "point-like hadrons"],
+    ["Temperature", `${(Tk / 1e12).toFixed(2)}×10¹² K`, `${T.toFixed(1)} MeV`],
+    ["Strangeness, charge", `μS ${(st.muS * 1e3).toFixed(1)}  μQ ${(st.muQ * 1e3).toFixed(1)}`, "MeV, from zero net strangeness"],
+    ["Energy density", `${st.e.toFixed(3)} GeV/fm³`, `${(st.e / 0.150).toFixed(1)}× the inside of a nucleus`],
+    ["Universe at this T", isFinite(age) ? `${age < 100 ? age.toFixed(1) : age.toFixed(0)} µs` : "–",
+      "after the Big Bang (P2's calendar)"],
+  ];
+  $("readouts").innerHTML = items.map(([k, v, s]) =>
+    `<div class="ro"><span class="k">${k}</span><span class="v">${v}</span><span class="s">${s}</span></div>`).join("");
+  $("cap1").innerHTML = `<b>${ds.title.replace("√s_NN", "√s<sub>NN</sub>")}.</b> Dots: measured yields per unit rapidity with their errors; bars: the gas at the chosen T and μ<sub>B</sub>, after resonance decays. Open dots are not fitted (K*⁰ is depleted by rescattering after freeze-out).`;
+}
+
+// ---------------------------------------------------------------- charts
+let tip = null;
+function tooltip(container, html, x, y) {
+  if (!tip) { tip = document.createElement("div"); tip.className = "tip"; }
+  if (tip.parentNode !== container) container.appendChild(tip);
+  tip.hidden = !html; if (!html) return;
+  tip.innerHTML = html;
+  const w = container.clientWidth, tw = tip.offsetWidth;
+  tip.style.left = Math.min(Math.max(0, x + 12), w - tw) + "px";
+  tip.style.top = (y + 14) + "px";
+}
+
+function renderYields(ds) {
+  const box = $("c1"); box.innerHTML = "";
+  const W = Math.max(300, box.clientWidth), H = Math.round(Math.min(520, Math.max(360, W * 0.62)));
+  const ml = 50, mr = 10, mt = 8, mb = 54, gap = 14;
+  const hTop = Math.round((H - mt - mb - gap) * 0.72), hBot = H - mt - mb - gap - hTop;
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Yields: data and model" }, box);
+  const ys = ds.yields.filter(y => y.fitted || y.key === "K*0"), idx = ys.map(y => ds.yields.indexOf(y));
+  const vals = []; ys.forEach((y, j) => { vals.push(Math.max(y.value - y.err, y.value * 0.3), cur.model[idx[j]]); });
+  const lo = Math.floor(Math.log10(Math.min(...vals.filter(v => v > 0)) / 2)), hi = Math.ceil(Math.log10(Math.max(...vals) * 1.5));
+  const n = ys.length, step = (W - ml - mr) / n;
+  const x = (j) => ml + step * (j + 0.5);
+  const y1 = (v) => mt + hTop * (1 - (Math.log10(v) - lo) / (hi - lo));
+  const top2 = mt + hTop + gap, rLo = 0.4, rHi = 1.8;
+  const y2 = (r) => top2 + hBot * (1 - (Math.min(rHi, Math.max(rLo, r)) - rLo) / (rHi - rLo));
+  const g = el("g", {}, svg);
+  for (let e = lo; e <= hi; e++) {
+    el("line", { x1: ml, x2: W - mr, y1: y1(10 ** e), y2: y1(10 ** e), stroke: css("--grid"), "stroke-width": 1 }, g);
+    if ((hi - lo) <= 6 || e % 2 === 0) {
+      const t = el("text", { x: ml - 6, y: y1(10 ** e) + 4, "text-anchor": "end", "font-size": 10.5, fill: css("--muted"), "font-family": "var(--font-data)" }, g);
+      t.textContent = e === 0 ? "1" : e === 1 ? "10" : "10" + String(e).replace(/-/g, "⁻").replace(/\d/g, c => "⁰¹²³⁴⁵⁶⁷⁸⁹"[c]);
+    }
+  }
+  for (const r of [0.5, 1, 1.5]) {
+    el("line", { x1: ml, x2: W - mr, y1: y2(r), y2: y2(r), stroke: r === 1 ? css("--model") : css("--grid"), "stroke-width": r === 1 ? 1.4 : 1 }, g);
+    const t = el("text", { x: ml - 6, y: y2(r) + 4, "text-anchor": "end", "font-size": 10.5, fill: css("--muted"), "font-family": "var(--font-data)" }, g);
+    t.textContent = r.toFixed(1);
+  }
+  const yl = el("text", { x: 12, y: mt + hTop / 2, transform: `rotate(-90 12 ${mt + hTop / 2})`, "text-anchor": "middle", "font-size": 11, fill: css("--ink2") }, g);
+  yl.textContent = "dN/dy";
+  const rl = el("text", { x: 12, y: top2 + hBot / 2, transform: `rotate(-90 12 ${top2 + hBot / 2})`, "text-anchor": "middle", "font-size": 11, fill: css("--ink2") }, g);
+  rl.textContent = "data/model";
+  ys.forEach((y, j) => {
+    const o = idx[j], m = cur.model[o], cx = x(j), bw = Math.min(26, step * 0.7);
+    el("line", { x1: cx - bw / 2, x2: cx + bw / 2, y1: y1(m), y2: y1(m), stroke: css("--model"), "stroke-width": 3, "stroke-linecap": "round" }, g);
+    const lo_ = Math.max(y.value - y.err, 10 ** lo), hi_ = y.value + y.err;
+    el("line", { x1: cx, x2: cx, y1: y1(lo_), y2: y1(hi_), stroke: css("--ink"), "stroke-width": 1.2 }, g);
+    el("circle", { cx, cy: y1(y.value), r: 4.2, fill: y.fitted ? css("--ink") : css("--bg"), stroke: css("--ink"), "stroke-width": 1.4 }, g);
+    const r = y.value / m, er = y.err / m;
+    el("line", { x1: cx, x2: cx, y1: y2(r - er), y2: y2(r + er), stroke: css("--ink"), "stroke-width": 1.2 }, g);
+    el("circle", { cx, cy: y2(r), r: 3.6, fill: y.fitted ? css("--ink") : css("--bg"), stroke: css("--ink"), "stroke-width": 1.3 }, g);
+    const lab = el("text", { x: cx, y: H - mb + 22, "text-anchor": "middle", "font-size": step < 22 ? 10 : 12, fill: css("--ink2") }, g);
+    svgLabel(lab, y.html);
+  });
+  const hit = el("rect", { x: ml, y: mt, width: W - ml - mr, height: H - mt - mb, fill: "transparent" }, svg);
+  const move = (ev) => {
+    const rect = svg.getBoundingClientRect(), sx = (ev.clientX - rect.left) * W / rect.width;
+    const j = Math.floor((sx - ml) / step);
+    if (j < 0 || j >= n) { tooltip(box, null); return; }
+    const y = ys[j], m = cur.model[idx[j]];
+    tooltip(box, `<b>${y.html}</b>${y.fitted ? "" : " (not fitted)"}<br>measured ${fmt(y.value)} ± ${fmt(y.err, 2)}<br>model ${fmt(m)}<br>data/model ${(y.value / m).toFixed(3)}, pull ${((y.value - m) / y.err).toFixed(2)}σ`,
+      (ev.clientX - box.getBoundingClientRect().left), (ev.clientY - box.getBoundingClientRect().top));
+  };
+  hit.addEventListener("pointermove", move);
+  hit.addEventListener("pointerdown", move);
+  hit.addEventListener("pointerleave", () => tooltip(box, null));
+}
+
+function legendHTML(items) {
+  return items.map(([sym, label]) => `<span>${sym}${label}</span>`).join("");
+}
+function sym(shape, color, fill) {
+  const f = fill || color;
+  const shapes = {
+    dot: `<circle cx="7" cy="7" r="4" fill="${f}" stroke="${color}" stroke-width="1.4"/>`,
+    bar: `<line x1="2" x2="12" y1="7" y2="7" stroke="${color}" stroke-width="3" stroke-linecap="round"/>`,
+    square: `<rect x="3" y="3" width="8" height="8" fill="${f}" stroke="${color}" stroke-width="1.4"/>`,
+    star: `<path d="M7 1.5l1.6 3.6 3.9.4-2.9 2.6.9 3.8L7 10l-3.5 1.9.9-3.8L1.5 5.5l3.9-.4z" fill="${f}" stroke="${color}"/>`,
+    diamond: `<path d="M7 2l5 5-5 5-5-5z" fill="${f}" stroke="${color}" stroke-width="1.3"/>`,
+    line: `<line x1="1" x2="13" y1="7" y2="7" stroke="${color}" stroke-width="2.4"/>`,
+    band: `<rect x="1" y="3" width="12" height="8" fill="${f}"/>`,
+    ring: `<circle cx="7" cy="7" r="5" fill="none" stroke="${color}" stroke-width="2"/>`,
+  };
+  return `<svg viewBox="0 0 14 14" aria-hidden="true">${shapes[shape]}</svg>`;
+}
+
+function renderPhase() {
+  const box = $("c2"); box.innerHTML = "";
+  const W = Math.max(300, box.clientWidth), H = Math.round(Math.min(520, Math.max(330, W * 0.82)));
+  const ml = 44, mr = 12, mt = 10, mb = 40;
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "QCD phase diagram" }, box);
+  const xMax = 1000, yMax = 200;
+  const x = (m) => ml + (W - ml - mr) * Math.max(0, m) / xMax, y = (t) => mt + (H - mt - mb) * (1 - t / yMax);
+  const g = el("g", {}, svg);
+  for (let m = 0; m <= xMax; m += 200) {
+    el("line", { x1: x(m), x2: x(m), y1: mt, y2: H - mb, stroke: css("--grid") }, g);
+    const t = el("text", { x: x(m), y: H - mb + 16, "text-anchor": "middle", "font-size": 10.5, fill: css("--muted"), "font-family": "var(--font-data)" }, g); t.textContent = m;
+  }
+  for (let t = 0; t <= yMax; t += 50) {
+    el("line", { x1: ml, x2: W - mr, y1: y(t), y2: y(t), stroke: css("--grid") }, g);
+    const tx = el("text", { x: ml - 6, y: y(t) + 4, "text-anchor": "end", "font-size": 10.5, fill: css("--muted"), "font-family": "var(--font-data)" }, g); tx.textContent = t;
+  }
+  const xl = el("text", { x: (ml + W - mr) / 2, y: H - 6, "text-anchor": "middle", "font-size": 11, fill: css("--ink2") }, g);
+  xl.textContent = "baryon chemical potential μB (MeV)";
+  const yl = el("text", { x: 12, y: (mt + H - mb) / 2, transform: `rotate(-90 12 ${(mt + H - mb) / 2})`, "text-anchor": "middle", "font-size": 11, fill: css("--ink2") }, g);
+  yl.textContent = "T (MeV)";
+  const L = P.phase.lattice;
+  const band = L.mu_B.map((m, i) => `${x(m)},${y(L.hi[i])}`).concat(L.mu_B.map((m, i) => `${x(m)},${y(L.lo[i])}`).reverse());
+  el("polygon", { points: band.join(" "), fill: css("--lattice-wash") }, g);
+  el("polyline", { points: L.mu_B.map((m, i) => `${x(m)},${y(L.T[i])}`).join(" "), fill: "none", stroke: css("--lattice"), "stroke-width": 1.6 }, g);
+  const U = P.phase.universe;
+  el("polyline", { points: U.T.map((t, i) => `${x(U.muB[i])},${y(t)}`).join(" "), fill: "none", stroke: css("--universe"), "stroke-width": 2.4 }, g);
+  const ul = el("text", { x: x(470), y: y(36), "text-anchor": "start", "font-size": 10.5, fill: css("--ink2") }, g);
+  ul.textContent = "early universe";
+  const pts = [];
+  const mark = (shape, cx, cy, color, fill, r) => {
+    if (shape === "square") el("rect", { x: cx - r, y: cy - r, width: 2 * r, height: 2 * r, fill, stroke: color, "stroke-width": 1.4 }, g);
+    else if (shape === "diamond") el("path", { d: `M${cx} ${cy - r - 1}L${cx + r + 1} ${cy}L${cx} ${cy + r + 1}L${cx - r - 1} ${cy}Z`, fill, stroke: color, "stroke-width": 1.3 }, g);
+    else if (shape === "dot") el("circle", { cx, cy, r, fill, stroke: color, "stroke-width": 1.4 }, g);
+    else if (shape === "star") {
+      let d = ""; for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5, rr = k % 2 ? r * 0.45 : r;
+        d += (k ? "L" : "M") + (cx + rr * Math.cos(a)).toFixed(2) + " " + (cy + rr * Math.sin(a)).toFixed(2); }
+      el("path", { d: d + "Z", fill, stroke: color, "stroke-width": 0.8 }, g);
+    }
+  };
+  for (const p of P.phase.other) { mark("diamond", x(p.muB), y(p.T), css("--other"), css("--bg"), 3.6); pts.push([x(p.muB), y(p.T), `Other analysis (compiled by Andronic et al.)<br>T ${p.T.toFixed(1)} MeV, μ<sub>B</sub> ${p.muB.toFixed(0)} MeV`]); }
+  for (const p of P.phase.andronic) { mark("square", x(p.muB), y(p.T), css("--andronic"), css("--bg"), 3.6); pts.push([x(p.muB), y(p.T), `Andronic et al. 2018<br>T ${p.T.toFixed(1)} MeV, μ<sub>B</sub> ${p.muB.toFixed(1)} MeV`]); }
+  for (const p of P.phase.star) { mark("dot", x(p.muB), y(p.T), css("--star"), css("--bg"), 3.8); pts.push([x(p.muB), y(p.T), `${p.label}<br>T ${p.T} ± ${p.T_err} MeV, μ<sub>B</sub> ${p.muB} ± ${p.muB_err} MeV`]); }
+  for (const p of P.phase.ours) { mark("star", x(p.muB), y(p.T), css("--ink"), css("--ink"), 7); pts.push([x(p.muB), y(p.T), `Our fit: ${p.label}<br>T ${p.T.toFixed(1)} ± ${p.T_err.toFixed(1)} MeV, μ<sub>B</sub> ${p.muB.toFixed(1)} ± ${p.muB_err.toFixed(1)} MeV`]); }
+  // the current setting
+  const cx = x(mu), cy = y(T);
+  el("line", { x1: ml, x2: cx, y1: cy, y2: cy, stroke: css("--hot"), "stroke-width": 1, "stroke-dasharray": "3 3" }, g);
+  el("line", { x1: cx, x2: cx, y1: cy, y2: H - mb, stroke: css("--hot"), "stroke-width": 1, "stroke-dasharray": "3 3" }, g);
+  el("circle", { cx, cy, r: 8, fill: "none", stroke: css("--hot"), "stroke-width": 2.4 }, g);
+  const t1 = el("text", { x: x(25), y: y(188), "font-size": 12, fill: css("--ink2"), "font-style": "italic" }, g); t1.textContent = "quark–gluon plasma";
+  const t2 = el("text", { x: x(330), y: y(40), "font-size": 12, fill: css("--ink2"), "font-style": "italic" }, g); t2.textContent = "hadron gas";
+  const hit = el("rect", { x: ml, y: mt, width: W - ml - mr, height: H - mt - mb, fill: "transparent", style: "cursor: crosshair" }, svg);
+  const local = (ev) => { const r = svg.getBoundingClientRect(); return [(ev.clientX - r.left) * W / r.width, (ev.clientY - r.top) * H / r.height]; };
+  hit.addEventListener("pointermove", (ev) => {
+    const [sx, sy] = local(ev); let best = null, bd = 22 * 22;
+    for (const p of pts) { const d = (p[0] - sx) ** 2 + (p[1] - sy) ** 2; if (d < bd) { bd = d; best = p; } }
+    const b = box.getBoundingClientRect();
+    tooltip(box, best ? best[2] : `Click to set T ${((1 - (sy - mt) / (H - mt - mb)) * yMax).toFixed(0)} MeV, μ<sub>B</sub> ${((sx - ml) / (W - ml - mr) * xMax).toFixed(0)} MeV`, ev.clientX - b.left, ev.clientY - b.top);
+  });
+  hit.addEventListener("pointerleave", () => tooltip(box, null));
+  hit.addEventListener("click", (ev) => {
+    const [sx, sy] = local(ev);
+    setParams((1 - (sy - mt) / (H - mt - mb)) * yMax, (sx - ml) / (W - ml - mr) * xMax);
+  });
+}
+
+function renderTable(ds) {
+  const rows = ds.yields.map((y, o) => {
+    const m = cur.model[o];
+    return `<tr class="${y.fitted ? "" : "nofit"}"><td>${y.html}${y.fitted ? "" : " (not fitted)"}</td><td class="num">${fmt(y.value)}</td><td class="num">${fmt(y.err, 2)}</td><td class="num">${fmt(m)}</td><td class="num">${(y.value / m).toFixed(3)}</td><td class="num">${((y.value - m) / y.err).toFixed(2)}</td></tr>`;
+  }).join("");
+  $("tab").innerHTML = `<thead><tr><th>Particle</th><th>Measured dN/dy</th><th>Error</th><th>Model</th><th>Data/model</th><th>Pull (σ)</th></tr></thead><tbody>${rows}</tbody>`;
+}
+
+function legends() {
+  $("leg1").innerHTML = legendHTML([[sym("dot", css("--ink")), "measured (fitted)"], [sym("dot", css("--ink"), css("--bg")), "measured, not fitted"], [sym("bar", css("--model")), "hadron gas at the chosen T, μB"]]);
+  $("leg2").innerHTML = legendHTML([[sym("ring", css("--hot")), "your setting"], [sym("star", css("--ink")), "our fits (LHC; RHIC 39–7.7 GeV)"], [sym("square", css("--andronic"), css("--bg")), "Andronic et al. 2018"], [sym("dot", css("--star"), css("--bg")), "STAR 2017"], [sym("diamond", css("--other"), css("--bg")), "other analyses"], [sym("band", css("--lattice"), css("--lattice-wash")), "lattice QCD"], [sym("line", css("--universe")), "early universe"]]);
+}
+
+// ---------------------------------------------------------------- wiring
+Tin.addEventListener("input", () => setParams(+Tin.value, mu));
+muIn.addEventListener("input", () => setParams(T, +muIn.value));
+dsSel.addEventListener("change", () => { di = +dsSel.value; guess.muS = 0; guess.muQ = 0;
+  const b = P.datasets[di].best; setParams(b.T, b.muB); });
+$("reset").addEventListener("click", () => { const b = P.datasets[di].best; setParams(b.T, b.muB); });
+$("fit").addEventListener("click", () => {
+  const btn = $("fit"); btn.disabled = true; $("busy").textContent = "Fitting…";
+  setTimeout(() => {
+    const t0 = performance.now(), p = fit(P.datasets[di], T, mu);
+    setParams(p[0], p[1]);
+    $("busy").textContent = `Best fit: T ${p[0].toFixed(1)} MeV, μB ${p[1].toFixed(1)} MeV (${((performance.now() - t0) / 1000).toFixed(1)} s)`;
+    btn.disabled = false;
+  }, 20);
+});
+let rt = null;
+window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(update, 120); });
+if (window.matchMedia) window.matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", () => { legends(); update(); });
+new MutationObserver(() => { legends(); update(); }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+window.addEventListener("scroll", () => tooltip($("c1"), null), { passive: true });
+legends();
+setParams(T, mu);
+})();
+</script>
