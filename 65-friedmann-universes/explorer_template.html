@@ -1,0 +1,836 @@
+<title>Build a Universe</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,500;1,6..72,400;1,6..72,500&display=swap">
+<style>
+/* Layout: an instrument. The map of all possible universes is the control
+   surface; the chosen universe's history, fate and speed answer it beside and
+   below. Hue belongs to the three measurements only; "your universe" is ink. */
+:root {
+  --bg: #f3f5f8;
+  --panel: #ffffff;
+  --ink: #131a27;
+  --ink-2: #4b5466;
+  --muted: #7a8394;
+  --rule: #dfe4eb;
+  --rule-2: #c9d0db;
+  --ref: #8a93a3;
+  --bao: #2a78d6;
+  --sn: #eb6834;
+  --cmb: #1baf7a;
+  --bao-fill: rgba(42, 120, 214, 0.20);
+  --sn-fill: rgba(235, 104, 52, 0.18);
+  --cmb-fill: rgba(27, 175, 122, 0.22);
+  --all-fill: rgba(19, 26, 39, 0.30);
+  --r-accel: #edf1f7;
+  --r-slow: #e4e9f1;
+  --r-end: #d9dfe8;
+  --r-nobang: #cfd5df;
+  --focus: #2a78d6;
+  --display: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e131c; --panel: #151c28; --ink: #e8ecf3; --ink-2: #aab3c3; --muted: #7d8697;
+    --rule: #242e3e; --rule-2: #334055; --ref: #7f8899;
+    --bao: #3987e5; --sn: #d95926; --cmb: #199e70;
+    --bao-fill: rgba(57, 135, 229, 0.28); --sn-fill: rgba(217, 89, 38, 0.26);
+    --cmb-fill: rgba(25, 158, 112, 0.30); --all-fill: rgba(232, 236, 243, 0.34);
+    --r-accel: #171f2c; --r-slow: #1c2533; --r-end: #222c3c; --r-nobang: #2a3446;
+    --focus: #3987e5; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e131c; --panel: #151c28; --ink: #e8ecf3; --ink-2: #aab3c3; --muted: #7d8697;
+  --rule: #242e3e; --rule-2: #334055; --ref: #7f8899;
+  --bao: #3987e5; --sn: #d95926; --cmb: #199e70;
+  --bao-fill: rgba(57, 135, 229, 0.28); --sn-fill: rgba(217, 89, 38, 0.26);
+  --cmb-fill: rgba(25, 158, 112, 0.30); --all-fill: rgba(232, 236, 243, 0.34);
+  --r-accel: #171f2c; --r-slow: #1c2533; --r-end: #222c3c; --r-nobang: #2a3446;
+  --focus: #3987e5; color-scheme: dark;
+}
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px;
+       line-height: 1.5; }
+.page { max-width: 1240px; margin: 0 auto; padding-block: 28px 40px;
+        padding-left: max(16px, env(safe-area-inset-left, 0px));
+        padding-right: max(16px, env(safe-area-inset-right, 0px));
+        display: grid; gap: 20px; }
+header { display: grid; gap: 6px; max-width: 72ch; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; color: var(--muted);
+           text-transform: uppercase; }
+h1 { font-family: var(--display); font-weight: 500; font-size: clamp(32px, 5vw, 46px);
+     line-height: 1.05; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+header p { margin: 0; color: var(--ink-2); max-width: 68ch; }
+.fate { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px;
+        padding: 18px 20px; display: grid; gap: 14px; }
+.fate-text { font-family: var(--display); font-style: italic; font-size: clamp(19px, 2.4vw, 25px);
+             line-height: 1.3; margin: 0; text-wrap: pretty; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px 18px; }
+.stat { display: grid; gap: 2px; min-width: 0; }
+.stat .k { font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
+.stat .v { font-family: var(--mono); font-size: 17px; font-variant-numeric: tabular-nums; }
+.stat .s { font-size: 12.5px; color: var(--ink-2); }
+.work { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 20px; }
+.card { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; margin: 0;
+        padding: 14px 14px 12px; display: grid; gap: 8px; min-width: 0; align-content: start; }
+.card h2 { font-size: 14px; font-weight: 600; margin: 0; display: flex; flex-wrap: wrap;
+           align-items: baseline; gap: 4px 12px; justify-content: space-between; }
+.card h2 small { font-weight: 400; color: var(--muted); font-size: 12.5px; }
+.toggle { display: inline-flex; border: 1px solid var(--rule-2); border-radius: 7px; overflow: hidden; }
+.toggle button { font: inherit; font-size: 12.5px; padding: 4px 10px; border: 0; background: transparent;
+                 color: var(--ink-2); cursor: pointer; }
+.toggle button[aria-pressed="true"] { background: var(--ink); color: var(--panel); }
+svg { display: block; width: 100%; height: auto; touch-action: none; overflow: visible; }
+svg text { font-family: var(--sans); fill: var(--ink-2); }
+svg .tick { font-size: 11px; fill: var(--muted); font-variant-numeric: tabular-nums; }
+svg .lab { font-size: 11.5px; fill: var(--ink-2); }
+svg .reg { font-size: 12px; fill: var(--ink-2); font-style: italic; }
+.mapwrap { position: relative; }
+.mapwrap canvas { position: absolute; z-index: 0; pointer-events: none; image-rendering: auto; }
+.mapwrap svg { position: relative; z-index: 1; }
+svg .lab, svg .reg { paint-order: stroke; stroke: var(--panel); stroke-width: 3px; stroke-linejoin: round; }
+#map:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--focus);
+                                                               outline-offset: 2px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12.5px; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 14px; height: 10px; border-radius: 2px; display: inline-block; }
+.controls { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 20px; }
+.sliders { display: grid; gap: 12px; }
+.slider { display: grid; grid-template-columns: 9.5em minmax(0, 1fr) 6.2em; align-items: center; gap: 10px; }
+.slider label { font-size: 13.5px; }
+.slider label b { font-family: var(--mono); font-weight: 500; }
+.slider output { font-family: var(--mono); font-size: 13.5px; text-align: right;
+                 font-variant-numeric: tabular-nums; }
+.slider .hint { grid-column: 2 / 4; font-size: 12px; color: var(--muted); margin-top: -6px; }
+input[type=range] { width: 100%; accent-color: var(--ink); }
+.presets { display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; }
+.presets button { font: inherit; font-size: 13px; padding: 6px 11px; border-radius: 999px;
+                  border: 1px solid var(--rule-2); background: var(--panel); color: var(--ink);
+                  cursor: pointer; }
+.presets button:hover { border-color: var(--ink-2); }
+.presets button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+.lower { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 20px; }
+.verdict { display: grid; gap: 10px; align-content: start; }
+.vrow { display: grid; grid-template-columns: 1.3em 9em minmax(0, 1fr); gap: 8px; align-items: baseline;
+        font-size: 13.5px; }
+.vrow .ic { font-family: var(--mono); }
+.vrow .nm { color: var(--ink-2); }
+.eq { font-family: var(--mono); font-size: 13px; background: var(--bg); border-radius: 8px;
+      padding: 10px 12px; overflow-x: auto; white-space: nowrap; }
+.note { font-size: 12.5px; color: var(--muted); margin: 0; }
+footer { font-size: 12.5px; color: var(--muted); display: grid; gap: 6px; max-width: 90ch; }
+footer p { margin: 0; }
+.tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--panel);
+       font-family: var(--mono); font-size: 12px; padding: 4px 7px; border-radius: 5px;
+       white-space: nowrap; transform: translate(-50%, -130%); }
+@media (max-width: 860px) {
+  .work, .controls, .lower { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 600px) {
+  svg .tick { font-size: 18px; } svg .lab, svg .reg { font-size: 19px; }
+  #map .tick { font-size: 15px; } #map .lab, #map .reg { font-size: 15px; }
+  .slider { grid-template-columns: 7.5em minmax(0, 1fr) 5.4em; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+<!--BODY-->
+<div class="page">
+  <header>
+    <div class="eyebrow">Astrophysics atlas · O1 · the Friedmann equations</div>
+    <h1>Build a universe</h1>
+    <p>Pick how much matter, radiation and dark energy a universe holds, and the Friedmann
+      equation tells you its whole life: whether it began in a Big Bang, how old it is, and
+      whether it ends in a crunch, a rip, or never. Drag the point across the map. Every
+      universe here expands at the same rate today, H<sub>0</sub>.</p>
+  </header>
+
+  <section class="fate" aria-live="polite">
+    <p class="fate-text" id="fateText">…</p>
+    <div class="stats" id="stats"></div>
+  </section>
+
+  <section class="work">
+    <figure class="card">
+      <h2>The map of universes <span class="toggle" role="group" aria-label="Map range">
+        <button type="button" id="viewAll" aria-pressed="true">all</button>
+        <button type="button" id="viewNear" aria-pressed="false">near ours</button></span></h2>
+      <div class="mapwrap" id="mapwrap">
+        <canvas id="mapRegions" aria-hidden="true"></canvas>
+        <svg id="map" tabindex="0" role="application"
+             aria-label="Map of universes: matter density across, dark-energy density up. Drag, or use the arrow keys, to choose a universe."></svg>
+      </div>
+      <div class="legend" id="mapLegend">
+        <span><i class="sw" style="background:var(--sn-fill);border:1.5px solid var(--sn)"></i>supernovae (Pantheon+)</span>
+        <span><i class="sw" style="background:var(--bao-fill);border:1.5px solid var(--bao)"></i>BAO (DESI DR2)</span>
+        <span><i class="sw" style="background:var(--cmb-fill);border:1.5px solid var(--cmb)"></i>CMB (Planck)</span>
+        <span><i class="sw" style="background:var(--all-fill);border:1.5px solid var(--ink)"></i>all three</span>
+      </div>
+    </figure>
+    <figure class="card">
+      <h2>Its size over time <small>scale factor a; 1 = today</small></h2>
+      <div style="position:relative" id="histwrap"><svg id="hist" aria-label="Size of the chosen universe against time"></svg></div>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--ink);height:3px"></i>your universe</span>
+        <span><i class="sw" style="background:repeating-linear-gradient(90deg,var(--ref) 0 5px,transparent 5px 8px);height:2px"></i>ours, as measured</span>
+      </div>
+    </figure>
+  </section>
+
+  <section class="controls">
+    <div class="card">
+      <h2>Ingredients <small>today's densities, as fractions of the critical density</small></h2>
+      <div class="sliders">
+        <div class="slider"><label for="sOm">matter <b>Ω<sub>m</sub></b></label>
+          <input type="range" id="sOm" min="0" max="3" step="0.001"><output id="oOm" for="sOm"></output></div>
+        <div class="slider"><label for="sOL">dark energy <b>Ω<sub>Λ</sub></b></label>
+          <input type="range" id="sOL" min="-1" max="3" step="0.001"><output id="oOL" for="sOL"></output></div>
+        <div class="slider"><label for="sOr">radiation <b>Ω<sub>r</sub></b></label>
+          <input type="range" id="sOr" min="-6" max="0" step="0.01"><output id="oOr" for="sOr"></output>
+          <div class="hint" id="hOr"></div></div>
+        <div class="slider"><label for="sW">dark energy's <b>w</b></label>
+          <input type="range" id="sW" min="-2" max="0" step="0.01"><output id="oW" for="sW"></output>
+          <div class="hint">pressure ÷ density; −1 is a cosmological constant, below −1 is “phantom”</div></div>
+        <div class="slider"><label for="sH0">expansion today <b>H<sub>0</sub></b></label>
+          <input type="range" id="sH0" min="50" max="80" step="0.1"><output id="oH0" for="sH0"></output>
+          <div class="hint">km/s/Mpc; the CMB and BAO say 68.6, the Cepheid distance ladder says 73.5</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Try a universe</h2>
+      <div class="presets" id="presets"></div>
+      <p class="note" id="presetNote"></p>
+    </div>
+  </section>
+
+  <section class="lower">
+    <figure class="card">
+      <h2>Its speedometer <small>expansion speed ȧ = H(z)/(1+z), against redshift</small></h2>
+      <div style="position:relative" id="speedwrap"><svg id="speed" aria-label="Expansion speed against redshift, with measurements"></svg></div>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--ink);height:3px"></i>your universe</span>
+        <span><i class="sw" style="background:var(--muted);border-radius:50%;width:8px;height:8px"></i>cosmic chronometers (32 galaxies' ages)</span>
+        <span><i class="sw" style="background:var(--ink);width:8px;height:8px"></i>DESI DR2 BAO</span>
+      </div>
+    </figure>
+    <div class="card verdict">
+      <h2>What the measurements say</h2>
+      <div id="verdict"></div>
+      <div class="eq" id="eq" aria-label="The Friedmann equation for this universe"></div>
+      <p class="note" id="verdictNote"></p>
+    </div>
+  </section>
+
+  <footer>
+    <p>The Friedmann equation is solved exactly in the page itself (time integrals with the
+      turning points removed by substitution; the same method as the project's Python code, checked
+      there against closed-form solutions, a direct integration of the acceleration equation, and
+      CAMB). Probability regions (68% dark, 95% light) are our own fits with curvature free:
+      Pantheon+ supernovae (Scolnic et al. 2022), DESI DR2 BAO (2025) and the compressed Planck
+      PR4 CMB (Lemos &amp; Lewis 2023). Speedometer data: Moresco et al. (2022) cosmic chronometers
+      (diagonal errors, drawn only) and DESI DR2 line-of-sight BAO converted with our r<sub>d</sub>.</p>
+    <p id="credits"></p>
+  </footer>
+</div>
+
+<script>
+"use strict";
+const DATA = /*__DATA__*/null;
+
+/* ---------------- physics: the Friedmann equation ---------------- */
+const GX = [-0.9602898564975363, -0.7966664774136267, -0.5255324099163290, -0.1834346424956498,
+            0.1834346424956498, 0.5255324099163290, 0.7966664774136267, 0.9602898564975363];
+const GW = [0.1012285362903763, 0.2223810344533745, 0.3137066458778873, 0.3626837833783620,
+            0.3626837833783620, 0.3137066458778873, 0.2223810344533745, 0.1012285362903763];
+function gl(f, a, b) {
+  const m = 0.5 * (a + b), h = 0.5 * (b - a);
+  let s = 0;
+  for (let i = 0; i < 8; i++) s += GW[i] * f(m + h * GX[i]);
+  return s * h;
+}
+const HUBBLE_GYR = DATA ? DATA.hubbleTimeGyrTimesH0 : 977.79;
+const OR_COEF = DATA ? DATA.omegaR_h2 : 4.1826e-5;  // photons + neutrinos, x h^-2
+
+function makeU(Om, OL, Or, w, H0) {
+  const Ok = 1 - Om - OL - Or, n = 1 - 3 * w;
+  const P = a => Or + Om * a + Ok * a * a + OL * Math.pow(a, n);
+  const dP = a => Om + 2 * Ok * a + n * OL * Math.pow(a, n - 1);
+  return { Om, OL, Or, w, H0, Ok, n, P, dP, tH: HUBBLE_GYR / H0 };
+}
+
+function roots(u) {
+  const out = [];
+  const N = 3600, lo = Math.log(1e-8), hi = Math.log(1e8);
+  let xPrev = Math.exp(lo), pPrev = u.P(xPrev), pPrev2 = NaN;
+  for (let i = 1; i <= N; i++) {
+    const x = Math.exp(lo + (hi - lo) * i / N), p = u.P(x);
+    if (pPrev === 0) out.push(xPrev);
+    else if (pPrev * p < 0) {
+      let a = xPrev, b = x, pa = pPrev;
+      for (let k = 0; k < 90; k++) {
+        const m = 0.5 * (a + b), pm = u.P(m);
+        if (pa * pm <= 0) b = m; else { a = m; pa = pm; }
+      }
+      out.push(0.5 * (a + b));
+    } else if (pPrev2 > pPrev && p > pPrev && pPrev > 0 && pPrev < 1e-10) out.push(xPrev);
+    pPrev2 = pPrev; pPrev = p; xPrev = x;
+  }
+  return out;
+}
+
+function eternalPast(u) {
+  // P ~ c a^p near a = 0 with p >= 4 (nothing but a cosmological constant or phantom energy)
+  if (u.Or > 0 || u.Om > 0 || u.Ok > 1e-12) return false;
+  return !(u.OL !== 0 && u.n < 4);
+}
+
+function Q(u, r, x) {  // P(x) / (x - r) without cancellation near the root r
+  const d = x - r;
+  if (Math.abs(d) < 1e-7 * Math.max(r, 1e-12)) return u.dP(r);
+  return u.P(x) / d;
+}
+// time (1/H0) from the Big Bang to size a: a = s^2 removes the a -> 0 behaviour
+function gZero(u) { return s => { const p = u.P(s * s); return p > 0 ? 2 * s * s * s / Math.sqrt(p) : 0; }; }
+// time from a turning point r: a = r +- s^2 removes the 1/sqrt singularity
+function gRoot(u, r, sign) { return s => { const x = r + sign * s * s; return 2 * x / Math.sqrt(Math.abs(Q(u, r, x))); }; }
+// ordinary stretch, in x = ln a
+function gLog(u) { return x => { const a = Math.exp(x), p = u.P(a); return p > 0 ? a * a / Math.sqrt(p) : 0; }; }
+
+function cumulative(g, nodes) {
+  const t = [0];
+  for (let i = 1; i < nodes.length; i++) t.push(t[i - 1] + gl(g, nodes[i - 1], nodes[i]));
+  return t;
+}
+function linspace(a, b, n) { const out = []; for (let i = 0; i < n; i++) out.push(a + (b - a) * i / (n - 1)); return out; }
+
+function analyse(u, tWindow) {
+  const r = roots(u);
+  const below = r.filter(x => x < 1), above = r.filter(x => x > 1);
+  const aMin = below.length ? Math.max(...below) : null;
+  const aMax = above.length ? Math.min(...above) : null;
+  const isDouble = x => Math.abs(u.dP(x)) < 1e-7 * (1 + Math.abs(u.Om) + Math.abs(u.Ok) + Math.abs(u.OL));
+  const F = { aMin, aMax, roots: r };
+  // past branch: from its start up to a = 1, times relative to today (1/H0)
+  let pa, pt;
+  if (aMin !== null) {
+    if (isDouble(aMin)) { F.past = "static"; }
+    const s = linspace(0, Math.sqrt(1 - aMin), 220);
+    const T = cumulative(gRoot(u, aMin, 1), s);
+    pa = s.map(v => aMin + v * v); pt = T.map(v => v - T[T.length - 1]);
+    F.past = F.past || "bounce"; F.tBounce = pt[0];
+  } else if (eternalPast(u)) {
+    const x = linspace(0, Math.log(1e-7), 400);  // downward in ln a
+    const T = cumulative(gLog(u), x);           // negative increments
+    pa = x.map(Math.exp).reverse(); pt = T.map(v => v).reverse();
+    F.past = "eternal";
+  } else {
+    const s = linspace(0, 1, 500);
+    const T = cumulative(gZero(u), s);
+    pa = s.map(v => v * v); pt = T.map(v => v - T[T.length - 1]);
+    F.past = "bang"; F.age = -pt[0];
+  }
+  // future branch
+  let fa, ft;
+  const tHi = tWindow / u.tH;
+  if (aMax !== null) {
+    const s = linspace(Math.sqrt(aMax - 1), 0, 220);
+    const g = gRoot(u, aMax, -1);
+    ft = [0]; for (let i = 1; i < s.length; i++) ft.push(ft[i - 1] + gl(g, s[i], s[i - 1]));
+    fa = s.map(v => aMax - v * v);
+    F.future = isDouble(aMax) ? "static" : "crunch"; F.tTurn = ft[ft.length - 1];
+    if (F.past === "bang") F.tCrunch = F.tTurn + F.age + F.tTurn;
+  } else {
+    fa = [1]; ft = [0];
+    const g = gLog(u);
+    let x = 0, t = 0;
+    while (t < tHi && x < 18) {
+      const dx = 0.02;
+      t += gl(g, x, x + dx); x += dx; fa.push(Math.exp(x)); ft.push(t);
+    }
+    if (u.w < -1 && u.OL > 0) {  // Big Rip: add the remaining time to a -> infinity
+      let tt = t, xx = x;
+      while (xx < 30) { tt += gl(g, xx, xx + 0.05); xx += 0.05; }
+      const A = Math.exp(xx), k = u.n / 2 - 2;
+      tt += Math.pow(A, -k) / (k * Math.sqrt(u.OL));
+      F.future = "rip"; F.tRip = tt;
+    } else {
+      F.future = (u.OL > 0 && u.w < -1 / 3) ? "accelerating" : "slowing";
+    }
+  }
+  const pieces = [{ t: pt.concat(ft.slice(1)), a: pa.concat(fa.slice(1)) }];
+  if (aMin !== null && F.past === "bounce") {
+    const tb = pt[0];
+    pieces.unshift({ t: pt.map(v => 2 * tb - v).reverse(), a: pa.slice().reverse() });
+  }
+  if (F.future === "crunch") {
+    const tt = ft[ft.length - 1];
+    pieces.push({ t: ft.map(v => 2 * tt - v).reverse(), a: fa.slice().reverse() });
+  }
+  // loitering: the slowest expansion in the past, relative to today's (a-dot / H0)
+  if (F.past === "bang") {
+    let minSpeed = Infinity, aSlow = 1;
+    for (let i = 1; i < 400; i++) {
+      const a = Math.exp(Math.log(1e-4) * (1 - i / 400));
+      const sp = Math.sqrt(Math.max(u.P(a), 0)) / a;
+      if (sp < minSpeed) { minSpeed = sp; aSlow = a; }
+    }
+    if (minSpeed < 0.25 && F.age > 2.2) { F.loiter = { a: aSlow, speed: minSpeed }; }
+  }
+  // deceleration today and the redshift where it switched sign
+  F.q0 = u.Or + 0.5 * u.Om + 0.5 * (1 + 3 * u.w) * u.OL;
+  const qz = z => { const x = 1 + z; return 2 * u.Or * x ** 4 + u.Om * x ** 3 + (1 + 3 * u.w) * u.OL * Math.pow(x, 3 + 3 * u.w); };
+  F.zAcc = null;
+  if (F.q0 < 0) {
+    const zMaxSee = aMin !== null ? 1 / aMin - 1 : 50;
+    let z0 = 0, f0 = qz(0);
+    for (let i = 1; i <= 500; i++) {
+      const z1 = Math.min(zMaxSee, 50) * i / 500, f1 = qz(z1);
+      if (f0 < 0 && f1 >= 0) { let a = z0, b = z1; for (let k = 0; k < 60; k++) { const m = (a + b) / 2; if (qz(m) < 0) a = m; else b = m; } F.zAcc = (a + b) / 2; break; }
+      z0 = z1; f0 = f1;
+    }
+  }
+  F.pieces = pieces.map(p => ({ t: p.t.map(v => v * u.tH), a: p.a }));
+  return F;
+}
+
+/* ---------------- state ---------------- */
+const ours = DATA.ours;
+const state = { Om: ours.Om, OL: ours.OL, Or: ours.Or, w: -1, H0: ours.H0, view: "all", orAuto: true };
+const VIEWS = { all: { x: [0, 3], y: [-1, 3] }, near: { x: [0, 1], y: [0, 1.2] } };
+const NS = "http://www.w3.org/2000/svg";
+const $ = id => document.getElementById(id);
+function el(tag, attrs, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+const fmt = (v, d) => (Math.abs(v) < 0.5 * Math.pow(10, -d) ? 0 : v).toFixed(d).replace("-", "−");
+const gyr = v => (v >= 100 ? v.toFixed(0) : v.toFixed(1));
+function orDefault(H0) { return OR_COEF / Math.pow(H0 / 100, 2); }
+
+/* ---------------- map ---------------- */
+const MAP = { W: 460, H: 500, L: 46, R: 12, T: 10, B: 40 };
+function mapScales() {
+  const v = VIEWS[state.view];
+  const sx = x => MAP.L + (x - v.x[0]) / (v.x[1] - v.x[0]) * (MAP.W - MAP.L - MAP.R);
+  const sy = y => MAP.H - MAP.B - (y - v.y[0]) / (v.y[1] - v.y[0]) * (MAP.H - MAP.T - MAP.B);
+  const ix = px => v.x[0] + (px - MAP.L) / (MAP.W - MAP.L - MAP.R) * (v.x[1] - v.x[0]);
+  const iy = py => v.y[0] + (MAP.H - MAP.B - py) / (MAP.H - MAP.T - MAP.B) * (v.y[1] - v.y[0]);
+  return { v, sx, sy, ix, iy };
+}
+
+function classify(Om, OL, Or, w) {
+  // 0 accelerating forever, 1 slowing forever, 2 Big Crunch, 3 Big Rip, 4 no Big Bang
+  const Ok = 1 - Om - OL - Or, n = 1 - 3 * w;
+  let neg = false, prev = Or + Om * 1e-6 + Ok * 1e-12 + OL * Math.pow(1e-6, n), bounce = false, crunch = false;
+  for (let i = 1; i <= 192; i++) {
+    const a = Math.pow(10, -6 + 12 * i / 192);
+    const p = Or + Om * a + Ok * a * a + OL * Math.pow(a, n);
+    if (p < 0) { if (a < 1) bounce = true; else { crunch = true; break; } }
+    prev = p;
+  }
+  if (bounce) return 4;
+  if (crunch) return 2;
+  if (w < -1 && OL > 0) return 3;
+  const q0 = Or + 0.5 * Om + 0.5 * (1 + 3 * w) * OL;
+  return q0 < 0 ? 0 : 1;
+}
+
+let regionKey = "";
+function drawRegions() {
+  const key = [state.view, state.Or.toPrecision(4), state.w.toFixed(3), getComputedStyle(document.documentElement).getPropertyValue("--r-accel")].join("|");
+  const cv = $("mapRegions"), svg = $("map");
+  const rect = svg.getBoundingClientRect();
+  const scale = rect.width / MAP.W;
+  const S = mapScales();
+  const x0 = S.sx(S.v.x[0]) * scale, y0 = S.sy(S.v.y[1]) * scale;
+  const w = (S.sx(S.v.x[1]) - S.sx(S.v.x[0])) * scale, h = (S.sy(S.v.y[0]) - S.sy(S.v.y[1])) * scale;
+  cv.style.left = x0 + "px"; cv.style.top = y0 + "px";
+  cv.style.width = w + "px"; cv.style.height = h + "px";
+  if (key === regionKey && cv.width > 0) return;
+  regionKey = key;
+  const nx = 150, ny = 160;
+  cv.width = nx; cv.height = ny;
+  const ctx = cv.getContext("2d");
+  const css = getComputedStyle(document.documentElement);
+  const cols = ["--r-accel", "--r-slow", "--r-end", "--r-end", "--r-nobang"].map(v => css.getPropertyValue(v).trim());
+  for (let j = 0; j < ny; j++) {
+    const OL = S.v.y[1] - (j + 0.5) / ny * (S.v.y[1] - S.v.y[0]);
+    for (let i = 0; i < nx; i++) {
+      const Om = S.v.x[0] + (i + 0.5) / nx * (S.v.x[1] - S.v.x[0]);
+      ctx.fillStyle = cols[classify(Om, OL, state.Or, state.w)];
+      ctx.fillRect(i, j, 1, 1);
+    }
+  }
+}
+
+function edges(Or, w) {
+  // the double-root curves P(a*) = P'(a*) = 0, linear in (Om, OL) for each a*
+  const n = 1 - 3 * w;
+  const pts = a => {
+    const a11 = a - a * a, a12 = Math.pow(a, n) - a * a, a21 = 1 - 2 * a, a22 = n * Math.pow(a, n - 1) - 2 * a;
+    const b1 = -Or * (1 - a * a) - a * a, b2 = -2 * a * (1 - Or);
+    const det = a11 * a22 - a12 * a21;
+    return [(b1 * a22 - a12 * b2) / det, (a11 * b2 - a21 * b1) / det];
+  };
+  const low = [], high = [];
+  for (let i = 1; i < 700; i++) { const a = Math.pow(10, -3 + 3 * i / 700) * 0.9999; const p = pts(a); if (p[0] >= 0 && p[0] < 6 && isFinite(p[1])) low.push(p); }
+  for (let i = 1; i < 700; i++) { const a = 1 + Math.pow(10, -3 + 6 * i / 700); const p = pts(a); if (p[0] >= 0 && p[0] < 6 && isFinite(p[1])) high.push(p); }
+  return { low, high };
+}
+
+function polyPath(pts, S) {
+  let d = "";
+  pts.forEach((p, i) => { d += (i ? "L" : "M") + S.sx(p[0]).toFixed(1) + "," + S.sy(p[1]).toFixed(1); });
+  return d;
+}
+
+function drawMapStatic() {
+  const svg = $("map");
+  svg.setAttribute("viewBox", `0 0 ${MAP.W} ${MAP.H}`);
+  svg.innerHTML = "";
+  const S = mapScales();
+  const g = el("g", {}, svg);
+  const clip = el("clipPath", { id: "mclip" }, el("defs", {}, svg));
+  el("rect", { x: MAP.L, y: MAP.T, width: MAP.W - MAP.L - MAP.R, height: MAP.H - MAP.T - MAP.B }, clip);
+  // grid and ticks
+  const xt = state.view === "all" ? [0, 0.5, 1, 1.5, 2, 2.5, 3] : [0, 0.2, 0.4, 0.6, 0.8, 1];
+  const yt = state.view === "all" ? [-1, -0.5, 0, 0.5, 1, 1.5, 2, 2.5, 3] : [0, 0.2, 0.4, 0.6, 0.8, 1, 1.2];
+  xt.forEach(x => { el("line", { x1: S.sx(x), x2: S.sx(x), y1: MAP.T, y2: MAP.H - MAP.B, stroke: "var(--rule)", "stroke-width": 0.7 }, g);
+                    el("text", { x: S.sx(x), y: MAP.H - MAP.B + 15, "text-anchor": "middle", class: "tick" }, g).textContent = String(x); });
+  yt.forEach(y => { el("line", { x1: MAP.L, x2: MAP.W - MAP.R, y1: S.sy(y), y2: S.sy(y), stroke: "var(--rule)", "stroke-width": 0.7 }, g);
+                    el("text", { x: MAP.L - 6, y: S.sy(y) + 4, "text-anchor": "end", class: "tick" }, g).textContent = String(y).replace("-", "−"); });
+  el("text", { x: (MAP.L + MAP.W - MAP.R) / 2, y: MAP.H - 6, "text-anchor": "middle", class: "lab" }, g).textContent = "Ωm, matter";
+  const yl = el("text", { x: 12, y: (MAP.T + MAP.H - MAP.B) / 2, "text-anchor": "middle", class: "lab", transform: `rotate(-90 12 ${(MAP.T + MAP.H - MAP.B) / 2})` }, g);
+  yl.textContent = "ΩΛ, dark energy";
+  const inner = el("g", { "clip-path": "url(#mclip)" }, svg);
+  // boundary lines
+  const E = edges(state.Or, state.w);
+  const line = (pts, extra) => el("path", Object.assign({ d: polyPath(pts, S), fill: "none", stroke: "var(--ink-2)", "stroke-width": 1.1 }, extra || {}), inner);
+  line(E.low); line(E.high);
+  if (state.w < -1 / 3 + 1e-9) {
+    const k = -(1 + 3 * state.w) / 2;  // q0 = 0 line: OL = (Or + Om/2) / k
+    line([[0, state.Or / k], [6, (state.Or + 3) / k]], { "stroke-width": 0.8, "stroke-dasharray": "5 4" });
+    if (state.w === -1) line([[0, 0], [1 - state.Or, 0]], { "stroke-width": 1.1 });
+  }
+  line([[0, 1 - state.Or], [6, -5 - state.Or]], { "stroke-width": 0.8 });
+  // data contours (valid for a cosmological constant and today's radiation)
+  const showData = Math.abs(state.w + 1) < 1e-9;
+  const cg = el("g", { opacity: showData ? 1 : 0.18 }, inner);
+  for (const [key, col, fill] of [["sn", "--sn", "--sn-fill"], ["cmb", "--cmb", "--cmb-fill"], ["bao", "--bao", "--bao-fill"], ["all", "--ink", "--all-fill"]]) {
+    const c = DATA.contours[key];
+    for (const lev of ["p95", "p68"]) {
+      for (const poly of c[lev]) {
+        el("path", { d: polyPath(poly, S) + "Z", fill: `var(${fill})`, stroke: `var(${col})`, "stroke-width": lev === "p68" ? 1.2 : 0.8, "fill-opacity": lev === "p68" ? 1 : 0.7 }, cg);
+      }
+    }
+  }
+  // region names
+  const reg = (txt, x, y) => { if (x > S.v.x[0] && x < S.v.x[1] && y > S.v.y[0] && y < S.v.y[1]) el("text", { x: S.sx(x), y: S.sy(y), class: "reg", "text-anchor": "middle" }, inner).textContent = txt; };
+  if (state.view === "all") {
+    reg("no Big Bang", 0.42, 2.72); reg("forever, speeding up", 1.05, 1.62); reg("forever, slowing", 2.35, 0.48);
+    reg("Big Crunch", 1.9, -0.62);
+    if (state.w < -1) reg("then a Big Rip", 1.05, 1.35);
+  } else {
+    reg("forever, speeding up", 0.2, 1.1); reg("forever, slowing", 0.78, 0.08);
+  }
+  // our universe and the marker
+  el("path", { d: starPath(S.sx(ours.Om), S.sy(ours.OL), 7), fill: "var(--ink)", stroke: "var(--panel)", "stroke-width": 1 }, svg);
+  const mk = el("g", { id: "marker" }, svg);
+  el("circle", { r: 9, fill: "none", stroke: "var(--ink)", "stroke-width": 2 }, mk);
+  el("circle", { r: 2.2, fill: "var(--ink)" }, mk);
+  drawRegions();
+  placeMarker();
+}
+function starPath(cx, cy, r) {
+  let d = "";
+  for (let i = 0; i < 10; i++) {
+    const ang = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.45 : r;
+    d += (i ? "L" : "M") + (cx + rr * Math.cos(ang)).toFixed(1) + "," + (cy + rr * Math.sin(ang)).toFixed(1);
+  }
+  return d + "Z";
+}
+function placeMarker() {
+  const S = mapScales();
+  const x = Math.min(Math.max(state.Om, S.v.x[0]), S.v.x[1]);
+  const y = Math.min(Math.max(state.OL, S.v.y[0]), S.v.y[1]);
+  $("marker").setAttribute("transform", `translate(${S.sx(x)},${S.sy(y)})`);
+}
+
+/* ---------------- history and speedometer charts ---------------- */
+const HIS = { W: 680, H: 500, L: 44, R: 12, T: 12, B: 36, x: [-30, 50], y: [0, 4] };
+const SPD = { W: 680, H: 330, L: 44, R: 12, T: 12, B: 36, x: [0, 2.5], y: [20, 120] };
+function axes(svg, C, xt, yt, xlab, ylab) {
+  svg.setAttribute("viewBox", `0 0 ${C.W} ${C.H}`);
+  svg.innerHTML = "";
+  const sx = x => C.L + (x - C.x[0]) / (C.x[1] - C.x[0]) * (C.W - C.L - C.R);
+  const sy = y => C.H - C.B - (y - C.y[0]) / (C.y[1] - C.y[0]) * (C.H - C.T - C.B);
+  const g = el("g", {}, svg);
+  xt.forEach(x => { el("line", { x1: sx(x), x2: sx(x), y1: C.T, y2: C.H - C.B, stroke: "var(--rule)", "stroke-width": 0.7 }, g);
+                    el("text", { x: sx(x), y: C.H - C.B + 15, "text-anchor": "middle", class: "tick" }, g).textContent = String(x).replace("-", "−"); });
+  yt.forEach(y => { el("line", { x1: C.L, x2: C.W - C.R, y1: sy(y), y2: sy(y), stroke: "var(--rule)", "stroke-width": 0.7 }, g);
+                    el("text", { x: C.L - 6, y: sy(y) + 4, "text-anchor": "end", class: "tick" }, g).textContent = String(y); });
+  el("text", { x: (C.L + C.W - C.R) / 2, y: C.H - 4, "text-anchor": "middle", class: "lab" }, g).textContent = xlab;
+  const yl = el("text", { x: 11, y: (C.T + C.H - C.B) / 2, "text-anchor": "middle", class: "lab", transform: `rotate(-90 11 ${(C.T + C.H - C.B) / 2})` }, g);
+  yl.textContent = ylab;
+  const clipId = svg.id + "clip";
+  const cp = el("clipPath", { id: clipId }, el("defs", {}, svg));
+  el("rect", { x: C.L, y: C.T, width: C.W - C.L - C.R, height: C.H - C.T - C.B }, cp);
+  return { sx, sy, inner: el("g", { "clip-path": `url(#${clipId})` }, svg) };
+}
+function pathOf(xs, ys, sx, sy, yMax) {
+  let d = "", pen = false;
+  for (let i = 0; i < xs.length; i++) {
+    const ok = isFinite(ys[i]) && isFinite(xs[i]);
+    if (!ok) { pen = false; continue; }
+    const X = sx(xs[i]), Y = sy(Math.min(ys[i], yMax));
+    d += (pen ? "L" : "M") + X.toFixed(1) + "," + Y.toFixed(1);
+    pen = ys[i] <= yMax;
+  }
+  return d;
+}
+
+let oursHist = null;
+function drawHistory(F) {
+  const svg = $("hist");
+  const A = axes(svg, HIS, [-30, -20, -10, 0, 10, 20, 30, 40, 50], [0, 1, 2, 3, 4], "time from today (billions of years)", "scale factor a");
+  el("line", { x1: A.sx(0), x2: A.sx(0), y1: HIS.T, y2: HIS.H - HIS.B, stroke: "var(--rule-2)", "stroke-width": 1 }, A.inner);
+  if (!oursHist) oursHist = analyse(makeU(ours.Om, ours.OL, ours.Or, -1, ours.H0), 60);
+  for (const p of oursHist.pieces) el("path", { d: pathOf(p.t, p.a, A.sx, A.sy, 4.4), fill: "none", stroke: "var(--ref)", "stroke-width": 1.6, "stroke-dasharray": "6 4" }, A.inner);
+  for (const p of F.pieces) el("path", { d: pathOf(p.t, p.a, A.sx, A.sy, 4.4), fill: "none", stroke: "var(--ink)", "stroke-width": 2.6, "stroke-linecap": "round", "stroke-linejoin": "round" }, A.inner);
+  el("circle", { cx: A.sx(0), cy: A.sy(1), r: 4.5, fill: "var(--ink)", stroke: "var(--panel)", "stroke-width": 1.5 }, svg);
+  el("text", { x: A.sx(0) + 8, y: A.sy(1) + 16, class: "lab" }, svg).textContent = "today";
+  const mark = (t, label, y) => {
+    if (t < HIS.x[0] || t > HIS.x[1]) return;
+    el("line", { x1: A.sx(t), x2: A.sx(t), y1: A.sy(0) - 7, y2: A.sy(0) + 0, stroke: "var(--ink)", "stroke-width": 2 }, svg);
+    el("text", { x: A.sx(t) + (label === "Big Bang" ? -6 : 6), y: A.sy(y), "text-anchor": label === "Big Bang" ? "end" : "start", class: "lab" }, svg).textContent = label;
+  };
+  const tH = makeU(state.Om, state.OL, state.Or, state.w, state.H0).tH;
+  if (F.past === "bang") mark(-F.age * tH, "Big Bang", 0.12);
+  if (F.future === "crunch" && F.tCrunch) mark(F.tCrunch * tH, "Big Crunch", 0.12);
+  if (F.future === "rip") mark(F.tRip * tH, "Big Rip", 0.12);
+  HIS.A = A;
+}
+
+function drawSpeed(u, F) {
+  const svg = $("speed");
+  const A = axes(svg, SPD, [0, 0.5, 1, 1.5, 2, 2.5], [20, 40, 60, 80, 100, 120], "redshift z (how far back)", "ȧ (km/s/Mpc)");
+  const zs = linspace(0, 2.5, 251);
+  const speed = (uu, z) => { const a = 1 / (1 + z), p = uu.P(a); return p > 0 ? uu.H0 * Math.sqrt(p) / a : NaN; };
+  const uo = makeU(ours.Om, ours.OL, ours.Or, -1, ours.H0);
+  el("path", { d: pathOf(zs, zs.map(z => speed(uo, z)), A.sx, A.sy, 130), fill: "none", stroke: "var(--ref)", "stroke-width": 1.5, "stroke-dasharray": "6 4" }, A.inner);
+  const pts = [];
+  for (const [z, H, e] of DATA.cc) {
+    const y = H / (1 + z), ey = e / (1 + z);
+    el("line", { x1: A.sx(z), x2: A.sx(z), y1: A.sy(y - ey), y2: A.sy(y + ey), stroke: "var(--muted)", "stroke-width": 1 }, A.inner);
+    el("circle", { cx: A.sx(z), cy: A.sy(y), r: 3.4, fill: "var(--muted)" }, A.inner);
+    pts.push({ x: A.sx(z), y: A.sy(y), txt: `chronometer z=${z}: ${y.toFixed(1)} ± ${ey.toFixed(1)}` });
+  }
+  for (const [z, H, e] of DATA.desi) {
+    const y = H / (1 + z), ey = e / (1 + z);
+    el("line", { x1: A.sx(z), x2: A.sx(z), y1: A.sy(y - ey), y2: A.sy(y + ey), stroke: "var(--ink)", "stroke-width": 1.4 }, A.inner);
+    el("rect", { x: A.sx(z) - 4, y: A.sy(y) - 4, width: 8, height: 8, fill: "var(--ink)", stroke: "var(--panel)", "stroke-width": 1 }, A.inner);
+    pts.push({ x: A.sx(z), y: A.sy(y), txt: `DESI z=${z}: ${y.toFixed(1)} ± ${ey.toFixed(1)}` });
+  }
+  el("path", { d: pathOf(zs, zs.map(z => speed(u, z)), A.sx, A.sy, 130), fill: "none", stroke: "var(--ink)", "stroke-width": 2.4, "stroke-linecap": "round" }, A.inner);
+  if (F.zAcc !== null && F.zAcc < 2.5) {
+    const y = speed(u, F.zAcc);
+    el("circle", { cx: A.sx(F.zAcc), cy: A.sy(y), r: 4, fill: "var(--panel)", stroke: "var(--ink)", "stroke-width": 1.6 }, svg);
+    el("text", { x: A.sx(F.zAcc), y: A.sy(y) + 18, "text-anchor": "middle", class: "lab" }, svg).textContent = "speeds up from here";
+  }
+  SPD.pts = pts;
+}
+
+/* ---------------- verdict: what the data say ---------------- */
+function inPoly(pt, poly) {
+  let inside = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const xi = poly[i][0], yi = poly[i][1], xj = poly[j][0], yj = poly[j][1];
+    if ((yi > pt[1]) !== (yj > pt[1]) && pt[0] < (xj - xi) * (pt[1] - yi) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+function level(key) {
+  const c = DATA.contours[key], p = [state.Om, state.OL];
+  if (c.p68.some(poly => inPoly(p, poly))) return 68;
+  if (c.p95.some(poly => inPoly(p, poly))) return 95;
+  return 0;
+}
+function snDchi2() {
+  const g = DATA.sngrid;
+  const fx = (state.Om - g.om0) / g.dom, fy = (state.OL - g.ol0) / g.dol;
+  if (fx < 0 || fy < 0 || fx > g.nom - 1 || fy > g.nol - 1) return null;
+  const i = Math.min(Math.floor(fx), g.nom - 2), j = Math.min(Math.floor(fy), g.nol - 2), tx = fx - i, ty = fy - j;
+  const v = (a, b) => g.d[a * g.nol + b];
+  return (1 - tx) * (1 - ty) * v(i, j) + tx * (1 - ty) * v(i + 1, j) + (1 - tx) * ty * v(i, j + 1) + tx * ty * v(i + 1, j + 1);
+}
+function drawVerdict() {
+  const box = $("verdict");
+  box.innerHTML = "";
+  const lambda = Math.abs(state.w + 1) < 1e-9;
+  const radOK = state.Or <= 3 * orDefault(state.H0);  // radiation barely moves a universe on the map
+  if (!lambda || !radOK) {
+    $("verdictNote").textContent = !lambda ? "The fits assume a cosmological constant (w = −1); set w back to −1 to compare with the data."
+      : "The fits assume about today's radiation (the CMB's photons and neutrinos); lower Ωr to compare with the data.";
+  } else {
+    $("verdictNote").textContent = "Inside the dark region: within the 68% range of that measurement; inside the light one: within 95%. Curvature is free in every fit.";
+  }
+  const rows = [["sn", "supernovae"], ["bao", "BAO"], ["cmb", "CMB"], ["all", "all three"]];
+  for (const [key, name] of rows) {
+    let ic = "–", txt = "no comparison for this universe";
+    if (lambda && radOK) {
+      const L = level(key);
+      ic = L === 68 ? "●" : L === 95 ? "◐" : "○";
+      txt = L === 68 ? "fits (inside 68%)" : L === 95 ? "fits at 95%" : "ruled out";
+      if (key === "sn" && L === 0) { const d = snDchi2(); if (d !== null) txt += d >= 999 ? " (Δχ² > 999)" : ` (Δχ² = ${d.toFixed(0)})`; }
+    }
+    const r = document.createElement("div");
+    r.className = "vrow";
+    r.innerHTML = `<span class="ic" aria-hidden="true">${ic}</span><span class="nm">${name}</span><span>${txt}</span>`;
+    box.appendChild(r);
+  }
+  const u = makeU(state.Om, state.OL, state.Or, state.w, state.H0);
+  const term = (c, p) => `${c >= 0 ? "+" : "−"} ${Math.abs(c) < 1e-3 && c !== 0 ? Math.abs(c).toExponential(1) : Math.abs(c).toFixed(3)} a${p}`;
+  const dePow = state.w === -1 ? "" : `^${fmt(-3 * (1 + state.w), 2)}`;
+  $("eq").innerHTML = `H²/H₀² = ${u.Or === 0 ? "0" : u.Or < 1e-3 ? u.Or.toExponential(1) : u.Or.toFixed(3)} a⁻⁴ ${term(u.Om, "⁻³")} ${term(u.Ok, "⁻²")} ${state.OL >= 0 ? "+" : "−"} ${Math.abs(state.OL).toFixed(3)}${dePow ? " a" + dePow : ""}`;
+}
+
+/* ---------------- readouts ---------------- */
+function describe(u, F) {
+  const tH = u.tH;
+  let past;
+  if (F.past === "bang") past = `Begins in a Big Bang ${gyr(F.age * tH)} billion years ago`;
+  else if (F.past === "eternal") past = "Has no beginning: it has always been expanding";
+  else if (F.past === "static") past = "Emerged from Einstein's static universe infinitely long ago";
+  else past = `Had no Big Bang: it shrank from infinitely large, stopped at ${F.aMin.toFixed(2)} times today's size ${gyr(-F.tBounce * tH)} billion years ago, and has grown since`;
+  let fut;
+  if (F.future === "crunch") fut = `stops growing ${gyr(F.tTurn * tH)} billion years from now at ${F.aMax.toFixed(2)} times today's size, then collapses${F.tCrunch ? ` into a Big Crunch ${gyr(F.tCrunch * tH)} billion years from now` : ""}`;
+  else if (F.future === "rip") fut = `is torn apart in a Big Rip ${gyr(F.tRip * tH)} billion years from now`;
+  else if (F.future === "static") fut = "creeps towards a static size forever";
+  else if (F.future === "accelerating") fut = "expands forever, faster and faster";
+  else fut = "expands forever, ever more slowly";
+  let s = past + (F.past === "bounce" ? "; it " : ", and ") + fut + ".";
+  if (F.loiter) s += ` On the way it lingered near a fixed size around z ≈ ${(1 / F.loiter.a - 1).toFixed(1)}: a loitering universe.`;
+  if (F.past === "bounce") s += ` Nothing in it can look more redshifted than z = ${(1 / F.aMin - 1).toFixed(2)}; we see the CMB at z = 1090.`;
+  return s;
+}
+function stat(k, v, s) { return `<div class="stat"><span class="k">${k}</span><span class="v">${v}</span><span class="s">${s}</span></div>`; }
+function drawStats(u, F) {
+  const tH = u.tH, html = [];
+  html.push(stat("age", F.past === "bang" ? `${gyr(F.age * tH)} Gyr` : "no Big Bang" , F.past === "bang" ? `1/H₀ = ${tH.toFixed(1)} Gyr` : (F.past === "bounce" ? `largest z: ${(1 / F.aMin - 1).toFixed(2)}` : "infinitely old")));
+  html.push(stat("space", `Ωk = ${fmt(u.Ok, 3)}`, Math.abs(u.Ok) < 0.005 ? "flat" : u.Ok > 0 ? "open, like a saddle" : "closed, like a sphere"));
+  html.push(stat("expansion today", `q₀ = ${fmt(F.q0, 2)}`, F.q0 < 0 ? "speeding up" : "slowing down"));
+  html.push(stat("speeding up since", F.zAcc !== null ? `z = ${F.zAcc.toFixed(2)}` : "—", F.zAcc !== null ? "dark energy took over" : (F.q0 < 0 ? "always" : "never, so far")));
+  html.push(stat("future", F.future === "crunch" ? `crunch +${gyr(F.tCrunch ? F.tCrunch * tH : F.tTurn * tH)} Gyr` : F.future === "rip" ? `rip +${gyr(F.tRip * tH)} Gyr` : "forever", F.future === "crunch" ? `largest size ${F.aMax.toFixed(2)}× today` : F.future === "rip" ? "phantom dark energy" : (F.future === "accelerating" ? "accelerating" : "decelerating")));
+  $("stats").innerHTML = html.join("");
+}
+
+/* ---------------- wiring ---------------- */
+let lastF = null;
+function update(redrawMap) {
+  const u = makeU(state.Om, state.OL, state.Or, state.w, state.H0);
+  const F = analyse(u, 60);
+  lastF = F;
+  $("fateText").textContent = describe(u, F);
+  drawStats(u, F);
+  drawHistory(F);
+  drawSpeed(u, F);
+  drawVerdict();
+  if (redrawMap) drawMapStatic(); else placeMarker();
+  $("sOm").value = state.Om; $("oOm").textContent = state.Om.toFixed(3);
+  $("sOL").value = state.OL; $("oOL").textContent = fmt(state.OL, 3);
+  $("sOr").value = Math.log10(Math.max(state.Or, 1e-6)); $("oOr").textContent = state.Or === 0 ? "0" : state.Or < 1e-3 ? state.Or.toExponential(1) : state.Or.toFixed(3);
+  $("hOr").textContent = state.orAuto ? "today's CMB photons + neutrinos (set by H₀)" : "drag left to remove radiation; far right is a universe of pure light";
+  $("sW").value = state.w; $("oW").textContent = fmt(state.w, 2);
+  $("sH0").value = state.H0; $("oH0").textContent = state.H0.toFixed(1);
+}
+function setPreset(p) {
+  state.Om = p.Om; state.OL = p.OL; state.w = p.w; state.H0 = ours.H0;
+  if (p.Or === "cmb") { state.orAuto = true; state.Or = orDefault(state.H0); } else { state.orAuto = false; state.Or = p.Or; }
+  if (state.Om > 1.0 || state.OL > 1.2 || state.OL < 0) setView("all");
+  document.querySelectorAll("#presets button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.key === p.key)));
+  $("presetNote").textContent = p.story;
+  update(true);
+}
+function setView(v) {
+  state.view = v; regionKey = "";
+  $("viewAll").setAttribute("aria-pressed", String(v === "all"));
+  $("viewNear").setAttribute("aria-pressed", String(v === "near"));
+}
+function clearPreset() { document.querySelectorAll("#presets button").forEach(b => b.setAttribute("aria-pressed", "false")); $("presetNote").textContent = ""; }
+
+function init() {
+  const pr = $("presets");
+  for (const p of DATA.presets) {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = p.name; b.dataset.key = p.key; b.setAttribute("aria-pressed", "false");
+    b.addEventListener("click", () => setPreset(p));
+    pr.appendChild(b);
+  }
+  const svg = $("map");
+  const pick = ev => {
+    const r = svg.getBoundingClientRect(), S = mapScales();
+    const px = (ev.clientX - r.left) / r.width * MAP.W, py = (ev.clientY - r.top) / r.height * MAP.H;
+    state.Om = Math.min(Math.max(S.ix(px), Math.max(S.v.x[0], 0)), S.v.x[1]);
+    state.OL = Math.min(Math.max(S.iy(py), S.v.y[0]), S.v.y[1]);
+    state.Om = Math.round(state.Om * 1000) / 1000; state.OL = Math.round(state.OL * 1000) / 1000;
+    clearPreset(); update(false);
+  };
+  let dragging = false;
+  svg.addEventListener("pointerdown", ev => { dragging = true; svg.setPointerCapture(ev.pointerId); pick(ev); });
+  svg.addEventListener("pointermove", ev => { if (dragging) pick(ev); });
+  svg.addEventListener("pointerup", () => { dragging = false; });
+  svg.addEventListener("keydown", ev => {
+    const step = ev.shiftKey ? 0.1 : 0.01;
+    const k = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, step], ArrowDown: [0, -step] }[ev.key];
+    if (!k) return;
+    ev.preventDefault();
+    state.Om = Math.max(0, Math.round((state.Om + k[0]) * 1000) / 1000);
+    state.OL = Math.round((state.OL + k[1]) * 1000) / 1000;
+    clearPreset(); update(false);
+  });
+  $("viewAll").addEventListener("click", () => { setView("all"); update(true); });
+  $("viewNear").addEventListener("click", () => { setView("near"); update(true); });
+  $("sOm").addEventListener("input", e => { state.Om = +e.target.value; clearPreset(); update(false); });
+  $("sOL").addEventListener("input", e => { state.OL = +e.target.value; clearPreset(); update(false); });
+  $("sOr").addEventListener("input", e => { state.Or = Math.pow(10, +e.target.value); if (+e.target.value <= -5.99) state.Or = 0; state.orAuto = false; clearPreset(); update(true); });
+  $("sW").addEventListener("input", e => { state.w = Math.round(+e.target.value * 100) / 100; clearPreset(); update(true); });
+  $("sH0").addEventListener("input", e => { state.H0 = +e.target.value; if (state.orAuto) state.Or = orDefault(state.H0); clearPreset(); update(state.orAuto); });
+  // hover: crosshair on the history, nearest point on the speedometer
+  const tip = document.createElement("div"); tip.className = "tip"; tip.hidden = true;
+  $("histwrap").appendChild(tip);
+  $("hist").addEventListener("pointermove", ev => {
+    const r = $("hist").getBoundingClientRect(), px = (ev.clientX - r.left) / r.width * HIS.W;
+    const t = HIS.x[0] + (px - HIS.L) / (HIS.W - HIS.L - HIS.R) * (HIS.x[1] - HIS.x[0]);
+    const F = lastF;
+    let best = null;
+    for (const p of F.pieces) for (let i = 1; i < p.t.length; i++) if ((p.t[i - 1] - t) * (p.t[i] - t) <= 0) { const f = (t - p.t[i - 1]) / (p.t[i] - p.t[i - 1] || 1); best = p.a[i - 1] + f * (p.a[i] - p.a[i - 1]); }
+    if (best === null || t < HIS.x[0] || t > HIS.x[1]) { tip.hidden = true; return; }
+    tip.hidden = false;
+    tip.style.left = (ev.clientX - r.left) + "px"; tip.style.top = (ev.clientY - r.top) + "px";
+    tip.textContent = `${t >= 0 ? "+" : "−"}${Math.abs(t).toFixed(1)} Gyr · a = ${best.toFixed(3)}${best > 0 ? ` · z = ${fmt(1 / best - 1, 2)}` : ""}`;
+  });
+  $("hist").addEventListener("pointerleave", () => { tip.hidden = true; });
+  const tip2 = document.createElement("div"); tip2.className = "tip"; tip2.hidden = true;
+  $("speedwrap").appendChild(tip2);
+  $("speed").addEventListener("pointermove", ev => {
+    const r = $("speed").getBoundingClientRect(), sc = r.width / SPD.W;
+    const px = (ev.clientX - r.left) / sc, py = (ev.clientY - r.top) / sc;
+    let best = null, bd = 18;
+    for (const p of SPD.pts || []) { const d = Math.hypot(p.x - px, p.y - py); if (d < bd) { bd = d; best = p; } }
+    if (!best) { tip2.hidden = true; return; }
+    tip2.hidden = false; tip2.style.left = best.x * sc + "px"; tip2.style.top = best.y * sc + "px";
+    tip2.textContent = best.txt + " km/s/Mpc";
+  });
+  $("speed").addEventListener("pointerleave", () => { tip2.hidden = true; });
+  new ResizeObserver(() => drawRegions()).observe(svg);
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { regionKey = ""; drawRegions(); });
+  new MutationObserver(() => { regionKey = ""; drawRegions(); }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  $("credits").textContent = DATA.credits;
+  setPreset(DATA.presets[0]);
+}
+init();
+</script>
