@@ -10,6 +10,17 @@ foreground priors (we re-implement that likelihood; its data are measurements).
 
 from __future__ import annotations
 
+import os
+
+# One OpenMP thread per process, set before CAMB (and its bundled libgomp) is
+# loaded. CAMB run in the parent with a team of OpenMP threads leaves a
+# fork-started worker pool deadlocked: the children wait forever on a thread
+# team that was not copied into them. `run.py --force` hung this way inside
+# step_bk18_validation, after bk18_mcmc had called CAMB in the parent.
+# threadpool_limits() below cannot fix it: it only reaches libraries that are
+# already loaded, and CAMB is imported later.
+os.environ["OMP_NUM_THREADS"] = "1"
+
 from pathlib import Path
 
 from threadpoolctl import threadpool_limits

@@ -301,7 +301,10 @@ offline, light and dark):
 - hover anywhere to see how each data set grades that point.
 
 Ticks under the N* slider show the reheating histories for the current model. Buttons set N* to
-them. A table view lists predictions and verdicts.
+them. A table view lists predictions and verdicts. It is also published as a private artifact,
+https://claude.ai/artifact/TQe2Vg8pzWCKXYFx4beU2N, from `data/derived/inflation_explorer_artifact.html`
+(`explorer.py` rewrites it; republish to the same link). Others can open it only once it is shared
+from that page.
 
 ---
 
@@ -483,11 +486,15 @@ listed below.
 
     python fetch_data.py      # ~0.23 GB once (chains by byte range); the SMICA maps are linked from D3
     python run.py             # analysis (cached steps reused), 11 figures, the interactive page
-    python run.py --force     # recompute everything: ~10 min (the BK18 MCMC and its validation dominate)
+    python run.py --force     # recompute everything: ~5 min (the BK18 MCMC and its validation dominate)
     python run.py --check     # also run the 14 self-checks
 
-After the first fetch everything runs offline: `run.py --check` completes in about a minute from the
-caches.
+After the first fetch everything runs offline: `run.py --check` completes in about 20 s from the
+caches (checked with the network switched off). `--force` took 5.3 min on an idle 16-core machine,
+and about twice that on a heavily loaded one. Every step is seeded, so a forced rebuild reproduces
+every cached number. The largest change seen was 2 × 10⁻⁷ relative, from CAMB's thread count.
+`config.py` pins CAMB's OpenMP to one thread per process, because forking a worker pool after CAMB
+had started its OpenMP thread team deadlocked the validation step.
 
 | File | Role |
 |---|---|

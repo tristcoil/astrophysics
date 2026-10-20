@@ -697,8 +697,10 @@ def fig_08_bmodes():
         lt = np.arange(t.size)
         st = lt >= 2
         ax.plot(lt[st], t[st], color=ps.INK, lw=lw, ls="--")
+        # labels just under each curve's peak: above it, r = 0.036's label sat on the
+        # lensing curve, which crosses the tensor curves near l = 85
         i = 90
-        ax.text(lt[i] * 1.03, t[i] * 1.12, f"r = {r:g}", fontsize=7.5, color=ps.INK)
+        ax.text(lt[i] * 1.03, t[i] / 1.25, f"r = {r:g}", fontsize=7.5, color=ps.INK, va="top")
     for name, col, lab in (("dust150", ps.ORANGE, "polarized dust at 150 GHz (our BK18 fit, 68%)"),
                            ("dust95", ps.lighten(ps.ORANGE, 0.4), "... at 95 GHz (BICEP3)")):
         q = a[f"{name}_q"]
