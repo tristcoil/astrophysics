@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nickel Light Builder</title>
+<style>
+:root {
+  color-scheme: light;
+  --surface: #fcfcfb; --panel: #f4f3ef; --ink: #0b0b0b; --ink2: #52514e; --muted: #898781;
+  --grid: #e1e0d9; --axis: #c3c2b7; --model: #52514e;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --surface: #1a1a19; --panel: #232321; --ink: #ffffff; --ink2: #c3c2b7; --muted: #8f8e88;
+    --grid: #2f2f2d; --axis: #4a4a46; --model: #c3c2b7;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface: #1a1a19; --panel: #232321; --ink: #ffffff; --ink2: #c3c2b7; --muted: #8f8e88;
+  --grid: #2f2f2d; --axis: #4a4a46; --model: #c3c2b7;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--surface); color: var(--ink);
+       font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 1060px; margin: 0 auto; padding: 20px 16px 40px; }
+h1 { font-size: 1.45rem; margin: 0 0 4px; }
+p.lede { color: var(--ink2); margin: 0 0 16px; max-width: 760px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+button { font: inherit; font-size: 0.9rem; padding: 6px 12px; border-radius: 8px; cursor: pointer;
+         border: 1px solid var(--axis); background: var(--surface); color: var(--ink); }
+button[aria-pressed="true"] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+button:focus-visible, input:focus-visible { outline: 2px solid #2a78d6; outline-offset: 2px; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 290px; gap: 16px; }
+@media (max-width: 820px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+.card { background: var(--panel); border-radius: 12px; padding: 12px; }
+svg { width: 100%; height: auto; display: block; }
+.ctl { margin-bottom: 14px; }
+.ctl label { display: flex; justify-content: space-between; font-size: 0.88rem; color: var(--ink2); }
+.ctl label b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.ctl input[type=range] { width: 100%; }
+.ctl.disabled { opacity: 0.45; }
+.check { font-size: 0.88rem; color: var(--ink2); display: flex; gap: 6px; align-items: center; margin-bottom: 12px; }
+.readout { font-size: 0.86rem; color: var(--ink2); border-top: 1px solid var(--grid); padding-top: 10px; }
+.readout b { color: var(--ink); }
+.note { font-size: 0.88rem; color: var(--ink2); margin: 10px 2px 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.82rem; color: var(--ink2); margin: 6px 2px 0; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+#tip { position: fixed; pointer-events: none; background: var(--surface); color: var(--ink);
+       border: 1px solid var(--axis); border-radius: 6px; padding: 5px 8px; font-size: 0.8rem; display: none;
+       box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+details { margin-top: 16px; font-size: 0.85rem; }
+table { border-collapse: collapse; font-variant-numeric: tabular-nums; }
+td, th { padding: 2px 10px; text-align: right; border-bottom: 1px solid var(--grid); }
+.tablewrap { max-height: 280px; overflow: auto; }
+.axis text { fill: var(--muted); font-size: 11px; }
+.axis line, .axis path { stroke: var(--axis); }
+.gridline { stroke: var(--grid); }
+.lbl { fill: var(--ink2); font-size: 12px; }
+footer { color: var(--muted); font-size: 0.78rem; margin-top: 18px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Build a supernova's light from nickel</h1>
+  <p class="lede">Explosions forge radioactive nickel-56, which decays to cobalt-56 and then to iron.
+  The gamma rays from those decays heat the debris, and that heat is the light we see for months.
+  Choose a supernova and set how much nickel it made: the model below is the decay chain,
+  plus light diffusing out of the debris, plus gamma rays escaping once the debris thins.</p>
+  <div class="row" id="sns" role="group" aria-label="supernova"></div>
+  <div class="layout">
+    <div class="card">
+      <svg id="chart" viewBox="0 0 720 440" role="img" aria-label="luminosity against time, data and model"></svg>
+      <div class="legend" id="legend"></div>
+      <p class="note" id="note"></p>
+    </div>
+    <div class="card">
+      <div class="ctl"><label for="m">Nickel-56 made <b id="mv"></b></label>
+        <input id="m" type="range" min="-2.3" max="0.25" step="0.005"></div>
+      <div class="ctl" id="taubox"><label for="tau">Diffusion time <b id="tauv"></b></label>
+        <input id="tau" type="range" min="3" max="40" step="0.1"></div>
+      <div class="ctl"><label for="t0">Gamma rays escape after T0 <b id="t0v"></b></label>
+        <input id="t0" type="range" min="1" max="3.3" step="0.005"></div>
+      <label class="check"><input id="pos" type="checkbox" checked> positrons stay in the debris</label>
+      <div class="row">
+        <button id="fit">project's fit</button>
+        <button id="trap">trap every gamma ray</button>
+      </div>
+      <div class="readout" id="readout"></div>
+    </div>
+  </div>
+  <details><summary>Table view of the data</summary><div class="tablewrap"><table id="tbl"></table></div></details>
+  <footer>Data: Open Supernova Catalog photometry (SN 2011fe, SN 2014J), Hsu et al. 2025 and Singh et al. 2024
+  (SN 2023ixf), published UVOIR of SN 1987A (Suntzeff et al. 1991, 1992; Bouchet et al. 1991), integrated
+  over wavelength by this project. Open circles: near-infrared share estimated, not measured.
+  Nuclear data: NNDC; energies per decay: Nadyozhin 1994.</footer>
+</main>
+<div id="tip" role="tooltip"></div>
+<script>
+const D = {"supernovae":{"SN2011fe":{"label":"SN 2011fe","type":"Ia","tmax":360,"ymin":3e+39,"series":{"t":[1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0,8.5,9.0,9.5,10.0,10.5,11.0,11.5,12.0,12.5,13.0,13.5,14.0,14.5,15.0,15.5,16.0,16.5,17.0,17.5,18.0,18.5,19.0,19.5,20.0,20.5,21.0,21.5,22.0,22.5,23.0,23.5,24.0,24.5,25.0,25.5,26.0,26.5,27.0,27.5,28.0,28.5,29.0,29.5,30.0,30.5,31.0,31.5,32.0,32.5,33.0,33.5,34.0,34.5,35.0,35.5,36.0,36.5,37.0,37.5,38.0,38.5,39.0,39.5,40.0,41.29,42.63,44.01,45.43,46.9,48.42,49.99,51.61,53.28,55.0,56.78,58.62,60.51,62.47,64.49,66.58,68.73,70.96,73.25,75.62,78.07,80.6,83.2,85.9,88.67,91.54,94.51,97.56,100.72,103.98,107.34,110.82,114.4,118.1,121.93,125.87,129.94,134.15,138.49,142.97,147.6,152.37,157.3,162.39,167.65,173.07,178.67,184.45,190.42,196.58,202.94,209.51,216.29,223.28,230.51,237.97,245.67,253.62,261.82,270.29,279.04,288.07,297.39,307.01,316.95,327.2,337.79,348.72,360.0],"L":[1.888e+41,3.209e+41,4.356e+41,5.901e+41,8.043e+41,1.065e+42,1.388e+42,1.739e+42,2.161e+42,2.686e+42,3.293e+42,3.95e+42,4.678e+42,5.489e+42,6.223e+42,6.903e+42,7.595e+42,8.281e+42,8.958e+42,9.603e+42,1.026e+43,1.09e+43,1.146e+43,1.2e+43,1.247e+43,1.287e+43,1.319e+43,1.346e+43,1.368e+43,1.271e+43,1.282e+43,1.382e+43,1.371e+43,1.356e+43,1.335e+43,1.311e+43,1.287e+43,1.264e+43,1.241e+43,1.216e+43,1.19e+43,1.162e+43,1.133e+43,1.103e+43,1.072e+43,1.039e+43,1.004e+43,9.673e+42,9.298e+42,8.929e+42,8.582e+42,8.26e+42,7.96e+42,7.684e+42,7.431e+42,7.19e+42,6.949e+42,6.706e+42,6.461e+42,6.221e+42,5.986e+42,5.761e+42,5.552e+42,5.365e+42,5.202e+42,5.06e+42,4.936e+42,4.825e+42,4.726e+42,4.636e+42,4.551e+42,4.472e+42,4.397e+42,4.326e+42,4.259e+42,4.193e+42,4.127e+42,4.061e+42,3.888e+42,3.707e+42,3.525e+42,3.332e+42,3.129e+42,2.914e+42,2.68e+42,2.433e+42,2.197e+42,1.988e+42,1.812e+42,1.665e+42,1.542e+42,1.436e+42,1.346e+42,1.267e+42,1.194e+42,1.141e+42,1.071e+42,9.981e+41,9.261e+41,8.619e+41,8.088e+41,7.626e+41,7.178e+41,6.71e+41,6.243e+41,5.822e+41,5.433e+41,5.056e+41,4.86e+41,4.511e+41,4.168e+41,3.642e+41,3.339e+41,3.108e+41,2.849e+41,2.613e+41,2.393e+41,2.184e+41,1.982e+41,1.791e+41,1.619e+41,1.474e+41,1.353e+41,1.239e+41,1.121e+41,1.006e+41,9.041e+40,8.131e+40,7.283e+40,6.533e+40,5.898e+40,5.312e+40,4.778e+40,4.28e+40,3.827e+40,3.441e+40,3.21e+40,2.912e+40,2.634e+40,2.362e+40,2.112e+40,1.886e+40,1.689e+40,1.492e+40,1.271e+40,1.042e+40,8.489e+39],"e":[5.84e+40,7.46e+40,3.56e+40,1.88e+40,1.6e+40,2.56e+40,4.76e+40,5.73e+40,6.2e+40,7.36e+40,8.58e+40,1.34e+41,1.62e+41,1.88e+41,1.81e+41,1.61e+41,1.3e+41,1.28e+41,1.45e+41,1.61e+41,1.61e+41,1.87e+41,2.43e+41,2.78e+41,2.67e+41,3.03e+41,3.32e+41,3.77e+41,3.79e+41,1.52e+41,1.34e+41,3.66e+41,3.17e+41,2.96e+41,2.6e+41,2.12e+41,2.07e+41,1.69e+41,1.54e+41,1.26e+41,1.39e+41,1.18e+41,1.3e+41,1.14e+41,1.15e+41,1.21e+41,1.15e+41,1.07e+41,1.01e+41,1.05e+41,1.07e+41,1.04e+41,9.15e+40,8.65e+40,8.71e+40,7.44e+40,7.81e+40,8.76e+40,8.17e+40,7.4e+40,7.85e+40,6.47e+40,5.59e+40,5.45e+40,4.73e+40,4.82e+40,4.14e+40,4.28e+40,4.4e+40,4.11e+40,4.19e+40,4.5e+40,3.82e+40,4.32e+40,3.91e+40,3.76e+40,3.75e+40,3.95e+40,3.41e+40,3.36e+40,3.44e+40,3.4e+40,3.27e+40,3.08e+40,2.78e+40,2.59e+40,2.04e+40,1.69e+40,1.75e+40,1.54e+40,1.66e+40,1.54e+40,1.42e+40,1.3e+40,1.26e+40,3.6e+40,3.53e+40,3.49e+40,3.39e+40,3.33e+40,3.26e+40,3.24e+40,3.2e+40,3.13e+40,3.05e+40,2.99e+40,2.96e+40,2.87e+40,2.79e+40,2.7e+40,2.58e+40,2.39e+40,2.26e+40,2.22e+40,2.09e+40,1.99e+40,1.88e+40,1.78e+40,1.67e+40,1.56e+40,1.46e+40,1.34e+40,1.19e+40,1.04e+40,9.04e+39,7.76e+39,6.64e+39,5.69e+39,4.82e+39,4.08e+39,3.44e+39,2.89e+39,2.42e+39,2.01e+39,1.66e+39,1.43e+39,1.2e+39,1.08e+39,9.9e+38,8.89e+38,7.89e+38,7.05e+38,6.44e+38,5.64e+38,4.88e+38,4.03e+38,3.37e+38],"m":[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},"fit":{"m":0.576,"tau":16.93,"t0":33.7},"tail_start":0,"note":"Type Ia: a white dwarf blown apart. The peak is the nickel's heat diffusing out; after it, the light follows the decay, then sinks as gamma rays escape."},"SN2014J":{"label":"SN 2014J","type":"Ia","tmax":140,"ymin":1e+41,"series":{"t":[6.5,7.0,7.5,8.0,8.5,9.0,9.5,10.0,10.5,11.0,11.5,12.0,12.5,13.0,13.5,14.0,14.5,15.0,15.5,16.0,16.5,17.0,17.5,18.0,18.5,19.0,19.5,20.0,20.5,21.0,21.5,22.0,22.5,23.0,23.5,24.0,24.5,25.0,25.5,26.0,26.5,27.0,27.5,28.0,28.5,29.0,29.5,30.0,30.5,31.0,31.5,32.0,32.5,33.0,33.5,34.0,34.5,35.0,35.5,36.0,36.5,37.0,37.5,38.0,38.5,39.0,39.5,40.0,41.64,43.34,45.11,46.96,48.88,50.88,52.97,55.13,57.39,59.74,62.18,64.73,67.38,70.13,73.0,75.99,79.1,82.34,85.71,89.22,92.87,96.67,100.62,104.74,109.03,113.49,118.13,122.97,128.0],"L":[4.277e+42,4.607e+42,4.987e+42,5.489e+42,6.058e+42,6.687e+42,7.36e+42,8.023e+42,8.631e+42,9.188e+42,9.641e+42,1.004e+43,1.038e+43,1.069e+43,1.101e+43,1.133e+43,1.164e+43,1.194e+43,1.223e+43,1.249e+43,1.272e+43,1.291e+43,1.308e+43,1.322e+43,1.335e+43,1.344e+43,1.349e+43,1.348e+43,1.343e+43,1.334e+43,1.321e+43,1.304e+43,1.285e+43,1.263e+43,1.238e+43,1.21e+43,1.179e+43,8.884e+42,1.111e+43,1.075e+43,1.038e+43,9.998e+42,9.616e+42,9.233e+42,8.854e+42,8.486e+42,8.133e+42,7.797e+42,7.477e+42,7.174e+42,6.891e+42,6.628e+42,6.385e+42,6.162e+42,5.958e+42,5.772e+42,5.603e+42,5.448e+42,5.305e+42,5.172e+42,5.047e+42,4.932e+42,4.824e+42,4.726e+42,4.635e+42,4.552e+42,4.474e+42,4.402e+42,4.19e+42,3.992e+42,3.774e+42,3.524e+42,3.252e+42,2.794e+42,2.555e+42,2.225e+42,1.984e+42,1.781e+42,1.616e+42,1.482e+42,1.383e+42,1.298e+42,1.221e+42,1.139e+42,1.051e+42,9.67e+41,8.935e+41,8.316e+41,7.803e+41,7.365e+41,6.964e+41,6.564e+41,6.157e+41,5.754e+41,5.369e+41,5.016e+41,4.711e+41],"e":[3.2e+41,2.33e+41,2.09e+41,2.63e+41,3.02e+41,3.21e+41,3.04e+41,2.89e+41,2.91e+41,1.96e+41,1.98e+41,1.95e+41,2.06e+41,2.2e+41,2.23e+41,2.41e+41,2.62e+41,2.56e+41,2.62e+41,3.16e+41,2.82e+41,3.1e+41,3.2e+41,3.6e+41,3.09e+41,2.87e+41,2.68e+41,2.68e+41,2.79e+41,2.66e+41,2.65e+41,2.71e+41,2.81e+41,3.32e+41,3.41e+41,3.65e+41,3.87e+41,2.44e+41,3.43e+41,3.32e+41,3.45e+41,2.89e+41,2.48e+41,2.23e+41,1.99e+41,1.81e+41,1.7e+41,1.44e+41,1.34e+41,1.24e+41,1.29e+41,1.34e+41,1.15e+41,1.08e+41,1.09e+41,9.54e+40,9.13e+40,8.02e+40,7.87e+40,7.4e+40,7.66e+40,7.17e+40,6.29e+40,6.39e+40,5.28e+40,4.76e+40,5.32e+40,4.76e+40,3.87e+40,3.97e+40,4.12e+40,4.42e+40,4.55e+40,3.42e+40,3.9e+40,1.25e+41,1.1e+41,9.75e+40,8.74e+40,7.9e+40,7.34e+40,6.93e+40,6.72e+40,6.51e+40,6.23e+40,5.87e+40,5.59e+40,5.37e+40,5.27e+40,5.13e+40,5.08e+40,5.01e+40,4.88e+40,4.71e+40,4.69e+40,4.65e+40,4.84e+40],"m":[0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},"fit":{"m":0.604,"tau":15.72,"t0":36.4},"tail_start":0,"note":"Type Ia behind thick dust in M82, dimmed 5 magnitudes in B. Its late points rise above any model: background light and broad-filter dust effects, not physics."},"SN2023ixf":{"label":"SN 2023ixf","type":"II","tmax":365,"ymin":1e+40,"series":{"t":[1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0,8.5,9.0,9.5,10.0,10.5,11.0,11.5,12.0,12.5,13.0,13.5,14.0,14.5,15.0,15.5,16.0,16.5,17.0,17.5,18.0,18.5,19.0,19.5,20.0,20.5,21.0,21.5,22.0,22.5,23.0,23.5,24.0,24.5,25.0,25.5,26.0,26.5,27.0,27.5,28.0,28.5,29.0,29.5,30.0,30.85,31.73,32.63,33.55,34.51,35.48,36.49,37.53,38.59,39.69,40.81,41.97,43.16,44.39,45.65,46.94,48.27,49.64,51.05,52.5,53.99,55.52,57.1,58.72,60.39,62.1,63.86,65.67,67.54,69.45,71.43,73.45,75.54,77.68,79.88,82.15,84.48,86.88,89.35,91.88,94.49,97.17,99.93,102.76,105.68,108.68,111.76,114.93,118.2,121.55,125.0,128.55,132.19,135.95,139.8,143.77,147.85,152.05,156.36,174.88,179.84,184.95,190.19,195.59,201.14,206.85,212.72,218.76,224.96,231.35,237.91,244.66,251.61,258.75,266.09,273.64,281.41,289.39,297.6,306.05,314.74,323.67,332.85,342.3,352.01,362.0],"L":[2.39e+42,1.207e+43,2.309e+43,2.02e+43,2.787e+43,2.645e+43,2.639e+43,1.991e+43,1.818e+43,1.861e+43,1.589e+43,1.319e+43,1.267e+43,1.136e+43,1.056e+43,1.06e+43,1.022e+43,9.283e+42,5.785e+42,5.757e+42,7.579e+42,7.48e+42,7.252e+42,6.981e+42,6.716e+42,6.499e+42,6.327e+42,6.156e+42,5.957e+42,5.769e+42,5.596e+42,5.443e+42,5.29e+42,5.133e+42,4.98e+42,4.828e+42,4.682e+42,4.541e+42,4.405e+42,4.282e+42,4.177e+42,4.097e+42,4.027e+42,3.956e+42,3.875e+42,3.778e+42,3.67e+42,3.561e+42,3.461e+42,3.374e+42,3.299e+42,3.233e+42,3.169e+42,3.105e+42,3.046e+42,2.997e+42,2.954e+42,2.917e+42,2.863e+42,2.793e+42,2.682e+42,2.597e+42,2.522e+42,2.46e+42,2.412e+42,2.368e+42,2.312e+42,2.272e+42,2.197e+42,2.115e+42,2.086e+42,2.065e+42,2.046e+42,2.027e+42,2.007e+42,1.983e+42,1.957e+42,1.927e+42,1.896e+42,1.865e+42,1.829e+42,1.788e+42,1.745e+42,1.7e+42,1.653e+42,1.602e+42,1.561e+42,1.516e+42,1.457e+42,1.388e+42,1.302e+42,1.184e+42,1.017e+42,8.176e+41,6.367e+41,5.159e+41,4.522e+41,4.198e+41,3.991e+41,3.832e+41,3.703e+41,3.593e+41,3.494e+41,3.392e+41,3.3e+41,3.2e+41,3.091e+41,2.976e+41,2.85e+41,2.778e+41,2.652e+41,2.437e+41,2.315e+41,2.198e+41,2.11e+41,1.946e+41,1.923e+41,1.873e+41,1.783e+41,1.678e+41,1.576e+41,1.479e+41,1.386e+41,1.292e+41,1.204e+41,1.121e+41,1.033e+41,9.465e+40,8.713e+40,8.049e+40,7.407e+40,6.756e+40,6.142e+40,5.575e+40,5.048e+40,4.564e+40,4.123e+40,3.725e+40,3.37e+40,2.465e+40,2.235e+40,2.011e+40,1.797e+40,1.595e+40],"e":[1.36e+42,1.28e+43,3.62e+43,1.38e+43,1.64e+43,3.51e+43,5.85e+42,3.58e+42,2.08e+42,2.63e+42,1.21e+42,1.15e+42,1.71e+42,1.75e+42,1.26e+42,9.27e+41,5.79e+41,4.53e+41,1.12e+41,1.13e+41,4.04e+41,2.2e+41,1.15e+41,1.1e+41,8.94e+40,9.07e+40,1.19e+41,7.66e+40,4.96e+40,5.76e+40,5.33e+40,5.71e+40,6.23e+40,7.49e+40,9.39e+40,1.14e+41,1.06e+41,1.23e+41,1.45e+41,1.14e+41,1.13e+41,1.11e+41,1.09e+41,1.08e+41,1.05e+41,1.02e+41,1.02e+41,1.01e+41,9.91e+40,9.63e+40,9.59e+40,9.36e+40,9.11e+40,9.12e+40,8.72e+40,8.55e+40,8.38e+40,8.14e+40,7.99e+40,7.78e+40,7.66e+40,7.44e+40,7.38e+40,7.2e+40,7.14e+40,7.07e+40,6.97e+40,6.99e+40,6.89e+40,6.81e+40,6.6e+40,6.58e+40,6.54e+40,1.07e+41,1.01e+41,8.95e+40,7.38e+40,4.97e+40,2.76e+40,1.56e+40,2.01e+40,2.52e+40,2.76e+40,2.4e+40,1.55e+40,9.59e+39,1.12e+40,1.01e+40,1.31e+40,1.1e+40,1.01e+40,1.32e+40,1.02e+40,6.5e+39,4.43e+39,2.91e+39,2.87e+39,4.01e+39,4.18e+39,5.03e+39,5.23e+39,4.19e+39,4.39e+39,4.04e+39,3.95e+39,3.24e+39,3.24e+39,3.56e+39,3.3e+39,2.32e+39,2.3e+39,3.08e+39,4.1e+39,4.59e+39,4.89e+39,5.96e+39,1.02e+40,1.32e+40,1.25e+40,1.19e+40,1.16e+40,1.14e+40,1.12e+40,1.09e+40,1.07e+40,1.04e+40,1e+40,9.62e+39,9.25e+39,8.91e+39,8.54e+39,8.1e+39,7.66e+39,7.23e+39,6.79e+39,6.37e+39,5.97e+39,5.59e+39,5.24e+39,3.96e+39,3.72e+39,3.46e+39,3.19e+39,2.93e+39],"m":[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},"fit":{"m":0.0641,"tau":0,"t0":210.5},"tail_start":90,"note":"Type II: a red supergiant's core collapsed. The plateau is the explosion's own heat leaking out as hydrogen recombines; nickel only takes over after the drop near day 85."},"SN1987A":{"label":"SN 1987A","type":"II","tmax":1400,"ymin":1e+37,"series":{"t":[13.8,14.8,19.7,24.8,25.8,30.8,32.8,33.8,34.8,35.8,36.8,37.8,39.7,42.7,43.7,44.7,46.7,47.7,58.7,59.7,68.7,73.7,74.7,79.7,80.7,98.7,101.6,103.7,104.7,106.7,108.7,110.7,111.7,115.0,116.0,122.7,134.0,198.0,256.0,282.0,316.0,346.0,376.0,432.0,455.7,468.0,518.1,526.1,616.0,636.0,641.0,648.0,670.0,670.0,692.0,698.0,734.0,793.0,904.0,935.0,1055.0,1115.0,1144.0,1352.0,1444.0,1699.0,1854.0],"L":[1.931e+41,2.004e+41,2.311e+41,2.697e+41,2.766e+41,3.139e+41,3.295e+41,3.38e+41,3.442e+41,3.539e+41,3.646e+41,3.775e+41,3.98e+41,4.294e+41,4.424e+41,4.58e+41,4.796e+41,4.919e+41,6.15e+41,6.279e+41,7.143e+41,7.462e+41,7.548e+41,7.796e+41,7.832e+41,7.242e+41,6.868e+41,6.635e+41,6.381e+41,6.024e+41,5.596e+41,5.186e+41,4.999e+41,4.194e+41,4.077e+41,3.442e+41,2.901e+41,1.614e+41,9.494e+40,7.533e+40,5.242e+40,4.069e+40,2.93e+40,1.656e+40,1.238e+40,1.079e+40,6.25e+39,5.674e+39,2.182e+39,1.844e+39,1.674e+39,1.749e+39,1.445e+39,1.358e+39,1.099e+39,9.075e+38,7.309e+38,4.59e+38,1.794e+38,1.297e+38,7.996e+37,4.394e+37,3.827e+37,1.297e+37,1.104e+37,3.74e+36,4.007e+36],"e":[4.45e+39,4.61e+39,5.32e+39,6.21e+39,6.37e+39,7.23e+39,7.59e+39,7.78e+39,7.93e+39,8.15e+39,8.4e+39,8.69e+39,9.16e+39,9.89e+39,1.02e+40,1.05e+40,1.1e+40,1.13e+40,1.42e+40,1.45e+40,1.64e+40,1.72e+40,1.74e+40,1.8e+40,1.8e+40,1.67e+40,1.58e+40,1.53e+40,1.47e+40,1.39e+40,1.29e+40,1.19e+40,1.15e+40,9.66e+39,9.39e+39,7.93e+39,6.68e+39,3.72e+39,2.19e+39,1.73e+39,1.21e+39,9.37e+38,6.75e+38,3.81e+38,2.85e+38,2.48e+38,1.44e+38,1.31e+38,1.51e+38,1.27e+38,1.16e+38,1.21e+38,9.98e+37,9.38e+37,7.59e+37,6.27e+37,5.05e+37,3.17e+37,1.24e+37,8.96e+36,5.52e+36,3.04e+36,2.64e+36,8.96e+35,7.62e+35,2.58e+35,2.77e+35],"m":[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]},"fit":{"m":0.0667,"tau":0,"t0":547.3},"tail_start":120,"note":"Type II from a compact blue supergiant: its shock heat faded fast, so nickel powered even the slow rise to the peak at day 85. Past day ~800 cobalt-57, titanium-44 and new dust take over (not modelled here)."}},"colors":{"SN2011fe":["#2a78d6","#3987e5"],"SN2014J":["#4a3aa7","#9085e9"],"SN1987A":["#eb6834","#d95926"],"SN2023ixf":["#1baf7a","#199e70"]},"nuclear":{"tauNi":8.764372373400453,"tauCo":111.42799417809998,"A":6.48345466815016e+43,"B":1.4421377995584218e+43,"posFrac":0.032171581769437},"ztf_median":0.516};
+const NS = "http://www.w3.org/2000/svg";
+const nuc = D.nuclear;
+let cur = "SN2011fe";
+const st = {};
+
+const dark = () => {
+  const forced = document.documentElement.dataset.theme;
+  if (forced) return forced === "dark";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches;
+};
+const color = sn => D.colors[sn][dark() ? 1 : 0];
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+// Heating per solar mass of nickel (erg/s), split into gamma rays and positrons.
+function heating(t) {
+  const total = nuc.A * Math.exp(-t / nuc.tauNi) + nuc.B * Math.exp(-t / nuc.tauCo);
+  const co = nuc.B * (Math.exp(-t / nuc.tauCo) - Math.exp(-t / nuc.tauNi));
+  const pos = co * nuc.posFrac;
+  return { gamma: total - pos, pos: pos };
+}
+function deposit(t, T0, posTrapped) {
+  const h = heating(Math.max(t, 1e-4));
+  const f = T0 > 0 ? 1 - Math.exp(-((T0 / t) ** 2)) : 1;
+  return h.gamma * f + (posTrapped ? h.pos : 0);
+}
+// Arnett (1982): L(t) = e^{-x^2} Int 2 t'/tau^2 e^{(t'/tau)^2} D(t') dt', stepped so no exponential
+// overflows; after 8 diffusion times the light simply follows the heating.
+function arnett(tmax, M, tau, T0, pos) {
+  const out = [], dt = 0.05, tm2 = tau * tau, tSwitch = Math.min(tmax, 8 * tau);
+  let L = 0, t = 0, d1 = M * deposit(1e-4, T0, pos);
+  out.push([0, 0]);
+  while (t < tSwitch) {
+    const t2 = t + dt, d2 = M * deposit(t2, T0, pos);
+    const damp = Math.exp(-(t2 * t2 - t * t) / tm2);
+    L = L * damp + 0.5 * dt * (2 * t / tm2 * damp * d1 + 2 * t2 / tm2 * d2);
+    t = t2; d1 = d2;
+    if (Math.abs(t / 0.5 - Math.round(t / 0.5)) < 1e-6) out.push([t, L]);
+  }
+  for (let tt = Math.ceil(t) + 1; tt <= tmax; tt += 1) out.push([tt, M * deposit(tt, T0, pos)]);
+  return out;
+}
+
+function el(tag, attrs, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+const fmtL = v => { const p = Math.floor(Math.log10(v)); return (v / 10 ** p).toFixed(2) + "e" + p; };
+const fmtM = v => v >= 0.1 ? v.toFixed(2) : v.toFixed(3);
+
+function draw() {
+  const sn = D.supernovae[cur], s = st[cur], svg = document.getElementById("chart");
+  svg.innerHTML = "";
+  // On narrow screens draw on a smaller canvas so the text stays legible.
+  const narrow = svg.clientWidth > 0 && svg.clientWidth < 560;
+  const W = narrow ? 460 : 720, H = narrow ? 400 : 440, ml = 62, mr = 12, mt = 14, mb = 44;
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  const ser = sn.series;
+  const ymax = Math.max(...ser.L) * 4, ymin = sn.ymin, tmax = sn.tmax;
+  const X = t => ml + (t / tmax) * (W - ml - mr);
+  const Y = L => mt + (Math.log10(ymax) - Math.log10(Math.max(L, ymin * 0.5))) /
+                 (Math.log10(ymax) - Math.log10(ymin)) * (H - mt - mb);
+  const ax = el("g", { class: "axis" }, svg);
+  for (let p = Math.ceil(Math.log10(ymin)); p <= Math.log10(ymax); p++) {
+    el("line", { x1: ml, x2: W - mr, y1: Y(10 ** p), y2: Y(10 ** p), class: "gridline" }, ax);
+    const tx = el("text", { x: ml - 8, y: Y(10 ** p) + 4, "text-anchor": "end" }, ax);
+    tx.textContent = "1e" + p;
+  }
+  const step = tmax > 800 ? 200 : tmax > 200 ? 50 : 20;
+  for (let t = 0; t <= tmax; t += step) {
+    el("line", { x1: X(t), x2: X(t), y1: mt, y2: H - mb, class: "gridline" }, ax);
+    const tx = el("text", { x: X(t), y: H - mb + 16, "text-anchor": "middle" }, ax);
+    tx.textContent = t;
+  }
+  el("line", { x1: ml, x2: W - mr, y1: H - mb, y2: H - mb }, ax);
+  el("line", { x1: ml, x2: ml, y1: mt, y2: H - mb }, ax);
+  const xl = el("text", { x: (ml + W - mr) / 2, y: H - 8, "text-anchor": "middle", class: "lbl" }, svg);
+  xl.textContent = sn.type === "Ia" ? "days since first light" : "days since explosion";
+  const yl = el("text", { x: 14, y: (mt + H - mb) / 2, "text-anchor": "middle", class: "lbl",
+                          transform: `rotate(-90 14 ${(mt + H - mb) / 2})` }, svg);
+  yl.textContent = "luminosity (erg/s)";
+
+  const clip = el("clipPath", { id: "plotclip" }, el("defs", {}, svg));
+  el("rect", { x: ml, y: mt, width: W - ml - mr, height: H - mt - mb }, clip);
+  const g = el("g", { "clip-path": "url(#plotclip)" }, svg);
+  const c = color(cur);
+  // Every gamma ray trapped (reference) and the model.
+  const tStart = sn.tail_start;
+  let pts = [];
+  for (let t = Math.max(tStart, 0.5); t <= tmax; t += 1) pts.push([t, s.m * deposit(t, 0, true)]);
+  el("path", { d: "M" + pts.map(p => X(p[0]).toFixed(1) + "," + Y(p[1]).toFixed(1)).join("L"), fill: "none",
+               stroke: css("--model"), "stroke-width": 1.2, "stroke-dasharray": "5 4" }, g);
+  let model;
+  if (sn.type === "Ia") model = arnett(tmax, s.m, s.tau, s.t0, s.pos);
+  else { model = []; for (let t = tStart; t <= tmax; t += 1) model.push([t, s.m * deposit(t, s.t0, s.pos)]); }
+  model = model.filter(p => p[1] > 0);
+  el("path", { d: "M" + model.map(p => X(p[0]).toFixed(1) + "," + Y(p[1]).toFixed(1)).join("L"), fill: "none",
+               stroke: c, "stroke-width": 2.2 }, g);
+  // Data.
+  const dots = el("g", {}, g);
+  ser.t.forEach((t, i) => {
+    if (t > tmax) return;
+    const open = !ser.m[i];
+    el("circle", { cx: X(t), cy: Y(ser.L[i]), r: 3.2, fill: open ? css("--surface") : c, stroke: open ? c : css("--surface"),
+                   "stroke-width": open ? 1.4 : 0.8 }, dots);
+  });
+  // Nearest-point hover over the whole plot.
+  const hit = el("rect", { x: ml, y: mt, width: W - ml - mr, height: H - mt - mb, fill: "transparent" }, svg);
+  const tip = document.getElementById("tip");
+  hit.addEventListener("mousemove", ev => {
+    const r = svg.getBoundingClientRect(), sx = (ev.clientX - r.left) * W / r.width, sy = (ev.clientY - r.top) * H / r.height;
+    let best = -1, bd = 1e9;
+    ser.t.forEach((t, i) => { if (t > tmax) return; const d = (X(t) - sx) ** 2 + (Y(ser.L[i]) - sy) ** 2; if (d < bd) { bd = d; best = i; } });
+    if (best < 0 || bd > 900) { tip.style.display = "none"; return; }
+    const t = ser.t[best], mod = sn.type === "Ia" || t >= tStart ? interp(model, t) : null;
+    tip.innerHTML = `day ${t.toFixed(1)}<br>observed ${fmtL(ser.L[best])} erg/s` +
+      (mod ? `<br>model ${fmtL(mod)} erg/s` : "") + (ser.m[best] ? "" : "<br><i>near-infrared estimated</i>");
+    tip.style.display = "block"; tip.style.left = (ev.clientX + 14) + "px"; tip.style.top = (ev.clientY + 10) + "px";
+  });
+  hit.addEventListener("mouseleave", () => { tip.style.display = "none"; });
+
+  // Readout.
+  let rd = `<b>${fmtM(s.m)}</b> solar masses of nickel-56 heat the debris with <b>${fmtL(s.m * deposit(1, 0, true))}</b> erg/s on day 1.`;
+  if (sn.type === "Ia") {
+    let pk = model.reduce((a, b) => b[1] > a[1] ? b : a, [0, 0]);
+    rd += `<br><br>Model peak: <b>${fmtL(pk[1])}</b> erg/s on day <b>${pk[0].toFixed(1)}</b>. ` +
+          `Arnett's rule (peak light = heating at that moment): ${fmtL(s.m * deposit(pk[0], s.t0, s.pos))} erg/s.`;
+  }
+  const t1 = Math.min(tmax, 300);
+  const kept = s.t0 > 0 ? 100 * (1 - Math.exp(-((s.t0 / t1) ** 2))) : 100;
+  rd += `<br><br>At day ${t1}, ${kept.toFixed(0)}% of the gamma rays still heat the debris.`;
+  rd += `<br><br>The project's fit: ${fmtM(sn.fit.m)} Msun, ` + (sn.type === "Ia" ? `diffusion ${sn.fit.tau} d, ` : "") +
+        `T0 = ${sn.fit.t0} d. ZTF Type Ia median: ${D.ztf_median} Msun.`;
+  document.getElementById("readout").innerHTML = rd;
+  document.getElementById("note").textContent = sn.note;
+  document.getElementById("legend").innerHTML =
+    `<span><svg width="26" height="10"><line x1="0" y1="5" x2="26" y2="5" stroke="${c}" stroke-width="2.2"/></svg>model</span>` +
+    `<span><svg width="26" height="10"><line x1="0" y1="5" x2="26" y2="5" stroke="${css("--model")}" stroke-width="1.2" stroke-dasharray="5 4"/></svg>heating, every gamma ray trapped</span>` +
+    `<span><svg width="10" height="10"><circle cx="5" cy="5" r="4" fill="${c}"/></svg>${sn.label}</span>`;
+}
+
+function interp(arr, t) {
+  for (let i = 1; i < arr.length; i++) if (arr[i][0] >= t) {
+    const [t0, y0] = arr[i - 1], [t1, y1] = arr[i];
+    return y0 + (y1 - y0) * (t - t0) / (t1 - t0);
+  }
+  return null;
+}
+
+function syncControls() {
+  const s = st[cur], sn = D.supernovae[cur];
+  document.getElementById("m").value = Math.log10(s.m);
+  document.getElementById("tau").value = s.tau || 15;
+  document.getElementById("t0").value = s.t0 > 0 ? Math.log10(s.t0) : 3.3;
+  document.getElementById("pos").checked = s.pos;
+  document.getElementById("taubox").classList.toggle("disabled", sn.type !== "Ia");
+  document.getElementById("tau").disabled = sn.type !== "Ia";
+  labels();
+}
+function labels() {
+  const s = st[cur];
+  document.getElementById("mv").textContent = fmtM(s.m) + " Msun";
+  document.getElementById("tauv").textContent = D.supernovae[cur].type === "Ia" ? s.tau.toFixed(1) + " d" : "n/a";
+  document.getElementById("t0v").textContent = s.t0 > 0 ? Math.round(s.t0) + " d" : "never";
+}
+function table() {
+  const ser = D.supernovae[cur].series;
+  let h = "<tr><th>day</th><th>luminosity (erg/s)</th><th>error</th><th>near-IR</th></tr>";
+  ser.t.forEach((t, i) => { h += `<tr><td>${t.toFixed(1)}</td><td>${fmtL(ser.L[i])}</td><td>${fmtL(ser.e[i])}</td><td>${ser.m[i] ? "measured" : "estimated"}</td></tr>`; });
+  document.getElementById("tbl").innerHTML = h;
+}
+function select(sn) {
+  cur = sn;
+  document.querySelectorAll("#sns button").forEach(b => b.setAttribute("aria-pressed", b.dataset.sn === sn));
+  syncControls(); table(); draw();
+}
+
+for (const sn in D.supernovae) {
+  const f = D.supernovae[sn].fit;
+  st[sn] = { m: f.m, tau: f.tau || 15, t0: f.t0, pos: true };
+  const b = document.createElement("button");
+  b.textContent = D.supernovae[sn].label + " (Type " + D.supernovae[sn].type + ")";
+  b.dataset.sn = sn;
+  b.addEventListener("click", () => select(sn));
+  document.getElementById("sns").appendChild(b);
+}
+document.getElementById("m").addEventListener("input", e => { st[cur].m = 10 ** +e.target.value; labels(); draw(); });
+document.getElementById("tau").addEventListener("input", e => { st[cur].tau = +e.target.value; labels(); draw(); });
+document.getElementById("t0").addEventListener("input", e => { st[cur].t0 = 10 ** +e.target.value; labels(); draw(); });
+document.getElementById("pos").addEventListener("change", e => { st[cur].pos = e.target.checked; draw(); });
+document.getElementById("fit").addEventListener("click", () => {
+  const f = D.supernovae[cur].fit; st[cur] = { m: f.m, tau: f.tau || 15, t0: f.t0, pos: true }; syncControls(); draw();
+});
+document.getElementById("trap").addEventListener("click", () => { st[cur].t0 = 0; syncControls(); draw(); });
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", draw);
+let resizeTimer;
+window.addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(draw, 120); });
+select("SN2011fe");
+</script>
+</body>
+</html>
