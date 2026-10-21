@@ -1,0 +1,87 @@
+# Dyson, Eddington & Davidson 1920, Phil. Trans. R. Soc. A 220, 291-333.
+# "List of Plates" of the Principe expedition (section IV, para. 30):
+#   check field  = p.315 (scan leaf024), "Check Field (R.A. 14h. 12m. 47s., Declination +20 deg 30')" (the Arcturus field);
+#   eclipse field = p.316 (scan leaf025), "Eclipse Field (R.A. 4h. 19m. 30s., Declination +21 deg 43')".
+# p.314-315: "All the eclipse photographs are given, though only W and X furnished results.
+#   Of the other series, only the exposures actually used in the reductions are given."
+#   The Oxford plates were "comparison photographs kindly taken for us by Mr. F. A. BELLAMY at Oxford".
+# Transcribed exactly as printed; one row per printed row; no values changed.
+# Ditto marks (,,) in the Place and Date columns are expanded to the value they repeat.
+# Plate letters: subscripts written inline (a1 = a with subscript 1, I2 = I with subscript 2);
+#   K' = the printed K-prime (first eclipse plate).
+# Columns:
+#   field        check | eclipse (which of the two printed tables)
+#   ref          Column 1 "Ref."  Paper's note: "The letter is marked on the original plates (preserved at
+#                Cambridge Observatory). The number refers to the exposure, disregarding exposures taken
+#                without the 8-inch stop."
+#   place        Column 2. Note: "The co-ordinates of Oxford Observatory are 5m. 3s. W., 51 deg 46' N., and of
+#                the site at Principe, 29m. 32s. E., 1 deg 40' N."
+#   date         Column 3, year 1919 (printed once at the top of the column).
+#   time_h, time_m, time_s   Column 4, the three printed sub-columns h. m. s.
+#   time_scale   what the printed column heading says: the column heading is "Loc. Sid. T." (local sidereal
+#                time, i.e. at Oxford) for the Oxford rows; below a rule, above the Principe rows, the paper prints
+#                the sub-heading "G.M.T.". The paper does not say whether this G.M.T. is astronomical (day counted
+#                from noon, the astronomical convention of 1919) or civil. Verified here (not printed): it is
+#                astronomical G.M.T. Recomputing the zenith distance of the field centre from these times gives the
+#                printed "Approx. Z.D." for all 31 rows within 0.6 deg (Oxford rows as L.S.T., Principe rows as
+#                astronomical G.M.T., i.e. civil U.T. = printed date + 12h + printed time); read as civil time the
+#                Principe check-field times would put the Arcturus field 133-135 deg from the zenith, and the eclipse
+#                (2h 13m civil = about 2.7h local mean time) would be at night. So: check plates q1-s2 = civil night
+#                of May 22/23 (~00h25m-00h38m U.T. May 23), v1, w1 = night of May 25/26; eclipse = 14h13m-14h18m U.T.
+#                May 29 (the eclipse "occurred in the afternoon", p.317). Totality was computed as
+#                "2h. 13m. 5s. to 2h. 18m. 7s. G.M.T." (p.314).
+#                Paper's note to column 4: "The mid-instant of the exposure is given. Times for check plates at
+#                Principe were only noted roughly. Times for the eclipse plates are deduced from the calculated
+#                time of totality, the interval from the end of one exposure to the beginning of the next being
+#                assumed uniform."
+#   exposure_s   Column 5 "Exp." (s.)
+#   approx_zenith_distance_deg  Column 6 "Approx. Z.D." (degrees)
+#   barometer_inches Column 7 "Bar.". The unit printed under the heading is "m." on both pages, but the values
+#                are inches of mercury (the note to column 7 speaks of "a regular semi-diurnal wave of amplitude
+#                about 0.05 in."); "m." is evidently a misprint for "in.". Paper's note: "Readings at Principe were
+#                taken with an aneroid recording instrument, and therefore automatically reduced to the latitude
+#                of England. The barometer during our visit was practically constant except for a regular
+#                semi-diurnal wave of amplitude about 0.05 in."  The first eclipse-field value (D1) is printed
+#                with a stray speck between the 9 and the decimal point; it reads 29.65.
+#                Check: the eclipse-plate mid-times imply a uniform gap of 11.5 s (+-0.5 s from the whole-second
+#                rounding) between exposures, the first exposure starting 1.5 s after 2h13m5s and the last ending
+#                5 s before 2h18m7s; 16 exposures (123 s) + 15 gaps fill the 302 s of totality, as the note says.
+#   thermometer_F    Column 8 "Ther." (degrees; Fahrenheit -- the text p.316 gives the water temperature as 78 deg F.)
+#   plate_type   Column 9 "Plate.", brand abbreviations as printed. Note: "Brand of Plate: S. = Imperial
+#                Sovereign, S.S. = Imperial Special Sensitive, S.R. = Ilford Special Rapid, E. = Ilford Empress.
+#                Backed plates were used at Principe."
+#   page         printed page number
+# Plates used in the reductions: check pairs q1-a1, w1-b1, s2-c1, r1-d1, v1-e1 (Table XI, p.318);
+#   eclipse plate X against Oxford G1 and H1, W against D1 and I2, U against K2 (pp.321-326).
+field,ref,place,date,time_h,time_m,time_s,time_scale,exposure_s,approx_zenith_distance_deg,barometer_inches,thermometer_F,plate_type,page
+check,a1,Oxford,1919 January 16,12,55,10,Loc. Sid. T.,60,35,29.64,37.0,S.,315
+check,b1,Oxford,1919 January 17,13,10,40,Loc. Sid. T.,60,34,29.83,35.3,S.,315
+check,c1,Oxford,1919 January 17,13,54,55,Loc. Sid. T.,60,31,29.83,35.3,S.,315
+check,d1,Oxford,1919 January 17,14,9,25,Loc. Sid. T.,60,31,29.83,35.3,S.,315
+check,e1,Oxford,1919 January 23,13,13,30,Loc. Sid. T.,60,33,30.45,29.0,S.,315
+check,q1,Principe,1919 May 22,12,25,40,G.M.T.,40,43,29.45,76.5,S.R.,315
+check,r1,Principe,1919 May 22,12,31,20,G.M.T.,40,45,29.45,76.5,S.R.,315
+check,s2,Principe,1919 May 22,12,37,50,G.M.T.,80,46,29.45,76.5,S.R.,315
+check,v1,Principe,1919 May 25,12,22,20,G.M.T.,40,45,29.45,76.5,S.S.,315
+check,w1,Principe,1919 May 25,12,26,20,G.M.T.,40,46,29.45,76.5,S.S.,315
+eclipse,D1,Oxford,1919 January 16,3,58,1,Loc. Sid. T.,5,30,29.65,39.0,S.,316
+eclipse,G1,Oxford,1919 January 22,4,4,39,Loc. Sid. T.,5,30,30.30,31.0,S.,316
+eclipse,H1,Oxford,1919 January 22,4,34,28,Loc. Sid. T.,5,30,30.30,31.0,S.,316
+eclipse,I2,Oxford,1919 January 22,4,48,46,Loc. Sid. T.,10,31,30.30,31.0,S.,316
+eclipse,K2,Oxford,1919 February 9,4,45,24,Loc. Sid. T.,10,30,30.48,24.5,S.,316
+eclipse,K',Principe,1919 May 29,2,13,9,G.M.T.,5,46,29.45,77.0,S.R.,316
+eclipse,L,Principe,1919 May 29,2,13,28,G.M.T.,10,46,29.45,77.0,S.R.,316
+eclipse,M,Principe,1919 May 29,2,13,46,G.M.T.,3,46,29.45,77.0,S.R.,316
+eclipse,N,Principe,1919 May 29,2,14,1,G.M.T.,5,46,29.45,77.0,E.,316
+eclipse,O,Principe,1919 May 29,2,14,20,G.M.T.,10,46,29.45,77.0,S.S.,316
+eclipse,P,Principe,1919 May 29,2,14,44,G.M.T.,15,46,29.45,77.0,S.S.,316
+eclipse,Q,Principe,1919 May 29,2,15,6,G.M.T.,5,46,29.45,77.0,S.R.,316
+eclipse,R,Principe,1919 May 29,2,15,30,G.M.T.,20,46,29.45,77.0,S.R.,316
+eclipse,S,Principe,1919 May 29,2,15,53,G.M.T.,3,46,29.45,77.0,S.S.,316
+eclipse,T,Principe,1919 May 29,2,16,13,G.M.T.,15,46,29.45,77.0,E.,316
+eclipse,U,Principe,1919 May 29,2,16,37,G.M.T.,10,46,29.45,77.0,S.R.,316
+eclipse,V,Principe,1919 May 29,2,16,56,G.M.T.,5,46,29.45,77.0,S.S.,316
+eclipse,W,Principe,1919 May 29,2,17,15,G.M.T.,10,46,29.45,77.0,S.,316
+eclipse,X,Principe,1919 May 29,2,17,33,G.M.T.,3,46,29.45,77.0,S.R.,316
+eclipse,Y,Principe,1919 May 29,2,17,47,G.M.T.,2,46,29.45,77.0,S.R.,316
+eclipse,Z,Principe,1919 May 29,2,18,1,G.M.T.,2,46,29.45,77.0,S.R.,316

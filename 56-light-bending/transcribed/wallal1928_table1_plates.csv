@@ -1,0 +1,39 @@
+# Campbell, W. W. & Trumpler, R. J. 1928, Lick Observatory Bulletin 13, 130-160 (No. 397), "Observations made with a pair of five-foot cameras on the light-deflections in the Sun's gravitational field at the total solar eclipse of September 21, 1922" (ADS 1928LicOB..13..130C; printed page p = PDF page p-129).
+# Table 1, "Data of photographs", printed p.132 (PDF page 3). One row per exposure, in printed order.
+# plate: plate number (M, N = the two objectives of the twin five-foot camera; M and N plates of one pair were exposed
+#   simultaneously). station: printed only on the first line of each plate (empty = same plate as the line above).
+# date_1922 as printed; lmt_h, lmt_min: local mean time (h, min) as printed (7h48m.0 -> 7, 48.0), in ASTRONOMICAL
+#   reckoning (hours counted from noon of the printed date): Wallal "Sept. 21 1h30.7m" = 1:30.7 p.m. civil (with Wallal
+#   at 8h2.7m E this is about 5h28m UT; the hour angle 1h37.3m W agrees); Tahiti "May 25 15h39.7m" (check field) = 3:39.7
+#   a.m. civil on May 26, as the text says the check field was taken "in the morning" (p.131).
+#   exposure_s: seconds (printed 60s, 102, 180).
+# star_field: Check or Eclipse. ha_w_h, ha_w_min: hour angle West (h, min). temperature_F: deg Fahrenheit (the first
+#   value is printed with explicit sign, +72.5). barometer_in: inches of mercury. remark: "Not quite clear" is printed
+#   once with a brace spanning both lines of plate M7 and of plate N9.
+# Printed below the table: "All photographs at Wallal taken by Campbell, all those at Tahiti by Trumpler."
+#   "Observing station at Tahiti: long. 9h58m.3 W of Gr., lat. -17deg32'; Wallal: long. 8h 2m.7 E of Gr., lat. -19deg46'."
+# Plate pairs compared (eclipse - comparison): M15-M7, M16-M11, M17-M9, N18-N11, N19-N13, N20-N9 (Tables 3-6).
+# Internal inconsistencies between simultaneous M/N exposures (kept as printed, see wallal1928_notes.md):
+#   M16 vs N19 hour angle 1h39.4m vs 1h39.2m; M9 vs N11 check local time 15h27.7m vs 15h27.5m; M7 vs N9 eclipse barometer 30.34 vs 30.43.
+# Transcribed by hand from the 600-dpi page images embedded in the ADS scan, checked against the paper's own arithmetic and an independent per-cell OCR; see wallal1928_notes.md.
+plate,station,date_1922,lmt_h,lmt_min,exposure_s,star_field,ha_w_h,ha_w_min,temperature_F,barometer_in,remark,page
+M15,Wallal,Sept. 20,7,48.0,60,Check,1,36.9,+72.5,30.28,,132
+M15,,Sept. 21,1,30.7,60,Eclipse,1,37.3,79.2,30.26,,132
+M7,Tahiti,May 25,15,39.7,180,Check,1,47.5,71,30.34,Not quite clear,132
+M7,,May 26,9,21.8,180,Eclipse,1,47.3,73,30.34,Not quite clear,132
+M16,Wallal,Sept. 21,1,32.6,102,Eclipse,1,39.4,79.2,30.26,,132
+M11,Tahiti,May 30,9,8.1,180,Eclipse,1,49.4,76,30.34,,132
+M17,Wallal,Sept. 21,1,34.7,62,Eclipse,1,41.3,79.2,30.26,,132
+M17,,Sept. 21,7,48.0,60,Check,1,40.7,70.5,30.31,,132
+M9,Tahiti,May 29,9,10.0,180,Eclipse,1,47.4,73,30.31,,132
+M9,,May 29,15,27.7,180,Check,1,51.1,72,30.24,,132
+N18,Wallal,Sept. 20,7,48.0,60,Check,1,36.9,72.5,30.28,,132
+N18,,Sept. 21,1,30.7,60,Eclipse,1,37.3,79.2,30.26,,132
+N11,Tahiti,May 29,9,10.0,180,Eclipse,1,47.4,73,30.31,,132
+N11,,May 29,15,27.5,180,Check,1,51.1,72,30.24,,132
+N19,Wallal,Sept. 21,1,32.6,102,Eclipse,1,39.2,79.2,30.26,,132
+N13,Tahiti,May 30,9,8.1,180,Eclipse,1,49.4,76,30.34,,132
+N20,Wallal,Sept. 21,1,34.7,62,Eclipse,1,41.3,79.2,30.26,,132
+N20,,Sept. 21,7,48.0,60,Check,1,40.7,70.5,30.31,,132
+N9,Tahiti,May 25,15,39.7,180,Check,1,47.5,71,30.34,Not quite clear,132
+N9,,May 26,9,21.8,180,Eclipse,1,47.3,73,30.43,Not quite clear,132

@@ -1,0 +1,56 @@
+# Dyson, Eddington & Davidson 1920, printed page 300 (section 14), the two Sobral exposure tables: "EXPOSURES with the
+#   13-inch Astrographic Telescope stopped to 8 inches." and "EXPOSURES with the 4-inch Telescope." (eclipse of 1919 May 29).
+# Source: Dyson, F. W., Eddington, A. S. & Davidson, C. 1920, Phil. Trans. R. Soc. A 220, 291-333, "A Determination of the Deflection of Light by the Sun's Gravitational Field, from Observations made at the Total Eclipse of May 29, 1919".
+# Scan: archive.org item philtrans06337895, leaf 9 (pages/leaf009.jpg); every digit read on the full-resolution 06337895_0009.jp2.
+# Section 14 (pp.299-300), quoted: "No observation of contact times was made, but it is known that these times were
+#   somewhat before those calculated. As the times recorded were reckoned from second contact, it is assumed that this
+#   occurred May 28, 23h. 58m. 18s. G.M.T." / "The details of the exposures are given in the following tables :-"
+# Timing (p.299, quoted): "When the crescent disappeared the word "go" was called and a metronome was started by
+#   Dr. LEOCADIO, who called out every tenth beat during totality, and the exposure times were recorded in terms of these
+#   beats. It beat 320 times in 310 seconds; allowance has been made for this rate in the recorded times."
+# Printed heads (both tables): "Ref. No." | "G.M.T. at Commencement of Exposure." (d. h. m. s.) | "Exposure." (s.) |
+#   "Plate."; each table is printed in two halves side by side (astrographic 1-10 | 11-19; 4-inch 1-4 | 5-8).
+# G.M.T. is astronomical (1919 usage: the day begins at noon), so d 28 h 23 m 58 s 23 = civil 1919 May 29, 11:58:23 G.M.T.
+# gmt_d, gmt_h, gmt_m, gmt_s are exactly as printed and empty where the page prints nothing (it prints d, h, m only when
+#   they change and again at the top of each half). gmt_astronomical = "d h m s" with omitted fields carried down from
+#   the row above (no other change).
+# Key printed below the 4-inch table (quoted): "In the fourth column the letter O stands for Imperial Ordinary. / E ,, ,,
+#   Empress. / S ,, ,, Sovereign. / SR ,, ,, Ilford Special Rapid." In the tables the codes are printed "O." "E." "S." "S.R.".
+# Text below the tables (p.300, quoted): "With the astrographic telescope 12 stars are shown on a number of plates, and
+#   seven stars on all but three (Nos. 13, 14 and 19). Of the eight plates taken with the 4-inch lens, seven show seven
+#   stars, but No. 6, which was taken through cloud, does not show any."
+# p.299 (quoted): "19 plates being exposed in the astrographic telescope with alternate exposures of 5 and 10 seconds, and
+#   eight in the 4-inch camera with a uniform exposure of 28 seconds." (consistent with the tables).
+# Columns: instrument (astrographic | 4-inch), ref_no, gmt_d, gmt_h, gmt_m, gmt_s, gmt_astronomical, exposure_s, plate
+#   (code as printed), then DERIVED columns (not printed on p.300): plate_type (from the key); utc_civil_derived (G.M.T. =
+#   UT, civil reckoning); t_after_second_contact_s_derived (start of exposure minus the assumed second contact
+#   23h 58m 18s); plate_label_tables2to8 (4-inch only: the Roman numeral of Tables II-VIII; the eclipse plates I-VIII are
+#   the 4-inch Ref. Nos. 1-8 in order, No. 6 = VI being the one without stars, pp.300 and 302); note (page references).
+instrument,ref_no,gmt_d,gmt_h,gmt_m,gmt_s,gmt_astronomical,exposure_s,plate,plate_type,utc_civil_derived,t_after_second_contact_s_derived,plate_label_tables2to8,note
+astrographic,1,28,23,58,23,28 23 58 23,5,O.,Imperial Ordinary,1919-05-29T11:58:23,+5,,
+astrographic,2,,,,37,28 23 58 37,10,E.,Empress,1919-05-29T11:58:37,+19,,
+astrographic,3,,,,57,28 23 58 57,5,E.,Empress,1919-05-29T11:58:57,+39,,
+astrographic,4,,,59,11,28 23 59 11,10,S.,Sovereign,1919-05-29T11:59:11,+53,,
+astrographic,5,,,,30,28 23 59 30,5,S.R.,Ilford Special Rapid,1919-05-29T11:59:30,+72,,
+astrographic,6,,,,45,28 23 59 45,10,S.R.,Ilford Special Rapid,1919-05-29T11:59:45,+87,,
+astrographic,7,29,0,0,4,29 0 0 4,5,S.R.,Ilford Special Rapid,1919-05-29T12:00:04,+106,,
+astrographic,8,,,,19,29 0 0 19,10,E.,Empress,1919-05-29T12:00:19,+121,,
+astrographic,9,,,,39,29 0 0 39,5,E.,Empress,1919-05-29T12:00:39,+141,,
+astrographic,10,,,,53,29 0 0 53,10,S.R.,Ilford Special Rapid,1919-05-29T12:00:53,+155,,
+astrographic,11,29,0,1,7,29 0 1 7,5,S.R.,Ilford Special Rapid,1919-05-29T12:01:07,+169,,
+astrographic,12,,,,22,29 0 1 22,10,E.,Empress,1919-05-29T12:01:22,+184,,
+astrographic,13,,,,36,29 0 1 36,5,E.,Empress,1919-05-29T12:01:36,+198,,not all seven stars shown (p.300); not in Table IX (p.310)
+astrographic,14,,,,51,29 0 1 51,10,S.R.,Ilford Special Rapid,1919-05-29T12:01:51,+213,,not all seven stars shown (p.300); not in Table IX (p.310)
+astrographic,15,,,2,10,29 0 2 10,5,S.R.,Ilford Special Rapid,1919-05-29T12:02:10,+232,,taken through clouds (p.310); star 10 not shown (p.312)
+astrographic,16,,,,25,29 0 2 25,10,S.R.,Ilford Special Rapid,1919-05-29T12:02:25,+247,,taken through clouds (p.310)
+astrographic,17,,,,44,29 0 2 44,5,E.,Empress,1919-05-29T12:02:44,+266,,
+astrographic,18,,,,58,29 0 2 58,10,E.,Empress,1919-05-29T12:02:58,+280,,
+astrographic,19,,,3,18,29 0 3 18,5,O.,Imperial Ordinary,1919-05-29T12:03:18,+300,,not all seven stars shown (p.300); not in Table IX (p.310)
+4-inch,1,28,23,58,21,28 23 58 21,28,S.R.,Ilford Special Rapid,1919-05-29T11:58:21,+3,I,
+4-inch,2,,,59,0,28 23 59 0,28,S.R.,Ilford Special Rapid,1919-05-29T11:59:00,+42,II,
+4-inch,3,,,,38,28 23 59 38,28,S.R.,Ilford Special Rapid,1919-05-29T11:59:38,+80,III,
+4-inch,4,29,0,0,17,29 0 0 17,28,S.R.,Ilford Special Rapid,1919-05-29T12:00:17,+119,IV,
+4-inch,5,29,0,0,56,29 0 0 56,28,S.R.,Ilford Special Rapid,1919-05-29T12:00:56,+158,V,
+4-inch,6,,,1,34,29 0 1 34,28,S.R.,Ilford Special Rapid,1919-05-29T12:01:34,+196,VI,taken through cloud; shows no stars (pp.300 and 302); plate VI absent from Tables II-VIII
+4-inch,7,,,2,13,29 0 2 13,28,S.R.,Ilford Special Rapid,1919-05-29T12:02:13,+235,VII,
+4-inch,8,,,,52,29 0 2 52,28,S.R.,Ilford Special Rapid,1919-05-29T12:02:52,+274,VIII,

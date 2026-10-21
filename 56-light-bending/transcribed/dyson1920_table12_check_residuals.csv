@@ -1,0 +1,36 @@
+# Dyson, Eddington & Davidson 1920, Phil. Trans. R. Soc. A 220, 291-333.
+# Table XII "Check Plates, Residuals." -- printed page 318 (scan leaf027). Principe expedition, check field.
+# Transcribed exactly as printed (signs and 2 decimals as printed; "0.00" is printed without sign);
+#   no values changed. Empty cell = printed dash (em-rule).
+# star: CHECK-field numbering, as in Table XI (not the eclipse-field Table I numbering).
+# Units: arcseconds (the columns are headed by a seconds mark).
+# p.318: "Plate-constants were then calculated in the usual way, by the formulae
+#     Delta x = ax + by + c,   Delta y = dx + ey + f.
+#   These were applied, and the residuals Delta1 x, Delta1 y converted into arc are as follows:"
+#   i.e. Delta1 = measured Delta (Table XI) minus the fitted plate model, times 0".003.
+# <pair>_d1x, <pair>_d1y: residuals Delta1 x, Delta1 y for the pairs q1-a1, w1-b1, s2-c1, r1-d1, v1-e1.
+# mean_d1x, mean_d1y: the printed "Mean." columns = mean over the pairs in which the star was measured
+#   (verified: each printed mean equals the average of the printed residuals of its row to within 0.005").
+# p.318 below the table: "The mean residual without regard to sign is +-0".21, from which the probable error of a
+#   determination of Delta x or Delta y is +-0".22."  (Recomputed from the 101 printed residuals: mean |v| = 0.219";
+#   Peters' formula 0.8453 sum|v| / sqrt(n(n-m)) with n = 101, m = 30 constants gives 0.221" -> 0.22 as printed.)
+# Checks: Table XII = (Table XI - a x - b y - mean) x 0".003 with the Table XIII constants, for all 101 entries,
+#   rms 0.0044", max 0.019" (w1-b1 y residuals were evidently computed with e ~ 54.0, Table XIII prints 53.6; see notes).
+#   They are NOT the residuals of an exact least-squares fit to Table XI (rms difference 0.05", max 0.18").
+#   Every value was read on enlarged crops and compared with a tesseract reading (signs checked visually): all
+#   cells agree except the first eight cells of the star-8 row, which tesseract garbled; they were read on a zoom
+#   (-0.30, +0.34 and six dashes) and the two values are confirmed by the Table XI arithmetic.
+# p.319: "the last column of Table XII. shows that on the check plates the y-comparisons are free from any serious
+#   systematic error." Star 7 (check field) mimics kappa1, kappa2 Tauri of the eclipse field.
+star,q1_a1_d1x,q1_a1_d1y,w1_b1_d1x,w1_b1_d1y,s2_c1_d1x,s2_c1_d1y,r1_d1_d1x,r1_d1_d1y,v1_e1_d1x,v1_e1_d1y,mean_d1x,mean_d1y
+1,-0.02,-0.02,+0.29,-0.34,+0.02,-0.07,-0.03,+0.22,+0.49,+0.01,+0.15,-0.04
+2,+0.39,+0.15,+0.16,+0.14,+0.69,0.00,+0.69,-0.29,+0.10,-0.23,+0.41,-0.05
+4,-0.14,-0.04,-0.16,+0.09,-0.38,-0.12,-0.02,-0.37,-0.54,+0.12,-0.25,-0.06
+5,-0.08,+0.35,,,+0.25,+0.19,-0.21,-0.21,,-0.01,-0.01,+0.08
+6,-0.06,-0.10,-0.28,+0.27,-0.09,+0.14,-0.10,+0.12,+0.15,+0.49,-0.08,+0.18
+7,-0.06,-0.28,-0.10,-0.16,-0.74,-0.09,-0.31,+0.02,-0.39,-0.12,-0.32,-0.13
+8,-0.30,+0.34,,,,,,,-0.38,-0.68,-0.34,-0.17
+10,-0.02,-0.10,-0.21,+0.52,-0.15,+0.16,+0.08,+0.25,-0.08,+0.34,-0.08,+0.23
+11,-0.46,-0.01,-0.13,-0.22,-0.13,+0.11,-0.13,+0.71,+0.30,-0.28,-0.11,+0.06
+12,+0.16,-0.14,+0.13,-0.04,+0.19,-0.06,+0.17,-0.09,-0.13,+0.08,+0.10,-0.05
+13,+0.59,-0.12,+0.32,-0.26,+0.34,-0.25,-0.13,-0.38,+0.48,+0.28,+0.32,-0.15

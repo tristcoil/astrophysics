@@ -1,0 +1,18 @@
+# Source: Harvey, G. M. 1979, "Gravitational deflection of light. A re-examination of the observations of the solar eclipse of
+#   1919", The Observatory 99, 195-198 (1979 December); ADS 1979Obs....99..195H (scanned PDF, 4 pages). Read on the PDF's
+#   native 3456x5400 page images (about 490 dpi, extracted with pdfimages), old-style figures checked at high zoom.
+# Table: Table I, printed page 196, "Plates taken by the Sobral expedition in 1919".
+# Printed column headings: "Object glass" | "Size of plates" | "Scale "/mm" | "Maximum no. of images in the field" |
+#   "Number of useful plates obtained by the expedition" with sub-columns "Eclipse" and "Comparison".
+# Column mapping: object_glass; plate_size (printed with a multiplication sign, written "x"); scale_arcsec_per_mm = Scale in
+#   arcsec per mm; max_images_in_field = Maximum no. of images in the field; useful_plates_eclipse / useful_plates_comparison =
+#   Number of useful plates obtained by the expedition, Eclipse / Comparison.
+# 13-inch = object glass of the 13-inch Astrographic telescope of the Royal Observatory; 4-inch = the 4-inch telescope belonging
+#   to the Royal Irish Academy (Harvey pp.195-196). (Dyson et al. 1920, p.309: the astrographic glass was stopped down to
+#   8 inches at Sobral.)
+# Consistency with Dyson et al. 1920: 16 astrographic eclipse plates (1-12, 15-18 in their Table IX; "the 16 photographs",
+#   p.312); at most 12 stars measured on an astrographic plate (Table IX, plate 7 vs 14_3); 7 stars and 7 eclipse plates
+#   (I-V, VII, VIII) for the 4-inch.
+object_glass,plate_size,scale_arcsec_per_mm,max_images_in_field,useful_plates_eclipse,useful_plates_comparison
+13-inch,16 x 16 cm,59.9,12,16,17
+4-inch,10 x 8 inches,35.9,7,7,7

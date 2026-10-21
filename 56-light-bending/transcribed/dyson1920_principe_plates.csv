@@ -1,0 +1,105 @@
+# Dyson, Eddington & Davidson 1920, Phil. Trans. R. Soc. A 220, 291-333. Principe expedition, section IV, para. 35.
+# Detailed reductions of the eclipse plates against the Oxford comparison plates:
+#   X-G1  "Plate X. (1) Comparison with Oxford Plate G1."  x table p.323, y table p.323 (scan leaf032)
+#   X-H1  "(2) Comparison with Oxford Plate H1."           x table p.323 (leaf032), y table p.324 (leaf033)
+#   W-D1  "Plate W. (1) Comparison with Oxford Plate D1."  x and y tables p.324 (leaf033)
+#   W-I2  "(2) Comparison with Oxford Plate I2."           x and y tables p.325 (leaf034)
+#   U-K2  "Plate U. Comparison with Oxford Plate K2."      x and y tables p.326 (leaf035)
+# Long format: one row per (comparison, coord, star) = one printed table row. Star numbers are the eclipse-field
+#   numbers of Table I (p.293): 3 = kappa2 Tau, 4 = kappa1 Tau, 5 = Piazzi IV 61, 6 = upsilon Tau, 10 = 72 Tau,
+#   11 = 66 Tau. Rows are in the printed order. Transcribed exactly as printed: signs only where printed (many
+#   positive numbers are printed unsigned), printed precision; no values changed. Empty cell = the column is not
+#   printed in that table.
+# Units: delta ... resid, Ex, Ey and the plate/orientation terms are in units of the fifth decimal place of the
+#   5-mm plate unit = 0".003 (p.318, p.322 "in our units of 0".003"; X-G1 x table heading "Resid. (unit = 0".003)").
+#   coordinate: approximate plate coordinate, unit 5 mm (~5' = 1 reseau interval). alpha_y: dimensionless.
+# Sense of delta: eclipse plate (Principe) minus Oxford comparison plate (p.317: "in the sense Principe - Oxford").
+# Columns (printed heading in quotes; x rows / y rows):
+#   comparison   X-G1 | X-H1 | W-D1 | W-I2 | U-K2
+#   coord        x = the "x" (R.A.-direction) table; y = the "y" (declination) table
+#   star         Table I number
+#   page         printed page of the table
+#   coordinate   "x." (x rows) / "y." (y rows): printed only in X-G1, W-D1, U-K2. In the U-K2 y table (p.326) the
+#                column is printed with the heading "x." but contains the y coordinates (12.40, 18.72, 17.60, 24.99,
+#                27.21 = the y values of the X-G1 and W-D1 y tables): heading misprint, values kept.
+#   delta        "Delta x." / "Delta y.": measured difference eclipse - comparison
+#   term_ax_or_dx  X-G1 only: "3.8x" (a x, a = +3.8) / "6.9x" (d x, d = +6.9)
+#   term_by_or_ey  X-G1 only: "6.9y" (b y, b = +6.9) / "38.6y" (e y, e = +38.6)
+#   delta1       "Delta1 x." / "Delta1 y." = delta - (a x + b y) / delta - (d x + e y), with the comparison's
+#                theoretical plate constants (dyson1920_principe_plate_constants.csv)
+#   three_quarter_Ex  "3/4 Ex." (x rows of X-G1 and W-D1 only; the other x tables omit the column but use the same
+#                values): three quarters of the full Einstein displacement in x
+#   delta2       "Delta2 x." = Delta1 x - 3/4 Ex (x rows; not printed for U-K2)
+#   orientation_heading  printed heading of the orientation column: "+theta y" in x tables, "-theta x" in y tables
+#                (theta = +163, +10, +91, -30, +240 for X-G1, X-H1, W-D1, W-I2, U-K2)
+#   orientation_term  the values of that column (the term theta*y resp. -theta*x, which is subtracted)
+#   delta3       "Delta3 x." = Delta2 x - theta y ; "Delta3 y." = Delta1 y - (-theta x)  (not printed for U-K2)
+#   Ex           "Ex." (U-K2 x rows only): the full Einstein displacement in x (= 184 alpha_x)
+#   Ey           "Ey." (y rows): the full Einstein displacement in y, Ey = 184 alpha_y (p.322)
+#   delta4       "Delta4 x." = Delta3 x - 1/4 Ex (U-K2: Delta1 x - 240y - Ex)
+#                "Delta4 y." = Delta3 y - Ey (U-K2: Delta1 y + 240x - Ey)
+#   alpha_y      "alpha_y." (y rows of X-G1 and W-D1 only; the same star has the same alpha_y in every comparison):
+#                p.322 "the y-displacements of the various stars will be kappa alpha_y", kappa = displacement at
+#                50' (10 reseau intervals) from the Sun's centre; kappa = 184 for the full Einstein deflection.
+#   resid        "Resid." = Delta4 - mean(Delta4) over the 5 stars of the table (p.323: "tabulate the residuals from
+#                the mean values -5942" for X-G1 x). y residuals refer to the full Einstein deflection (p.328 footnote).
+# Verified arithmetic (see dyson1920_principe_notes.md): every printed intermediate follows from the previous column
+#   to within 1 unit (rounding) except: W-I2 x resid of star 10 printed +90 where Delta4 x - mean = 5219 - 5120 = +99
+#   (printed value kept; copied as +0".27 into the p.328 table); U-K2 y Delta4 of star 3 printed 9089 where
+#   5165 + 4195 - 272 = 9088 (1 unit). The orientation term of star 6 in X-G1 (4075) and W-D1 (2275) corresponds to
+#   y = 25.0 instead of 24.99 (163 x 24.99 = 4073.4, 91 x 24.99 = 2274.1); the later columns follow the printed terms.
+#   The coordinates are x = 14 + 10 x, y = 14 + 10 y of Table I (p.293) exactly, and alpha_y, Ey, Ex are those of a
+#   1/r deflection from one Sun position (x = 19.53, y = 11.53), matching Table I's Principe column within rounding.
+#   The printed orientations theta are not the exact least-squares solutions of the printed Delta2 x = c + theta y
+#   (LS: +165.6, +14.3, +93.3, -28.8); see the notes for the effect on the deflections.
+comparison,coord,star,page,coordinate,delta,term_ax_or_dx,term_by_or_ey,delta1,three_quarter_Ex,delta2,orientation_heading,orientation_term,delta3,Ex,Ey,delta4,alpha_y,resid
+X-G1,x,11,323,1.39,-3916,5,86,-4007,-76,-3931,+163y,2021,-5952,,,-5927,,+15
+X-G1,x,5,323,12.40,-5518,47,20,-5585,-79,-5506,+163y,478,-5984,,,-5958,,-16
+X-G1,x,4,323,17.34,-2869,66,129,-3064,-54,-3010,+163y,3051,-6061,,,-6043,,-101
+X-G1,x,3,323,17.48,-2924,66,121,-3111,-69,-3042,+163y,2869,-5911,,,-5888,,+54
+X-G1,x,6,323,19.87,-1568,75,172,-1815,+3,-1818,+163y,4075,-5893,,,-5894,,+48
+X-G1,y,11,323,12.40,6398,10,479,5909,,,-163x,-227,6136,,+6,6130,+0.03,+5
+X-G1,y,5,323,2.93,4121,86,113,3922,,,-163x,-2021,5943,,-127,6070,-0.69,-55
+X-G1,y,4,323,18.72,4512,120,722,3670,,,-163x,-2826,6496,,+234,6262,+1.27,+137
+X-G1,y,3,323,17.60,4236,121,679,3436,,,-163x,-2849,6285,,+272,6013,+1.48,-112
+X-G1,y,6,323,24.99,4148,137,965,3046,,,-163x,-3239,6285,,+136,6149,+0.74,+24
+X-H1,x,11,323,,7290,,,7182,,7258,+10y,124,7134,,,7159,,+235
+X-H1,x,5,323,,6751,,,6680,,6759,+10y,29,6730,,,6756,,-168
+X-H1,x,4,323,,7126,,,6905,,6959,+10y,187,6772,,,6790,,-134
+X-H1,x,3,323,,7320,,,7108,,7177,+10y,176,7001,,,7024,,+100
+X-H1,x,6,323,,7429,,,7147,,7144,+10y,250,6894,,,6893,,-31
+X-H1,y,11,324,,1586,,,1095,,,-10x,-14,1109,,+6,1103,,+172
+X-H1,y,5,324,,858,,,642,,,-10x,-124,766,,-127,893,,-38
+X-H1,y,4,324,,1881,,,1015,,,-10x,-173,1188,,+234,954,,+23
+X-H1,y,3,324,,1785,,,961,,,-10x,-175,1136,,+272,864,,-67
+X-H1,y,6,324,,1909,,,779,,,-10x,-199,978,,+136,842,,-89
+W-D1,x,5,324,12.40,2450,,,2370,-79,2449,+91y,267,2182,,,2208,,+40
+W-D1,x,4,324,17.34,3948,,,3741,-54,3795,+91y,1704,2091,,,2109,,-59
+W-D1,x,3,324,17.48,3834,,,3634,-69,3703,+91y,1602,2101,,,2124,,-44
+W-D1,x,6,324,19.87,4525,,,4266,+3,4263,+91y,2275,1988,,,1987,,-181
+W-D1,x,10,324,22.60,5199,,,4911,+17,4894,+91y,2476,2418,,,2412,,+244
+W-D1,y,5,324,2.93,5320,,,5123,,,-91x,-1128,6251,,-127,6378,-0.69,+70
+W-D1,y,4,324,18.72,5745,,,4889,,,-91x,-1578,6467,,+234,6233,+1.27,-75
+W-D1,y,3,324,17.60,5911,,,5098,,,-91x,-1591,6689,,+272,6417,+1.48,+109
+W-D1,y,6,324,24.99,5628,,,4507,,,-91x,-1808,6315,,+136,6179,+0.74,-129
+W-D1,y,10,324,27.21,5616,,,4389,,,-91x,-2057,6446,,+114,6332,+0.62,+24
+W-I2,x,5,325,,5050,,,4973,,5052,-30y,-88,5140,,,5166,,+46
+W-I2,x,4,325,,4732,,,4493,,4547,-30y,-562,5109,,,5127,,+7
+W-I2,x,3,325,,4622,,,4392,,4461,-30y,-528,4989,,,5012,,-108
+W-I2,x,6,325,,4635,,,4329,,4326,-30y,-750,5076,,,5075,,-45
+W-I2,x,10,325,,4764,,,4426,,4409,-30y,-816,5225,,,5219,,+90
+W-I2,y,5,325,,-6824,,,-7051,,,+30x,372,-7423,,-127,-7296,,-15
+W-I2,y,4,325,,-5751,,,-6635,,,+30x,520,-7155,,+234,-7389,,-108
+W-I2,y,3,325,,-5609,,,-6451,,,+30x,524,-6975,,+272,-7247,,+34
+W-I2,y,6,325,,-5425,,,-6576,,,+30x,596,-7172,,+136,-7308,,-27
+W-I2,y,10,325,,-5109,,,-6371,,,+30x,678,-7049,,+114,-7163,,+118
+U-K2,x,11,326,1.39,2905,,,2791,,,+240y,2976,,-101,,-84,,-147
+U-K2,x,4,326,17.34,4508,,,4292,,,+240y,4493,,-72,,-129,,-192
+U-K2,x,3,326,17.48,4626,,,4420,,,+240y,4224,,-92,,+288,,+225
+U-K2,x,6,326,19.87,6270,,,5992,,,+240y,5998,,+4,,-10,,-73
+U-K2,x,10,326,22.60,7110,,,6805,,,+240y,6530,,+23,,+252,,+189
+U-K2,y,11,326,12.40,9026,,,8547,,,-240x,-334,,,+6,8875,,-94
+U-K2,y,4,326,18.72,5846,,,4986,,,-240x,-4162,,,+234,8914,,-55
+U-K2,y,3,326,17.60,5985,,,5165,,,-240x,-4195,,,+272,9089,,+120
+U-K2,y,6,326,24.99,5458,,,4339,,,-240x,-4769,,,+136,8972,,+3
+U-K2,y,10,326,27.21,4911,,,3684,,,-240x,-5424,,,+114,8994,,+25

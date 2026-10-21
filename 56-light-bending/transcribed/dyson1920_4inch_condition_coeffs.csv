@@ -1,0 +1,25 @@
+# Dyson, Eddington & Davidson 1920, section 19, printed page 304: "The left-hand sides of the equation for the
+#   seven stars shown are" (untitled table with columns No. / Right Ascension / Declination).
+# Source: Dyson, F. W., Eddington, A. S. & Davidson, C. 1920, Phil. Trans. R. Soc. A 220, 291-333, "A Determination of the Deflection of Light by the Sun's Gravitational Field, from Observations made at the Total Eclipse of May 29, 1919".
+# Scan: archive.org item philtrans06337895, leaf 13 (pages/leaf013.jpg); checked on the full-resolution 06337895_0013.jp2.
+# Model (p.304): Dx = a x + b y + c + alpha Ex ;  Dy = d x + e y + f + alpha Ey,
+#   x, y = star co-ordinates of Table I (unit 50 arcmin); Ex, Ey = "coefficients of the gravitational displacement";
+#   alpha = deflection at unit distance (50 arcmin from the sun's centre), in micrometer revolutions.
+# Printed rows, e.g. star 11:  R.A.  "c-0.160b-1.261a-0.587alpha"   Decl.  "f-1.261d-0.160e+0.036alpha".
+#   So the R.A. row is c + y b + x a + Ex alpha and the Decl. row is f + x d + y e + Ey alpha.
+# Columns: star (Table I number, in the printed row order 11 5 4 3 6 10 2); x, y (each printed twice, once in
+#   the R.A. row and once in the Decl. row; the two printings agree for every star); Ex (coefficient of alpha in
+#   the R.A. row); Ey (coefficient of alpha in the Decl. row). Dimensionless; signs and precision as printed.
+# Small printing blemishes (a dash under alpha for star 5 Decl., marks over alpha for star 6 R.A. and star 10
+#   Decl.) do not touch any digit.
+# Checks: x, y equal Table I; (Ex, Ey) = (s - s_sun)/|s - s_sun|^2 for one Sun position (x0 +0.436, y0 -0.263,
+#   the Sobral Sun of Table I) to within 0.0014 (14 values); sums of the coefficients reproduce the printed
+#   left-hand sides of Tables III-VI except as listed in dyson1920_tables3to6_lhs.csv.
+star,x,y,Ex,Ey
+11,-1.261,-0.160,-0.587,+0.036
+5,-0.160,-1.107,-0.557,-0.789
+4,+0.334,+0.472,-0.186,+1.336
+3,+0.348,+0.360,-0.222,+1.574
+6,+0.587,+1.099,+0.080,+0.726
+10,+0.860,+1.321,+0.158,+0.589
+2,+1.079,-0.328,+1.540,-0.156

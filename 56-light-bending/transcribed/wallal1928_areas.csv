@@ -1,0 +1,26 @@
+# Campbell, W. W. & Trumpler, R. J. 1928, Lick Observatory Bulletin 13, 130-160 (No. 397), "Observations made with a pair of five-foot cameras on the light-deflections in the Sun's gravitational field at the total solar eclipse of September 21, 1922" (ADS 1928LicOB..13..130C; printed page p = PDF page p-129).
+# Average displacements of the 8 areas of Fig. 1: observed values p.146 (PDF 17) and corrected values p.147 (PDF 18).
+# "The field of our plates was thus divided into 8 areas as outlined in Fig. 1, and the weighted means of the observed star
+#   displacements (last four cols. of Table 4) were computed for each area" (p.146). Outer areas I-IV, central areas V-VIII
+#   (the central square spans |x|, |y| < 0.5 unit = 3.76 deg; I and V: x < 0, y > 0 (north-preceding); II and VI:
+#   x > 0, y > 0 (north-following); III and VII: x > 0, y < 0; IV and VIII: x < 0, y < 0 - as reproduced from Table 4).
+# Dx_obs, Dy_obs: "Average displ." (arcsec); Mean and Check field rows as printed (no star count printed for them).
+# Dx_corr, Dy_corr: p.147 values after correcting d, f, d', f' by +".03, +.06, +".10, +.20 with zero-point change
+#   a = .00, a' = -".07 and applying the magnitude equation (bright-faint Dx = -".08, Dy = -".02) (pp.146-147).
+# Checks: with |x|,|y| < 0.5 as the central square, Table 4 gives exactly these star counts and reproduces 7 of the 8
+#   areas to <= 0.006"; area IV Dx is printed .00 but computes to -0.031" (its corrected value +.04 is consistent with
+#   the printed .00); see notes.
+# Transcribed by hand from the 600-dpi page images embedded in the ADS scan, checked against the paper's own arithmetic and an independent per-cell OCR; see wallal1928_notes.md.
+area,region,n_stars,Dx_obs,Dy_obs,Dx_corr,Dy_corr,page
+I,outer,16,-0.03,-0.11,+0.01,-0.04,146;147
+II,outer,15,-0.06,-0.08,-0.02,-0.01,146;147
+III,outer,18,-0.06,-0.03,-0.02,+0.04,146;147
+IV,outer,17,0.00,-0.08,+0.04,-0.01,146;147
+Mean,outer,,-0.04,-0.08,,,146
+Check field,outer,,-0.01,0.00,,,146
+V,central,18,-0.09,+0.17,-0.13,+0.11,146;147
+VI,central,21,+0.23,+0.23,+0.19,+0.17,146;147
+VII,central,24,+0.16,-0.04,+0.12,-0.10,146;147
+VIII,central,16,-0.15,-0.03,-0.19,-0.09,146;147
+Mean,central,,+0.04,+0.08,,,146
+Check field,central,,-0.02,+0.02,,,146

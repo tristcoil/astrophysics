@@ -1,0 +1,37 @@
+# Dyson, Eddington & Davidson 1920, Phil. Trans. R. Soc. A 220, 291-333.
+# Table XIII "Check Plates, Plate-Constants." -- printed page 319 (scan leaf028). Principe expedition, check field.
+# Transcribed exactly as printed (signs and 1 decimal as printed); no values changed.
+# Units: "in units of the fifth place of decimals" (p.319), i.e. 1e-5 (dimensionless scale/rotation terms of the
+#   plate model Delta x = ax + by + c, Delta y = dx + ey + f, p.318, with x, y in 5-mm units and Delta in 1e-5 of
+#   that unit). Sense of Delta: Principe - Oxford.
+# a, b, d, e: "Uncorrected." -- the constants "determined from the measures" (Table XI).
+# a_prime, b_prime, d_prime, e_prime: "Corrected." -- p.319: "As determined, these include the effects of
+#   differential refraction and aberration. The latter corrections were calculated for each plate by the usual
+#   formulae and applied, so as to determine the corrected plate-constants, a', b', d', e' free from differential
+#   refraction and aberration. Due allowance was made for the change in the coefficient of refraction owing to the
+#   difference of barometer and temperature (about 40 deg) between Oxford and Principe."
+# b_prime_plus_d_prime: printed column "b'+d'".
+# Row "Mean": the paper prints "Mean ......" across the uncorrected columns (no values -> empty cells) and a dash (em-rule)
+#   under b' and d' (-> empty cells); printed means only for a', e', b'+d'.
+# p.320: "The sign of the results shows that the scale of the photographs is larger at Principe than at Oxford;
+#   in fact the focus must have been set about 1.2 mm. further out ... it is best to adopt the values of a' and e'
+#   as determined, rather than to take a mean." "The sum b' + d' practically vanishes, as it should do. However,
+#   for consistency we adopt the small value found." "From the internal discordances of our determination of e'
+#   (the most important of these constants) the probable error of the mean is +-2.1. This ... will cause a probable
+#   error of our final determination of the deflection, reduced to the limb of the sun, of amount +-0".14".
+# The adopted scale terms for the eclipse reductions (p.322) are a = +31.2, b, d = -0.6 (= half of -1.3),
+#   e = +37.3 (see dyson1920_principe_plate_constants.csv).
+# Checks (details in dyson1920_principe_notes.md): b'+d' = b' + d' and the three printed means are exact; b'-b = d'-d
+#   for every pair (one refraction/aberration correction for b and d); the p.e. +-2.1 of mean e' follows from Peters'
+#   formula 0.8453 sum|v| / (n sqrt(n-1)) = 2.13. The uncorrected constants are the ones used to compute Table XII
+#   from Table XI (implied constants agree within 0.2 units, except w1-b1 e: Table XII implies 54.0, printed 53.6),
+#   but they are NOT the exact least-squares solution of the printed Table XI: refitting Delta = a x + b y + c per pair
+#   gives constants different by up to 4.7 units (rms 2.3); no star subset, weighting or rounding scheme tried
+#   reproduces them. Printed values kept.
+comparison,a,b,d,e,a_prime,b_prime,d_prime,e_prime,b_prime_plus_d_prime
+q1-a1,+32.7,+101.0,-87.8,+58.2,+32.7,+98.4,-90.4,+32.1,+8.0
+w1-b1,+26.2,-16.0,+25.9,+53.6,+30.4,-22.5,+19.4,+31.4,-3.1
+s2-c1,+31.5,+192.5,-173.5,+64.8,+35.8,+182.6,-183.4,+42.1,-0.8
+r1-d1,+28.2,+165.0,-146.8,+69.8,+32.1,+157.8,-154.0,+45.0,+3.8
+v1-e1,+21.6,-76.2,+70.6,+61.4,+25.2,-80.5,+66.3,+35.7,-14.2
+Mean,,,,,+31.2,,,+37.3,-1.3

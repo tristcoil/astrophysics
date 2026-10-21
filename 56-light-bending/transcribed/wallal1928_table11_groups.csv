@@ -1,0 +1,24 @@
+# Campbell, W. W. & Trumpler, R. J. 1928, Lick Observatory Bulletin 13, 130-160 (No. 397), "Observations made with a pair of five-foot cameras on the light-deflections in the Sun's gravitational field at the total solar eclipse of September 21, 1922" (ADS 1928LicOB..13..130C; printed page p = PDF page p-129).
+# Table 11, "Group means of observed radial star displacements (Mean of the two instruments)", printed p.153 (PDF 24).
+# dist_deg: "Distance from Sun's center" (deg); Dr: "Obs. radial star displacements" (arcsec, relative to the 5-foot
+#   reference stars); pe: "P. e." (probable error, arcsec; printed +-".07 on the first line, then .03 ...); weight;
+#   n_stars: "Stars"; einstein_rel: "Einstein Theory -".009r"; obs_minus_einstein: "Obs. -Th.";
+#   courvoisier_rel: "Courvoisier Yearly R. -".0735r" = 0".55 (1 - sqrt(sin r/2)) - 0".0735 r (p.155);
+#   obs_minus_courvoisier: "Obs. -Y. R.".
+# "The group means of Table 11 are derived from the data of Tables 10 and 6" (p.153): groups 1-7 are consecutive rows of
+#   Table 10 (10, 17, 14, 12, 14, 18, 18 stars), groups 8-11 equal Table 7 (all plates) groups 6-9 with weights / 3.
+# Checks: groups 2-11 reproduce (weights to <= 0.03, Dr to <= 0.005", distance to <= 0.011 deg); group 1 is printed with
+#   weight 8.92 while its ten Table 10 weights sum to 13.25 (its pe +-.07 = 0".20/sqrt(8.92)); kept as printed, see notes.
+# Transcribed by hand from the 600-dpi page images embedded in the ADS scan, checked against the paper's own arithmetic and an independent per-cell OCR; see wallal1928_notes.md.
+dist_deg,Dr,pe,weight,n_stars,einstein_rel,obs_minus_einstein,courvoisier_rel,obs_minus_courvoisier,page
+0.675,+0.63,0.07,8.92,10,+0.68,-0.05,+0.46,+0.17,153
+1.22,+0.41,0.03,43.1,17,+0.37,+0.04,+0.40,+0.01,153
+1.71,+0.27,0.03,47.7,14,+0.26,+0.01,+0.36,-0.09,153
+1.97,+0.29,0.03,45.9,12,+0.22,+0.07,+0.33,-0.04,153
+2.17,+0.22,0.03,41.0,14,+0.20,+0.02,+0.31,-0.09,153
+2.67,+0.10,0.03,45.3,18,+0.15,-0.05,+0.27,-0.17,153
+3.14,+0.17,0.03,41.8,18,+0.12,+0.05,+0.23,-0.06,153
+4.03,+0.08,0.03,34.8,19,+0.08,0.00,+0.15,-0.07,153
+5.33,+0.03,0.03,34.4,19,+0.04,-0.01,+0.04,-0.01,153
+6.56,-0.03,0.03,34.5,20,+0.01,-0.04,-0.07,+0.04,153
+8.29,-0.01,0.04,28.8,22,-0.02,+0.01,-0.21,+0.20,153

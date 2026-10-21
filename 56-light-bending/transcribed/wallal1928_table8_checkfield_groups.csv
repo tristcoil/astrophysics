@@ -1,0 +1,16 @@
+# Campbell, W. W. & Trumpler, R. J. 1928, Lick Observatory Bulletin 13, 130-160 (No. 397), "Observations made with a pair of five-foot cameras on the light-deflections in the Sun's gravitational field at the total solar eclipse of September 21, 1922" (ADS 1928LicOB..13..130C; printed page p = PDF page p-129).
+# Table 8, "Group means of radial components of check field residuals (Mean of four plates)", printed p.150 (PDF 21).
+# dist_deg: "Distance from center" (deg, from the check-field zero point); Dr: "Wallal-Tahiti" (arcsec); weight.
+# Printed below: "(Probable error of each group mean: +-".04)".
+# Checks: the weights partition the 75 check stars of Table 5 (mean columns, sorted by distance) exactly into groups of
+#   12, 10, 10, 11, 10, 10, 12 stars; Dr = weighted mean radial component of the Table 5 means to <= 0.006"; dist_deg
+#   reproduces only to <= 0.05 deg.
+# Transcribed by hand from the 600-dpi page images embedded in the ADS scan, checked against the paper's own arithmetic and an independent per-cell OCR; see wallal1928_notes.md.
+group,dist_deg,Dr,weight,page
+1,1.35,+0.01,36.45,150
+2,2.71,+0.05,39.0,150
+3,3.99,-0.06,39.7,150
+4,5.26,-0.07,42.05,150
+5,6.30,+0.03,39.0,150
+6,7.33,+0.03,33.6,150
+7,8.73,0.00,33.0,150

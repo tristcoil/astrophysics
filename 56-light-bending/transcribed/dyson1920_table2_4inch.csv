@@ -1,0 +1,130 @@
+# Dyson, Eddington & Davidson 1920, Table II, printed page 303 (printed sideways):
+#   "TABLE II.-Eclipse Plates-Scale." (upper half) and "COMPARISON Plates-Scale." (lower half).
+# Source: Dyson, F. W., Eddington, A. S. & Davidson, C. 1920, Phil. Trans. R. Soc. A 220, 291-333, "A Determination of the Deflection of Light by the Sun's Gravitational Field, from Observations made at the Total Eclipse of May 29, 1919".
+# Scan: archive.org item philtrans06337895, leaf 12 (pages/leaf012.jpg, rotated 90 deg clockwise to read); every digit read on the
+#   full-resolution 06337895_0012.jp2.
+# Content: Sobral 4-inch object glass (19 ft focal length), 10 x 8-inch plates. Each eclipse plate (May 29, 1919)
+#   and comparison plate (July 14-18, 1919, Sobral) was measured against the same "scale plate" (a photograph
+#   of the field taken through the glass on July 18, laid film to film); Dx, Dy = the measured differences
+#   in R.A. (x) and Decl. (y) for each star (sections 16-18, p.302). The paper does not state their sense;
+#   (plate measured) - (scale plate), with x east and y north as in Table I, is inferred: it is the sense that
+#   gives alpha > 0 (outward deflection) on the eclipse plates (p.304 model, Tables III, V and VII).
+# Units: micrometer screw revolutions ("r" printed at the head of each column); 1 rev = 6.25 arcsec
+#   ("The value of the micrometer screws (both in R.A. and Decl.) is 6".25", p.302).
+# Columns: plate (eclipse I II III IV V VII VIII; plate VI showed no stars; comparison plates printed as
+#   14_{2a} 14_{2b} 15_1 15_2 17_1 17_2 18_2, written here with "_" for the subscript), kind (eclipse|comparison),
+#   star (Table I number; printed row order 11 5 4 3 6 10 2), Dx_rev, Dy_rev (as printed, explicit signs).
+# These are the values ABOVE the line. The number printed below the line in each column is in
+#   dyson1920_table2_offsets.csv; the paper subtracts it before forming the normal equations
+#   (value used = printed value - offset; see the offsets file and the notes file).
+# Check: for 24 of the 28 columns the printed rhs1 of Tables III-VI equals sum(value - offset) exactly.
+# Printed values that differ from the values the 1920 reduction used (kept exactly as printed; both are
+#   unambiguous at full resolution; details and evidence in dyson1920_sobral4inch_notes.md):
+#   plate I, star 2, Dx: printed -0.789; Table III (all 13 numbers of column I) and Table VIII (p.308) were
+#     computed with -0.798 (sum(Dx - offset) = 2.168 as printed vs 2.159 printed in Table III). Probably a
+#     transposition of the last two digits in the printed Table II.
+#   plate 14_2a, star 2, Dx: printed -0.396; Table IV (all 13 numbers of column 14_2a) and Table VIII were
+#     computed with -0.346.
+#   plate VIII Dy: see the offset file (printed offset -1.322; -1.332 was used).
+# Also: the plate 14_2a Dy column sums to 0.448 after the offset, while Table VI prints rhs1 = +0.446: a
+#   0.002 slip or misprint in rhs1, or a 0.002 error in one printed Dy value (the printed digits are
+#   unambiguous); not resolvable, effect on alpha about 0.0004 rev (notes D9).
+plate,kind,star,Dx_rev,Dy_rev
+I,eclipse,11,-1.411,-0.554
+I,eclipse,5,-1.048,-0.338
+I,eclipse,4,-1.216,+0.114
+I,eclipse,3,-1.237,+0.150
+I,eclipse,6,-1.342,+0.124
+I,eclipse,10,-1.289,+0.205
+I,eclipse,2,-0.789,+0.109
+II,eclipse,11,-1.416,-1.324
+II,eclipse,5,-1.221,-1.312
+II,eclipse,4,-1.054,-0.944
+II,eclipse,3,-1.079,-0.862
+II,eclipse,6,-1.012,-0.932
+II,eclipse,10,-0.999,-0.948
+II,eclipse,2,-0.733,-1.019
+III,eclipse,11,+0.592,+0.956
+III,eclipse,5,+0.756,+0.843
+III,eclipse,4,+0.979,+1.172
+III,eclipse,3,+0.958,+1.244
+III,eclipse,6,+1.052,+1.197
+III,eclipse,10,+1.157,+1.211
+III,eclipse,2,+1.256,+0.924
+IV,eclipse,11,+0.563,+1.238
+IV,eclipse,5,+0.683,+1.226
+IV,eclipse,4,+0.849,+1.524
+IV,eclipse,3,+0.861,+1.587
+IV,eclipse,6,+0.894,+1.564
+IV,eclipse,10,+0.934,+1.522
+IV,eclipse,2,+1.177,+1.373
+V,eclipse,11,+0.406,+0.970
+V,eclipse,5,+0.468,+0.861
+V,eclipse,4,+0.721,+1.167
+V,eclipse,3,+0.733,+1.234
+V,eclipse,6,+0.798,+1.130
+V,eclipse,10,+0.864,+1.119
+V,eclipse,2,+0.995,+0.935
+VII,eclipse,11,-1.456,+0.964
+VII,eclipse,5,-1.267,+0.777
+VII,eclipse,4,-1.028,+1.142
+VII,eclipse,3,-1.010,+1.185
+VII,eclipse,6,-0.888,+1.125
+VII,eclipse,10,-0.820,+1.072
+VII,eclipse,2,-0.768,+0.892
+VIII,eclipse,11,-1.285,-1.195
+VIII,eclipse,5,-1.152,-1.332
+VIII,eclipse,4,-0.927,-0.930
+VIII,eclipse,3,-0.897,-0.894
+VIII,eclipse,6,-0.838,-0.937
+VIII,eclipse,10,-0.768,-0.964
+VIII,eclipse,2,-0.585,-1.166
+14_2a,comparison,11,-0.478,-0.109
+14_2a,comparison,5,-0.544,-0.204
+14_2a,comparison,4,-0.368,-0.136
+14_2a,comparison,3,-0.350,-0.073
+14_2a,comparison,6,-0.317,-0.144
+14_2a,comparison,10,-0.272,-0.146
+14_2a,comparison,2,-0.396,-0.182
+14_2b,comparison,11,+0.967,+1.170
+14_2b,comparison,5,+1.013,+1.192
+14_2b,comparison,4,+1.030,+1.249
+14_2b,comparison,3,+1.044,+1.305
+14_2b,comparison,6,+0.980,+1.319
+14_2b,comparison,10,+0.997,+1.327
+14_2b,comparison,2,+1.102,+1.289
+15_1,comparison,11,+1.098,+1.228
+15_1,comparison,5,+0.899,+1.232
+15_1,comparison,4,+1.133,+1.086
+15_1,comparison,3,+1.164,+1.114
+15_1,comparison,6,+1.244,+1.012
+15_1,comparison,10,+1.249,+0.960
+15_1,comparison,2,+0.969,+1.052
+15_2,comparison,11,+0.725,+0.830
+15_2,comparison,5,+0.692,+0.938
+15_2,comparison,4,+0.725,+0.854
+15_2,comparison,3,+0.732,+0.893
+15_2,comparison,6,+0.714,+0.824
+15_2,comparison,10,+0.722,+0.831
+15_2,comparison,2,+0.734,+0.941
+17_1,comparison,11,-1.073,-1.330
+17_1,comparison,5,-1.072,-1.075
+17_1,comparison,4,-1.296,-1.031
+17_1,comparison,3,-1.278,-1.014
+17_1,comparison,6,-1.375,-1.052
+17_1,comparison,10,-1.424,-1.038
+17_1,comparison,2,-1.236,-0.909
+17_2,comparison,11,+1.242,-0.302
+17_2,comparison,5,+1.161,-0.224
+17_2,comparison,4,+1.354,-0.281
+17_2,comparison,3,+1.342,-0.261
+17_2,comparison,6,+1.363,-0.390
+17_2,comparison,10,+1.370,-0.423
+17_2,comparison,2,+1.278,-0.328
+18_2,comparison,11,-1.188,-1.572
+18_2,comparison,5,-1.195,-1.432
+18_2,comparison,4,-1.165,-1.454
+18_2,comparison,3,-1.178,-1.394
+18_2,comparison,6,-1.165,-1.473
+18_2,comparison,10,-1.164,-1.476
+18_2,comparison,2,-1.164,-1.335

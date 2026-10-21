@@ -1,0 +1,161 @@
+# Dyson, Eddington & Davidson 1920, Phil. Trans. R. Soc. A 220, 291-333. Principe expedition (section IV, paras 32-38),
+#   printed pages 318-331 (scans leaf027-leaf040). Plate-reduction constants, normal equations, results and error budget,
+#   exactly as printed in the running text (not in the tables). Long format, one printed number per row; no values changed.
+# Columns:
+#   context   comparison (X-G1, X-H1, W-D1, W-I2, U-K2), plate(s), or the paragraph the number belongs to
+#   quantity  what the number is (names explained below)
+#   value     the printed number with its printed sign; "b, d = +8.2" is one printed value for both b and d (quantity b=d).
+#             Exception: limb_deflection_change is printed unsigned; its sign is taken from the wording ('an increase of
+#             0.19 arcsec on 1.75 arcsec' -> +0.19; '1.75 arcsec - 0.31 arcsec = 1.44 arcsec' -> -0.31).
+#   unit      1e-5 = "units of the fifth place of decimals" (dimensionless plate constants a, b, d, e, theta);
+#             0.003 arcsec = the same unit applied to displacements (kappa, delta_kappa, right-hand sides, mean Delta4x),
+#             i.e. 1e-5 of the 5-mm plate unit (5 mm ~ 5'); arcsec; arcmin; mm; empty = pure number
+#   page      printed page
+#   note      the printed sentence (abridged) in single quotes, or how the number was read. In quotations the printed
+#             seconds mark is written as the word arcsec after the number (printed 1".75 -> 1.75 arcsec), delta as d.
+# Plate model (p.318, p.322): Delta x = a x + b y + c, Delta y = d x + e y + f; Delta in the sense Principe (eclipse) minus
+#   Oxford (comparison); x, y in units of 5 mm (~5'). "Theoretical plate constants" (a, b, d, e) of a comparison =
+#   differential refraction and aberration (eclipse plate minus comparison plate) + the change of scale found from the
+#   check plates (Table XIII means a' = +31.2, (b'+d')/2 = -0.6, e' = +37.3), p.321-322.
+# Orientation theta: x-equations contain +theta y, y-equations -theta x (p.322). For X-G1 the value is stated in the
+#   text; for the other comparisons it is read from the printed column headings, as noted.
+# kappa: displacement at 50' (10 reseau intervals) from the Sun's centre in units of 0.003 arcsec; kappa = 184 is the full
+#   Einstein deflection 1.75 arcsec at the limb (Sun radius 15'.78). y-displacement of a star = kappa alpha_y (p.322).
+#   Limb deflection = 1.75 (184 + delta_kappa)/184 arcsec.
+# Normal equations (p.322): equations of condition 'residual = df + alpha_y dk', printed as
+#   n1_df df + n1_dk dk = n1_rhs ; n2_df df + n2_dk dk = n2_rhs ; whence elim_dk dk = elim_rhs.
+# Probable errors are printed as +-; the value column holds the number after the +-.
+# Arithmetic checks of all these numbers, and the discrepancies found, are in dyson1920_principe_notes.md.
+context,quantity,value,unit,page,note
+eclipse plates (all),refraction_a,-46.5,1e-5,321,"'The differential refraction for all the eclipse plates is a = -46.5, b, d = +8.2, e = -27.0 the differential aberration being zero.'"
+eclipse plates (all),refraction_b=d,+8.2,1e-5,321,see refraction_a
+eclipse plates (all),refraction_e,-27.0,1e-5,321,see refraction_a
+G1,refraction_aberration_a,-19.1,1e-5,321,"'For the comparison plate G1 a = -19.1, b, d = +0.7, e = -28.3.'"
+G1,refraction_aberration_b=d,+0.7,1e-5,321,see refraction_aberration_a
+G1,refraction_aberration_e,-28.3,1e-5,321,see refraction_aberration_a
+X-G1,refraction_aberration_a,-27.4,1e-5,321,"'Hence for X - G1 a = -27.4, b, d = +7.5, e = +1.3.'"
+X-G1,refraction_aberration_b=d,+7.5,1e-5,321,see refraction_aberration_a
+X-G1,refraction_aberration_e,+1.3,1e-5,321,see refraction_aberration_a
+check plates (Table XIII),scale_a,+31.2,1e-5,322,"'To these must be added the terms representing change of scale, determined from the check plates (Table XIII.), viz., a = +31.2, b, d = -0.6, e = +37.3.'"
+check plates (Table XIII),scale_b=d,-0.6,1e-5,322,see scale_a (half of the Table XIII mean b'+d' = -1.3)
+check plates (Table XIII),scale_e,+37.3,1e-5,322,see scale_a
+X-G1,theoretical_a,+3.8,1e-5,322,"'Hence the whole difference X - G1 is given by a = +3.8, b, d = +6.9, e = +38.6.'"
+X-G1,theoretical_b=d,+6.9,1e-5,322,see theoretical_a
+X-G1,theoretical_e,+38.6,1e-5,322,see theoretical_a
+X-H1,theoretical_a,+3.8,1e-5,323,"'The theoretical plate constants are a = +3.8, b, d = +8.3, e = +38.6.'"
+X-H1,theoretical_b=d,+8.3,1e-5,323,see theoretical_a
+X-H1,theoretical_e,+38.6,1e-5,323,see theoretical_a
+W-D1,theoretical_a,+4.9,1e-5,324,"'Theoretical plate-constants a = +4.9, b, d = +6.5, e = +39.7.'"
+W-D1,theoretical_b=d,+6.5,1e-5,324,see theoretical_a
+W-D1,theoretical_e,+39.7,1e-5,324,see theoretical_a
+W-I2,theoretical_a,+4.0,1e-5,325,"'Theoretical plate constants a = +4.0, b, d = +9.1, e = +38.8.'"
+W-I2,theoretical_b=d,+9.1,1e-5,325,see theoretical_a
+W-I2,theoretical_e,+38.8,1e-5,325,see theoretical_a
+U-K2,theoretical_a,+2.8,1e-5,326,"'Theoretical plate-constants a = +2.8, b, d = +8.9, e = +37.7.'"
+U-K2,theoretical_b=d,+8.9,1e-5,326,see theoretical_a
+U-K2,theoretical_e,+37.7,1e-5,326,see theoretical_a
+X-G1,orientation_theta,+163,1e-5,322,"'From the equations Delta2 x = c + theta y we determine by least squares the orientation theta, which is found to be +163. Removing the term 163y we obtain the residuals Delta3 x. Turning to Delta1 y, we correct for the orientation by taking out the term -163x' (column headings +163y and -163x on p.323)"
+X-H1,orientation_theta,+10,1e-5,323,not stated in the text; read from the printed column headings +10y (x table p.323) and -10x (y table p.324)
+W-D1,orientation_theta,+91,1e-5,324,not stated in the text; read from the printed column headings +91y and -91x
+W-I2,orientation_theta,-30,1e-5,325,not stated in the text; read from the printed column headings -30y and +30x
+U-K2,orientation_theta_preliminary,+240,1e-5,326,"column headings +240y and -240x; 'the value here applied is an arbitrary preliminary value'"
+X-G1,mean_Delta4x,-5942,0.003 arcsec,323,"'we complete the results for x by taking out the remaining 1/4 Ex, obtaining Delta4 x, and then tabulate the residuals from the mean values -5942.'"
+all comparisons,sun_radius,15.78,arcmin,322,"'The radius of the sun during the eclipse was 15'.78.'"
+all comparisons,einstein_limb_deflection,1.75,arcsec,322,"'Hence the full Einstein displacement of 1.75 arcsec corresponds to 0.55 arcsec at 50' distance, or, in our units of 0.003 arcsec, kappa = 184.'"
+all comparisons,einstein_deflection_at_50arcmin,0.55,arcsec,322,see einstein_limb_deflection
+all comparisons,kappa_reference_distance,50,arcmin,322,"'Denoting the value of the displacement at 50' (or 10 reseau-intervals) from the centre of the sun by kappa'"
+all comparisons,kappa_full_einstein,184,0.003 arcsec,322,see einstein_limb_deflection; also 'take out Ey = 184 alpha_y'
+X-G1,n1_df,5,,323,normal equation 1: '5 df + 2.83 dk = - 1'
+X-G1,n1_dk,2.83,,323,
+X-G1,n1_rhs,-1,0.003 arcsec,323,
+X-G1,n2_df,2.83,,323,normal equation 2: '2.83 df + 4.83 dk = +64'
+X-G1,n2_dk,4.83,,323,
+X-G1,n2_rhs,+64,0.003 arcsec,323,
+X-G1,elim_dk,3.23,,323,"'whence 3.23 dk = +64,'"
+X-G1,elim_rhs,+64,0.003 arcsec,323,
+X-G1,delta_kappa,+20,0.003 arcsec,323,'dk = +20.'
+X-G1,limb_deflection_change,+0.19,arcsec,323,'An increase of 20 on 184 corresponds to an increase of 0.19 arcsec on 1.75 arcsec.'
+X-G1,limb_deflection,1.94,arcsec,323,'Hence the resulting deflection at the limb is 1.94 arcsec.' (also p.327)
+X-H1,n1_df,5,,324,normal equation 1: '5 df + 2.83 dk = +1'
+X-H1,n1_dk,2.83,,324,
+X-H1,n1_rhs,+1,0.003 arcsec,324,
+X-H1,n2_df,2.83,,324,normal equation 2: '2.83 df + 4.83 dk = -105'
+X-H1,n2_dk,4.83,,324,
+X-H1,n2_rhs,-105,0.003 arcsec,324,
+X-H1,elim_dk,3.23,,324,"'whence 3.23 dk = -105,'"
+X-H1,elim_rhs,-105,0.003 arcsec,324,
+X-H1,delta_kappa,-33,0.003 arcsec,324,'dk = -33.'
+X-H1,limb_deflection_change,-0.31,arcsec,324,'The corresponding deflection at the limb is 1.75 arcsec - 0.31 arcsec = 1.44 arcsec.'
+X-H1,limb_deflection,1.44,arcsec,324,see limb_deflection_change (also p.327)
+W-D1,n1_df,5,,325,normal equation 1: '5 df + 3.42 dk = -1'
+W-D1,n1_dk,3.42,,325,
+W-D1,n1_rhs,-1,0.003 arcsec,325,
+W-D1,n2_df,3.42,,325,normal equation 2: '3.42 df + 5.21 dk = -62'
+W-D1,n2_dk,5.21,,325,
+W-D1,n2_rhs,-62,0.003 arcsec,325,
+W-D1,elim_dk,2.87,,325,'whence 2.87 dk = -61'
+W-D1,elim_rhs,-61,0.003 arcsec,325,
+W-D1,delta_kappa,-21,0.003 arcsec,325,'dk = -21.'
+W-D1,limb_deflection_change,-0.20,arcsec,325,'Hence deflection at the limb is 1.75 arcsec - 0.20 arcsec = 1.55 arcsec.'
+W-D1,limb_deflection,1.55,arcsec,325,see limb_deflection_change (also p.327)
+W-I2,n1_df,5,,325,normal equation 1: '5 df + 3.42 dk = +2'
+W-I2,n1_dk,3.42,,325,
+W-I2,n1_rhs,+2,0.003 arcsec,325,
+W-I2,n2_df,3.42,,325,normal equation 2: '3.42 df + 5.21 dk = -24'
+W-I2,n2_dk,5.21,,325,
+W-I2,n2_rhs,-24,0.003 arcsec,325,
+W-I2,elim_dk,2.87,,325,"'whence 2.87 dk = -25,'"
+W-I2,elim_rhs,-25,0.003 arcsec,325,
+W-I2,delta_kappa,-9,0.003 arcsec,325,'dk = -9.'
+W-I2,limb_deflection_change,-0.08,arcsec,325,'Hence deflection at the limb is 1.75 arcsec - 0.08 arcsec = 1.67 arcsec.'
+W-I2,limb_deflection,1.67,arcsec,325,see limb_deflection_change (also p.327)
+U-K2,delta_theta,+2,1e-5,326,"'We accordingly make a least-squares solution from both x- and y-residuals to determine the correction to the orientation, d-theta, as well as dc, df and dk. The result is d-theta = +2, dk = +121.'"
+U-K2,delta_kappa,+121,0.003 arcsec,326,see delta_theta
+U-K2,limb_deflection,2.90,arcsec,326,'This gives the deflection 2.90 arcsec.'
+U-K2,probable_error,0.87,arcsec,326,"'The probable error is, however, +-0.87 arcsec, so that the result is practically worthless.' p.327: 'This determination is ignored in the subsequent discussion.'"
+check plates,pe_mean_e_prime,2.1,1e-5,320,"'From the internal discordances of our determination of e' (the most important of these constants) the probable error of the mean is +-2.1.' (repeated p.327)"
+check plates,pe_limb_from_scale,0.14,arcsec,320,"'will cause a probable error of our final determination of the deflection, reduced to the limb of the sun, of amount +-0.14 arcsec, affecting all determinations systematically.' (repeated p.327, p.328)"
+check plates,focus_shift,1.2,mm,320,'the focus must have been set about 1.2 mm. further out'
+check plates,focussing_error_max,0.5,mm,320,"'As the error in focussing was probably not more than 0.5 mm., the greater part of this shift must be due to the focal length of the lens combination increasing with temperature'"
+check plates,mean_residual,0.21,arcsec,318,"'The mean residual without regard to sign is +-0.21 arcsec, from which the probable error of a determination of Delta x or Delta y is +-0.22 arcsec.'"
+check plates,pe_one_measure,0.22,arcsec,318,see mean_residual (repeated p.328: 'the probable error (+-0.22 arcsec) of the check plates')
+provisional reduction,limb_deflection_reduction,0.4,arcsec,321,"footnote: 'the final value for the deflection at the limb was reduced by 0.4 arcsec compared with the provisional value, but this was mainly due to the adoption of separate values of a' and e' instead of adopting the mean, and to recalculation of the differential refraction and aberration.'"
+plates W and X,relative_displacement_5_3,1.2,arcsec,321,"'The relative displacement of 5 and 3 is on EINSTEIN's theory, 1.2 arcsec in the y-co-ordinate.'"
+plates W and X,relative_displacement_11_3,0.8,arcsec,321,'Star 11 can scarcely take its place. It is true that the relative displacement is then 0.8 arcsec'
+plates X and W,scale_error_10units_effect,0.68,arcsec,327,'An error in the adopted scale of y of 10 units (in the fifth place of decimals) would lead to an error 0.68 arcsec in the result from either plate.'
+plates X and W,pe_limb_from_e_prime,0.14,arcsec,327,'Thus the probable error +-2.1 in the determination of e' gives a probable error +-0.14 arcsec in the final result'
+plates X and W,largest_e_prime_reduction,0.52,arcsec,327,"'or, if we adopted the largest (rather discordant) value found for e' instead of the mean, we should reduce the result by 0.52 arcsec.'"
+X,orientation_error_10units_effect,0.45,arcsec,327,"'An error of 10 units in the orientation gives an error in the result of 0.45 arcsec for plate X, and 0.22 arcsec for Plate W.'"
+W,orientation_error_10units_effect,0.22,arcsec,327,see X orientation_error_10units_effect
+X,assumed_pe_x_measures,0.20,arcsec,327,"'For Plate X, a probable error of +-0.20 arcsec in the x-measures would give an error +-4.0 in the orientation, leading to an error +-0.18 arcsec in the result;'"
+X,pe_orientation_from_x,4.0,1e-5,327,see X assumed_pe_x_measures
+X,pe_limb_via_orientation,0.18,arcsec,327,see X assumed_pe_x_measures
+X,pe_limb_from_y,0.35,arcsec,327,'whereas an error of the same magnitude in the y measures gives directly an error +-0.35 arcsec in the result.'
+W,pe_orientation_from_x,3.5,1e-5,327,"'For Plate W, the probable error of +-0.20 arcsec in x gives an error +-3.5 in the orientation and +-0.08 arcsec in the result, compared with +-0.38 arcsec for similar inaccuracy in y.'"
+W,pe_limb_via_orientation,0.08,arcsec,327,see W pe_orientation_from_x
+W,pe_limb_from_y,0.38,arcsec,327,see W pe_orientation_from_x
+W,quarter_Ex_orientation_effect,0.029,arcsec,327,'we neglected the correction 1/4 Ex in determining the orientation. This will make a difference of 0.029 arcsec in the results from Plate W and 0.092 arcsec from Plate X.'
+X,quarter_Ex_orientation_effect,0.092,arcsec,327,see W quarter_Ex_orientation_effect
+all four comparisons,mean_quarter_Ex_correction,-0.06,arcsec,327,"'The effect is that the deduced deflection needs to be decreased, and the mean correction -0.06 arcsec should be applied to the mean result obtained,'"
+all four comparisons,adopted_quarter_Ex_correction,-0.04,arcsec,327,"'or rather, to make the adopted deflection for x consistent with the deduced value from y, the correction needed is -0.04 arcsec.'"
+X-G,limb_deflection,1.94,arcsec,327,'37. The four determinations from the two eclipse plates are X - G .... 1.94 arcsec'
+X-H,limb_deflection,1.44,arcsec,327,'X - H .... 1.44 arcsec'
+W-D,limb_deflection,1.55,arcsec,327,'W - D .... 1.55 arcsec'
+W-I,limb_deflection,1.67,arcsec,327,'W - I .... 1.67 arcsec'
+all four comparisons,mean_limb_deflection,1.65,arcsec,327,'giving a mean of 1.65 arcsec. They evidently agree with EINSTEIN's predicted value 1.75 arcsec.'
+all four comparisons,einstein_prediction,1.75,arcsec,327,see mean_limb_deflection
+p.328 residuals,average_y_residual,0.22,arcsec,328,"'The average y-residual is +-0.22 arcsec, which gives a probable error for y of +-0.21 arcsec.'"
+p.328 residuals,pe_y,0.21,arcsec,328,see average_y_residual
+p.328 residuals,pe_x,0.25,arcsec,328,"'The probable error of x is +-0.25 arcsec, but we are not so much concerned with this.'"
+plates X and W,weight_delta_kappa_approx,3,,328,'The weight of the determination of dk is about 3 (strictly 3.23 for Plate X and 2.87 for Plate W).'
+X,weight_delta_kappa,3.23,,328,see weight_delta_kappa_approx
+W,weight_delta_kappa,2.87,,328,see weight_delta_kappa_approx
+plates X and W,pe_kappa,0.12,arcsec,328,"'The probable error of kappa is therefore +-0.12 arcsec, which corresponds to a probable error of +-0.38 arcsec in the final values of the deflection.'"
+plates X and W,pe_limb_single_determination,0.38,arcsec,328,see pe_kappa
+all four comparisons,pe_mean_result,0.25,arcsec,328,"'As the four determinations involve only two eclipse plates and are not wholly independent, and further small accidental errors may arise through inaccurate determination of the orientation, the probable error of our mean result will be about +-0.25 arcsec.'"
+all four comparisons,pe_scale_common,0.14,arcsec,328,"'There is further the error of +-0.14 arcsec affecting all four results equally, arising from the determination of scale.'"
+all four comparisons,correction_applied,-0.04,arcsec,328,"'Taking this into account, and including the small correction -0.04 arcsec previously mentioned, our result may be written'"
+Principe final,limb_deflection,1.61,arcsec,328,'1.61 arcsec +- 0.30 arcsec.' (repeated p.331: 'The deflection obtained was 1.61 arcsec. The probable error is about +-0.30 arcsec')
+Principe final,probable_error,0.30,arcsec,328,see Principe final limb_deflection
+p.329 discussion,greatest_relative_deflection_known_scale,1.2,arcsec,329,"'Knowing the scale, the greatest relative deflection to be measured amounts to 1.2 arcsec on EINSTEIN's theory;'"
+p.329 discussion,greatest_relative_deflection_scale_eliminated,0.67,arcsec,329,"'but if the scale is unknown and must be eliminated, this is reduced to 0.67 arcsec.' (seconds mark printed in the odd position 0.''67)"

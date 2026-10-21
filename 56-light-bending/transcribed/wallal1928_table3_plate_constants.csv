@@ -1,0 +1,137 @@
+# Campbell, W. W. & Trumpler, R. J. 1928, Lick Observatory Bulletin 13, 130-160 (No. 397), "Observations made with a pair of five-foot cameras on the light-deflections in the Sun's gravitational field at the total solar eclipse of September 21, 1922" (ADS 1928LicOB..13..130C; printed page p = PDF page p-129).
+# Table 3, "Coefficients of reduction formulae", printed pp.136-137 (PDF 7-8).
+# Reduction formula (p.135): Dx + a + bx + cy + dx^2 + exy + fy^2 + gx^3 + hx^2y + ixy^2 + ky^3 = D_x + v_x, and the same
+#   for Dy with primed coefficients; Dx, Dy = measured differences Eclipse - Night (Wallal - Tahiti). x, y in units of
+#   200 mm = 27084"; coefficients in arcsec (printed -21".91 -> -21.91).
+# Columns (printed headings): check_det = "Check F. det." (determined from the check field, still including refraction and
+#   aberration); check_corr = "Check F. corr." (instrumental part: refraction, aberration and the plate-centre inclination
+#   term of Table 2 deducted); eclipse_adopt = "Eclipse F. adopt." (used to reduce the eclipse field); eclipse_corr =
+#   "Eclipse F. corr." (eclipse values with refraction and aberration deducted). Empty = nothing printed.
+# Printed in italics (determined from the eclipse field itself, p.137): a, b, c, a', b', c' of eclipse_adopt and
+#   eclipse_corr for M15-M7, M17-M9, N18-N11, N20-N9. M16-M11 and N19-N13 have no check-field exposure and only
+#   "Eclipse F. adopt./corr." columns (their second/third-order terms were found from the eclipse field after removing
+#   the mean displacements of the other four plates, p.137).
+# The scale of the eclipse field is fixed by the condition that the 55 reference stars > 5 deg from the Sun have zero
+#   mean displacement (p.137); b and c' therefore do not include the deflection of the reference stars.
+# Transcribed by hand from the 600-dpi page images embedded in the ADS scan, checked against the paper's own arithmetic and an independent per-cell OCR; see wallal1928_notes.md.
+pair,coef,check_det,check_corr,eclipse_adopt,eclipse_corr,page
+M15-M7,a,-21.91,,-39.93,,136
+M15-M7,b,+1.14,+5.13,+6.31,+4.38,136
+M15-M7,c,+1.17,+1.09,+0.02,-0.08,136
+M15-M7,d,-4.46,-4.72,-4.85,,136
+M15-M7,e,+1.43,+1.38,+1.55,,136
+M15-M7,f,+0.07,-0.14,+0.14,,136
+M15-M7,g,+0.11,+0.16,+0.16,,136
+M15-M7,h,+1.09,+1.09,+1.09,,136
+M15-M7,i,-0.72,-0.68,-0.67,,136
+M15-M7,k,+0.29,+0.29,+0.29,,136
+M15-M7,a',+18.80,,+27.36,,136
+M15-M7,b',+1.26,+1.28,+1.24,+1.27,136
+M15-M7,c',+2.51,+5.84,+7.19,+4.60,136
+M15-M7,d',+0.08,+0.16,+0.08,,136
+M15-M7,e',-3.58,-3.59,-4.03,,136
+M15-M7,f',+1.81,+1.79,+1.95,,136
+M15-M7,g',-0.41,-0.41,-0.41,,136
+M15-M7,h',+1.49,+1.53,+1.54,,136
+M15-M7,i',+0.59,+0.60,+0.59,,136
+M15-M7,k',-1.16,-1.14,-1.11,,136
+M17-M9,a,-40.51,,-45.41,,136
+M17-M9,b,+6.68,+10.46,+11.66,+9.47,136
+M17-M9,c,+2.34,+2.28,+1.66,+1.65,136
+M17-M9,d,-1.69,-1.71,-1.86,,136
+M17-M9,e,+2.96,+2.91,+3.09,,136
+M17-M9,f,+0.36,+0.18,+0.42,,136
+M17-M9,g,-0.52,-0.47,-0.46,,136
+M17-M9,h,-0.36,-0.37,-0.37,,136
+M17-M9,i,-1.55,-1.51,-1.49,,136
+M17-M9,k,-0.31,-0.31,-0.31,,136
+M17-M9,a',-56.07,,-49.45,,136
+M17-M9,b',-5.20,-5.15,-4.68,-4.57,136
+M17-M9,c',+7.13,+10.23,+11.52,+8.82,136
+M17-M9,d',+0.10,+0.16,+0.11,,136
+M17-M9,e',-2.48,-2.23,-2.67,,136
+M17-M9,f',+3.12,+3.07,+3.22,,136
+M17-M9,g',-0.41,-0.41,-0.41,,136
+M17-M9,h',+0.21,+0.25,+0.27,,136
+M17-M9,i',+0.38,+0.38,+0.37,,136
+M17-M9,k',-1.33,-1.31,-1.28,,136
+N18-N11,a,+41.36,,+39.17,,137
+N18-N11,b,+0.38,+4.32,+5.22,+3.18,137
+N18-N11,c,+2.19,+2.05,+1.45,+1.36,137
+N18-N11,d,-5.62,-5.64,-5.76,,137
+N18-N11,e,+0.78,+0.65,+0.83,,137
+N18-N11,f,+0.17,-0.04,+0.22,,137
+N18-N11,g,-0.95,-0.90,-0.89,,137
+N18-N11,h,-2.48,-2.49,-2.49,,137
+N18-N11,i,0.00,+0.04,+0.06,,137
+N18-N11,k,-0.67,-0.67,-0.67,,137
+N18-N11,a',-52.79,,-50.39,,137
+N18-N11,b',-0.86,-0.89,+0.16,+0.19,137
+N18-N11,c',+1.06,+4.21,+5.59,+2.90,137
+N18-N11,d',-0.49,-0.41,-0.47,,137
+N18-N11,e',-5.74,-5.48,-5.91,,137
+N18-N11,f',+0.81,+0.68,+0.83,,137
+N18-N11,g',-0.64,-0.64,-0.64,,137
+N18-N11,h',-0.83,-0.79,-0.77,,137
+N18-N11,i',-1.74,-1.74,-1.75,,137
+N18-N11,k',+0.48,+0.50,+0.53,,137
+N20-N9,a,-11.86,,-39.06,,137
+N20-N9,b,-0.63,+3.20,+4.12,+2.04,137
+N20-N9,c,+1.12,+1.12,+0.20,+0.18,137
+N20-N9,d,-5.33,-5.70,-5.86,,137
+N20-N9,e,+3.12,+3.05,+3.23,,137
+N20-N9,f,-0.33,-0.51,-0.25,,137
+N20-N9,g,+1.47,+1.52,+1.52,,137
+N20-N9,h,-1.57,-1.57,-1.57,,137
+N20-N9,i,-0.27,-0.23,-0.22,,137
+N20-N9,k,+0.20,+0.20,+0.20,,137
+N20-N9,a',-49.14,,-39.93,,137
+N20-N9,b',-3.29,-3.19,-2.34,-2.23,137
+N20-N9,c',+0.16,+3.44,+4.83,+2.23,137
+N20-N9,d',-0.29,-0.23,-0.30,,137
+N20-N9,e',-5.57,-5.71,-6.18,,137
+N20-N9,f',+3.33,+3.29,+3.45,,137
+N20-N9,g',+0.04,+0.04,+0.04,,137
+N20-N9,h',+1.20,+1.24,+1.25,,137
+N20-N9,i',-1.04,-1.03,-1.04,,137
+N20-N9,k',-0.53,-0.51,-0.48,,137
+M16-M11,a,,,+43.77,,136
+M16-M11,b,,,+4.23,+2.16,136
+M16-M11,c,,,-0.03,-0.11,136
+M16-M11,d,,,-4.48,-4.37,136
+M16-M11,e,,,+2.02,+1.86,136
+M16-M11,f,,,+0.50,+0.24,136
+M16-M11,g,,,+1.54,+1.54,136
+M16-M11,h,,,+0.49,+0.48,136
+M16-M11,i,,,-0.24,-0.25,136
+M16-M11,k,,,+0.17,+0.17,136
+M16-M11,a',,,+47.37,,136
+M16-M11,b',,,+1.15,+1.19,136
+M16-M11,c',,,+5.01,+2.29,136
+M16-M11,d',,,-0.31,-0.24,136
+M16-M11,e',,,-3.89,-3.45,136
+M16-M11,f',,,+1.80,+1.65,136
+M16-M11,g',,,-0.24,-0.24,136
+M16-M11,h',,,-0.14,-0.15,136
+M16-M11,i',,,-0.04,-0.04,136
+M16-M11,k',,,+1.78,+1.75,136
+N19-N13,a,,,-38.85,,137
+N19-N13,b,,,+5.91,+3.84,137
+N19-N13,c,,,+1.04,+0.96,137
+N19-N13,d,,,-7.38,-7.27,137
+N19-N13,e,,,+5.81,+5.66,137
+N19-N13,f,,,+0.32,+0.06,137
+N19-N13,g,,,-0.51,-0.51,137
+N19-N13,h,,,-0.05,-0.06,137
+N19-N13,i,,,-0.20,-0.21,137
+N19-N13,k,,,-0.24,-0.24,137
+N19-N13,a',,,-39.31,,137
+N19-N13,b',,,-1.53,-1.49,137
+N19-N13,c',,,+6.55,+3.83,137
+N19-N13,d',,,-0.16,-0.09,137
+N19-N13,e',,,-7.03,-6.59,137
+N19-N13,f',,,+5.24,+5.09,137
+N19-N13,g',,,-0.54,-0.54,137
+N19-N13,h',,,-1.67,-1.68,137
+N19-N13,i',,,+0.38,+0.38,137
+N19-N13,k',,,+0.14,+0.11,137

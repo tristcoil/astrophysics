@@ -1,0 +1,103 @@
+# Source: Dyson, F. W., Eddington, A. S. & Davidson, C. 1920, Phil. Trans. R. Soc. A 220, 291-333.
+# Table: untitled table on printed page 311 (archive.org philtrans06337895 leaf 020; read on the full-resolution 5120x6600
+#   JPEG-2000 06337895_0020.jp2), Sobral astrographic plates, section 25. Printed headings: "No. of Eclipse Plate." |
+#   "Measured Values of Dy for Stars Nos.-" with sub-columns "5 4 3 6 10". The page prints it as two side-by-side halves
+#   (eclipse plates 1-8 and 9-18); it is written here in long format, one row per (eclipse plate, star), stars in the printed
+#   column order 5, 4, 3, 6, 10.
+# Context (pp.310-311, verbatim): "Reference to the diagram shows that the measurement of displacement depends essentially on the
+#   position of the stars Nos. 3 and 4 relative to 5 on one side and 6 and 10 on the other. These are all bright stars, and in
+#   this respect their images are more comparable than are the images of the fainter stars. The measures of these stars are
+#   given in the following table :-"
+# Units: Dy_rev in revolutions (r) of the measuring screw, 1 r = 12.3 arcsec (Table IX heading, p.310). Dy are the measured
+#   declination (y) differences between eclipse and comparison plate that form the right-hand sides of the condition equations
+#   (1)-(5) on p.311 (see dyson1920_p311_alpha_plus_e.csv); the form of these equations is defined for the 4-inch plates on
+#   p.304: "dx + ey + f + alphaE_y (= Dy)", x, y being the star's co-ordinates of Table I. The astrographic eclipse plates were
+#   "directly compared with the comparison plates taken in July" in the astrographic duplex micrometer (p.309). Signs exactly
+#   as printed.
+# Star numbers are the paper's Table I numbers (p.293): 3 kappa2 Tau, 4 kappa1 Tau, 5 Piazzi IV 61, 6 upsilon Tau, 10 72 Tau.
+# Missing value: eclipse plate 15, star 10 is printed as a dash ("-"); Dy_rev is left empty. p.312: "In photograph No. 15,
+#   star 10 is not shown, and the equation is slightly modified."
+# The table has one row per eclipse plate (16 plates: 1-12 and 15-18). Plates 7 and 12 have two comparison plates in Table IX
+#   (7: 14_3 and 18_3; 12: 11_1 and 17_2); the paper does not say which comparison plate (or the mean of both) these two rows
+#   refer to. See dyson1920_astrographic_notes.md for the arithmetic evidence.
+eclipse_plate,star,Dy_rev
+1,5,-0.051
+1,4,+0.175
+1,3,+0.169
+1,6,+0.201
+1,10,+0.235
+2,5,+0.558
+2,4,+0.656
+2,3,+0.724
+2,6,+0.668
+2,10,+0.702
+3,5,+0.124
+3,4,+0.285
+3,3,+0.286
+3,6,+0.274
+3,10,+0.355
+4,5,+0.111
+4,4,+0.222
+4,3,+0.247
+4,6,+0.231
+4,10,+0.167
+5,5,+0.034
+5,4,+0.228
+5,3,+0.232
+5,6,+0.218
+5,10,+0.308
+6,5,+0.164
+6,4,+0.488
+6,3,+0.478
+6,6,+0.557
+6,10,+0.637
+7,5,-0.051
+7,4,+0.156
+7,3,+0.162
+7,6,+0.250
+7,10,+0.279
+8,5,+0.108
+8,4,+0.330
+8,3,+0.314
+8,6,+0.376
+8,10,+0.397
+9,5,-0.059
+9,4,+0.121
+9,3,+0.109
+9,6,+0.205
+9,10,+0.180
+10,5,+0.033
+10,4,+0.270
+10,3,+0.188
+10,6,+0.258
+10,10,+0.280
+11,5,+0.025
+11,4,+0.215
+11,3,+0.210
+11,6,+0.233
+11,10,+0.274
+12,5,-0.068
+12,4,+0.144
+12,3,+0.124
+12,6,+0.160
+12,10,+0.167
+15,5,-0.038
+15,4,+0.138
+15,3,+0.107
+15,6,+0.172
+15,10,
+16,5,-0.050
+16,4,+0.076
+16,3,+0.046
+16,6,+0.127
+16,10,+0.073
+17,5,-0.071
+17,4,+0.104
+17,3,+0.081
+17,6,+0.186
+17,10,+0.164
+18,5,+0.016
+18,4,+0.092
+18,3,+0.109
+18,6,+0.099
+18,10,+0.084

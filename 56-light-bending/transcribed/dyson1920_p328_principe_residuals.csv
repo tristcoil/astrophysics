@@ -1,0 +1,24 @@
+# Dyson, Eddington & Davidson 1920, Phil. Trans. R. Soc. A 220, 291-333.
+# Untitled table on printed page 328 (scan leaf037), Principe expedition, para. 37: "The residuals* in the separate
+#   comparisons reduced to arc are as follows. They do not appear to show any special peculiarities."
+#   Footnote *: "The residuals refer to the theoretical deflection 1".75, not the deduced deflections."
+# Transcribed exactly as printed (signs and 2 decimals as printed; "0.00" printed without sign); no values changed.
+#   Empty cell = printed dash (em-rule).
+# star: eclipse-field number of Table I (p.293): 11 = 66 Tau, 5 = Piazzi IV 61, 4 = kappa1 Tau, 3 = kappa2 Tau,
+#   6 = upsilon Tau, 10 = 72 Tau.
+# Columns G, H, D, I = comparisons X-G1, X-H1, W-D1, W-I2 (the Oxford plate letter is printed as the heading).
+#   They are the "Resid." columns of pp.323-325 (units of 0".003) converted to arc; see dyson1920_principe_plates.csv.
+#   Mean = mean of the four comparisons, printed only for the stars present in all four (5, 4, 3, 6).
+# Units: arcseconds (columns headed by a seconds mark).
+# Verified: every entry = 0.003 x the p.323-325 residual to within 0.005" (half-way cases 0.045, 0.705, 0.015,
+#   0.165, 0.225, 0.045, 0.135 are rounded toward zero); x_I of star 10 (+0.27) follows the printed W-I2 residual +90,
+#   whereas Delta4 x - mean = +99 would give +0.30 (see notes). Means agree with the printed entries to within 0.005".
+# p.328: "The average y-residual is +-0".22, which gives a probable error for y of +-0".21. ... The probable error
+#   of x is +-0".25, but we are not so much concerned with this."
+star,x_G,x_H,x_D,x_I,x_mean,y_G,y_H,y_D,y_I,y_mean
+11,+0.04,+0.70,,,,+0.01,+0.52,,,
+5,-0.05,-0.50,+0.12,+0.14,-0.07,-0.16,-0.11,+0.21,-0.04,-0.02
+4,-0.30,-0.40,-0.18,+0.02,-0.21,+0.41,+0.07,-0.22,-0.32,-0.02
+3,+0.16,+0.30,-0.13,-0.32,0.00,-0.34,-0.20,+0.33,+0.10,-0.03
+6,+0.14,-0.09,-0.54,-0.13,-0.16,+0.07,-0.27,-0.39,-0.08,-0.17
+10,,,+0.73,+0.27,,,,+0.07,+0.35,

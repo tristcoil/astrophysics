@@ -1,0 +1,27 @@
+# Dyson, Eddington & Davidson 1920, printed page 307, first table (untitled): the corrections for differential refraction
+#   and aberration of the Sobral 4-inch plates. Introduced on p.306 (last sentence): "The following corrections for differential
+#   refraction and aberration are calculated from the times and dates of exposure."
+# Source: Dyson, F. W., Eddington, A. S. & Davidson, C. 1920, Phil. Trans. R. Soc. A 220, 291-333, "A Determination of the Deflection of Light by the Sun's Gravitational Field, from Observations made at the Total Eclipse of May 29, 1919".
+# Scan: archive.org item philtrans06337895, leaf 16 (pages/leaf016.jpg); every digit read on the full-resolution 06337895_0016.jp2.
+# Printed heads: "a." "e." "b." "d."; unit "r" (micrometer revolutions, 1 r = 6.25 arcsec) over each column. These are
+#   coefficients of the plate model of p.304 (Dx = a x + b y + c + alpha Ex; Dy = d x + e y + f + alpha Ey; x, y in units
+#   of 50'): a and e are scale terms in x (R.A.) and y (Decl.), b and d the cross (orientation-like) terms.
+# Printed rows: "Eclipse plates" (one row for all seven eclipse plates), "Scale plate" (the 4-inch plate 18_1, taken
+#   through the glass; p.301 footnote and p.302), "Comparison 14_2a", ",, 14_2b", ",, 15_1", ",, 15_2", ",, 17_1",
+#   ",, 17_2", ",, 18_2" (subscripts written with "_"; 14_2a and 14_2b are two exposures on plate 14_2, p.302).
+# Columns: row_label (Eclipse plates | Scale plate | comparison plate label), kind (eclipse|scale|comparison), a_rev, e_rev,
+#   b_rev, d_rev (as printed: explicit sign, 3 decimals).
+# How they are used (confirmed from the numbers, see dyson1920_p307_scale_orientation.csv): scale/orientation of a plate
+#   relative to the scale plate = normal-equation solution + [coefficient of the plate row - coefficient of the Scale plate row].
+# Internal checks: b = d on every printed row; 14_2a = 14_2b; for the scale plate and the six comparison plates a, e and b
+#   decrease (never increase) as the field altitude printed on p.301 rises from 33.6 deg (18_1) to 39.2 deg (18_2).
+row_label,kind,a_rev,e_rev,b_rev,d_rev
+Eclipse plates,eclipse,+0.240,+0.168,+0.062,+0.062
+Scale plate,scale,+0.423,+0.207,+0.096,+0.096
+14_2a,comparison,+0.409,+0.207,+0.091,+0.091
+14_2b,comparison,+0.409,+0.207,+0.091,+0.091
+15_1,comparison,+0.390,+0.207,+0.087,+0.087
+15_2,comparison,+0.370,+0.202,+0.087,+0.087
+17_1,comparison,+0.399,+0.207,+0.091,+0.091
+17_2,comparison,+0.337,+0.202,+0.077,+0.077
+18_2,comparison,+0.327,+0.202,+0.072,+0.072

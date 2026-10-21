@@ -1,0 +1,40 @@
+# Dyson, Eddington & Davidson 1920, Phil. Trans. R. Soc. A 220, 291-333.
+# Table XI "Check Plates, Measures." -- printed page 318 (scan leaf027). Principe expedition, check field
+#   (Arcturus field, R.A. 14h 12m 47s, Dec. +20 deg 30', p.315).
+# Transcribed exactly as printed; no values changed. Empty cell = printed dash (em-rule) (star not measured on that pair).
+# star: the paper's own numbering of the CHECK-field stars (1-13). This numbering is NOT the eclipse-field
+#   numbering of Table I. Stars 3 and 9 do not appear in the table. p.319: "Star 7 is much the brightest. Stars 1,
+#   6, 11, 13 are rather bright. Stars 2, 4, 10, 12 are fainter and more comfortable to measure. Stars 5 and 8 are
+#   very faint. Arcturus is on the plates but is much too bright to measure. No measures have been rejected."
+# x, y: "Approx. Co-ords." -- p.318: "The unit for x and y is 5 millimetres, which is approximately equal to 5'."
+#   "The centre of the plate is near x = 14, y = 14."
+# <pair>_dx, <pair>_dy: the measured differences Delta x, Delta y for the five plate pairs whose printed headings
+#   are q1-a1, w1-b1, s2-c1, r1-d1, v1-e1 (Principe plate - Oxford plate; subscripts written inline).
+#   p.317: "An Oxford and a Principe plate were placed film to film so that the images of corresponding stars
+#   nearly coincided ... The small differences Delta x and Delta y, in the sense Principe - Oxford, were then
+#   measured for each star. Eight settings were made on each image; for half of them the field was rotated
+#   through 180 degrees by the reversion prism." All measures by Eddington with the Cambridge measuring machine.
+#   p.318: "The differences Delta x, Delta y are given in units of the fifth place of decimals = 0".003."
+#   (i.e. 1e-5 of the 5-mm coordinate unit; 5 mm ~ 300" so 1 unit = 0.003".) All printed values are unsigned
+#   4-digit numbers; they include an arbitrary zero point (only differences between stars matter).
+# Plate dates/times: dyson1920_principe_exposures.csv. Fitted plate constants: dyson1920_table13_check_constants.csv;
+#   residuals: dyson1920_table12_check_residuals.csv.
+# Reading: every cell read on enlarged crops of the 5120x6600 JP2 scan and compared with a tesseract reading
+#   (129 of 132 cells agree; tesseract's 4814 for 4314 (star 5, v1-e1 dy), 4852 for 4352 (star 11, q1-a1 dy) and
+#   merged "19388" for 1938 (star 5, r1-d1 dx) are OCR errors, settled on 2-3x zooms and by the arithmetic below).
+#   Arithmetic check: Table XI minus the Table XIII plate model (constant term =
+#   mean) reproduces all 101 printed Table XII residuals to rms 0.0044" (max 0.019"), so no tens or higher digit can
+#   be misread here (10 units = 0.03" would show); units digits rest on the two independent readings.
+#   See dyson1920_principe_notes.md.
+star,x,y,q1_a1_dx,q1_a1_dy,w1_b1_dx,w1_b1_dy,s2_c1_dx,s2_c1_dy,r1_d1_dx,r1_d1_dy,v1_e1_dx,v1_e1_dy
+1,1.41,20.31,4346,7180,3199,4259,6012,7375,3921,8796,5435,4399
+2,5.89,12.74,3865,6405,3394,4129,4922,6132,3039,7440,5978,4170
+4,9.46,11.13,3640,5932,3408,4118,4369,5366,2638,6776,5966,4441
+5,12.00,6.84,3311,5590,,,3831,4752,1938,6156,,4314
+6,12.80,27.33,5415,6561,3192,5140,7689,5925,5379,7580,5032,5794
+7,13.75,13.78,4076,5630,3496,4290,4891,4805,3101,6461,5906,4826
+8,15.50,24.38,5125,6300,,,,,,,5139,5412
+10,20.13,10.49,3965,4940,3679,4505,4656,3568,2866,5370,6398,5229
+11,20.81,0.93,2874,4352,3876,3759,2845,2815,1238,4758,7268,4482
+12,22.91,6.23,3685,4436,3931,4158,4039,2738,2270,4551,6765,5076
+13,26.46,8.96,4222,4288,4045,4326,4724,2232,2720,4120,6836,5561

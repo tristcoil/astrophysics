@@ -1,0 +1,1846 @@
+<meta charset="utf-8">
+<title>1919 Plate Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+/* Layout: title and intro, one tab per instrument; each tab = a row of controls, the chart card beside the
+   result card, then a short note. Tokens and neutrals follow the atlas explorers (P1). */
+:root {
+  color-scheme: light;
+  --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink2: #52514e; --muted: #898781;
+  --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,0.10);
+  --blue: #2a78d6; --orange: #eb6834; --aqua: #1baf7a;
+  --good: #0ca30c; --warn: #fab219; --crit: #d03b3b; --warn-ink: #9a6a00;
+  --good-bg: #e2f3e2; --warn-bg: #fdf1d6; --crit-bg: #f8e1e1;
+  --band: rgba(139,138,132,0.16); --tip-bg: #ffffff; --sun: #ebeae4; --sun-edge: #a9a89f;
+  --inst: var(--blue);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink2: #c3c2b7; --muted: #898781;
+    --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
+    --blue: #3987e5; --orange: #d95926; --aqua: #199e70;
+    --warn-ink: #fab219; --good-bg: #16301a; --warn-bg: #3a2d0c; --crit-bg: #3a1616;
+    --band: rgba(163,162,155,0.14); --tip-bg: #242423; --sun: #272725; --sun-edge: #5f5e59;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink2: #c3c2b7; --muted: #898781;
+  --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
+  --blue: #3987e5; --orange: #d95926; --aqua: #199e70;
+  --warn-ink: #fab219; --good-bg: #16301a; --warn-bg: #3a2d0c; --crit-bg: #3a1616;
+  --band: rgba(163,162,155,0.14); --tip-bg: #242423; --sun: #272725; --sun-edge: #5f5e59;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--page); color: var(--ink);
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+main { max-width: 1180px; margin: 0 auto; padding-block: 20px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; }
+header .intro { flex: 1 1 560px; min-width: 0; }
+h1 { font-size: 26px; line-height: 1.2; margin: 0 0 8px; text-wrap: balance; }
+.lead { color: var(--ink2); margin: 0 0 14px; max-width: 78ch; }
+button { font: inherit; }
+button:focus-visible, input:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+  background: var(--surface); }
+.seg button { font-size: 13px; padding: 6px 10px; border: 0; background: transparent; color: var(--ink2); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+.seg button:hover:not([aria-pressed="true"]) { color: var(--ink); }
+.themebtn { flex: none; }
+
+/* tabs */
+.tabs { display: flex; flex-wrap: wrap; gap: 2px 4px; border-bottom: 1px solid var(--border); margin: 4px 0 16px; }
+.tabs [role="tab"] { display: inline-flex; align-items: center; gap: 7px; font-size: 14.5px; padding: 8px 12px 7px;
+  border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; background: transparent; color: var(--ink2); cursor: pointer; }
+.tabs [role="tab"]:hover { color: var(--ink); }
+.tabs [role="tab"][aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); font-weight: 600; }
+svg.mk { width: 12px; height: 12px; flex: none; display: inline-block; }
+
+/* controls */
+.panel { --inst: var(--blue); }
+#panel-astro { --inst: var(--aqua); }
+#panel-principe { --inst: var(--orange); }
+.controls { display: flex; flex-wrap: wrap; gap: 12px 22px; align-items: flex-start; margin: 0 0 14px; }
+.ctl { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+.label, legend { font-size: 12.5px; color: var(--ink2); padding: 0; }
+.checks { display: flex; flex-wrap: wrap; gap: 5px; }
+.checks label { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; line-height: 1.2; padding: 4px 8px 4px 6px;
+  border: 1px solid var(--border); border-radius: 6px; background: var(--surface); cursor: pointer; font-variant-numeric: tabular-nums;
+  white-space: nowrap; }
+.checks label:has(input:not(:checked)) { color: var(--muted); background: transparent; }
+.checks input, .toggle input { margin: 0; accent-color: var(--ink); width: 15px; height: 15px; }
+.checks sub { font-size: 9.5px; line-height: 0; }
+.toggle { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; cursor: pointer; }
+.linkbtn { font-size: 13px; padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border); background: transparent;
+  color: var(--ink); cursor: pointer; }
+.linkbtn:hover { background: var(--band); }
+.hint { font-size: 12.5px; color: var(--ink2); margin: 2px 0 0; max-width: 70ch; }
+.slider { flex: 1 1 260px; max-width: 440px; min-width: 0; }
+.slider label { font-size: 12.5px; color: var(--ink2); display: flex; justify-content: space-between; gap: 8px; }
+.slider output { font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 600; white-space: nowrap; }
+.slider-wrap { position: relative; padding-bottom: 26px; }
+input[type="range"] { width: 100%; accent-color: var(--ink); margin: 6px 0 0; }
+.ticks { position: absolute; left: 8px; right: 8px; top: 30px; height: 20px; }
+.ticks button { position: absolute; transform: translateX(-50%); font-size: 11.5px; color: var(--ink2); background: transparent;
+  border: 0; padding: 1px 4px; border-radius: 4px; cursor: pointer; white-space: nowrap; }
+.ticks button:hover { background: var(--band); color: var(--ink); }
+.ticks button::before { content: ""; position: absolute; left: 50%; top: -5px; height: 5px; border-left: 1px solid var(--muted); }
+
+/* chart + result card */
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 16px; align-items: start; }
+@media (max-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px; min-width: 0; }
+.chart-card { position: relative; }
+svg.chart { display: block; width: 100%; height: auto; }
+svg.chart text { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-size: 11.5px; fill: var(--muted); }
+svg.chart .ttl { fill: var(--ink2); font-size: 12.5px; }
+svg.chart .lab { fill: var(--ink2); }
+svg.chart .lab-ink { fill: var(--ink); font-weight: 600; }
+svg.chart .halo { paint-order: stroke; stroke: var(--surface); stroke-width: 4px; stroke-linejoin: round; }
+svg.chart .grid { stroke: var(--grid); stroke-width: 1; }
+svg.chart .axis { stroke: var(--axis); stroke-width: 1; }
+svg.chart .gr { stroke: var(--ink); stroke-width: 1.5; fill: none; }
+svg.chart .gr-thin { stroke: var(--ink); stroke-width: 1.2; fill: none; }
+svg.chart .newton { stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: 6 4; fill: none; }
+svg.chart .ink-fill { fill: var(--ink); }
+svg.chart .inst { stroke: var(--inst); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+svg.chart .inst-wide { stroke: var(--inst); stroke-width: 3; fill: none; stroke-linecap: round; }
+svg.chart .inst-err { stroke: var(--inst); stroke-width: 1.2; fill: none; opacity: 0.38; }
+svg.chart .inst-fill { fill: var(--inst); }
+svg.chart .inst-band { fill: var(--inst); fill-opacity: 0.13; stroke: none; }
+svg.chart .ring { stroke: var(--surface); stroke-width: 2; }
+svg.chart .open { fill: var(--surface); stroke: var(--inst); stroke-width: 1.5; }
+svg.chart .pub { fill: var(--surface); stroke: var(--ink2); stroke-width: 1.5; }
+svg.chart .pub-line { stroke: var(--ink2); stroke-width: 1.2; fill: none; }
+svg.chart .sun { fill: var(--sun); stroke: var(--sun-edge); stroke-width: 1; }
+svg.chart .other { fill: var(--muted); }
+svg.chart .faded { opacity: 0.3; }
+svg.chart .dotted { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 2 3; fill: none; }
+svg.chart .sep { stroke: var(--grid); stroke-width: 1; }
+svg.chart .cutband { fill: var(--band); stroke: none; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12.5px; color: var(--ink2); margin: 8px 2px 0; }
+.legend > span { display: inline-flex; align-items: center; gap: 6px; }
+.legend svg { width: 28px; height: 14px; flex: none; display: inline-block; overflow: visible; }
+.legend .l-gr { stroke: var(--ink); stroke-width: 1.5; fill: none; }
+.legend .l-newton { stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: 5 3; fill: none; }
+.legend .l-inst { stroke: var(--inst); stroke-width: 2.5; fill: none; }
+.legend .l-inst-fill { fill: var(--inst); }
+.legend .l-ink-fill { fill: var(--ink); }
+.legend .l-band { fill: var(--inst); fill-opacity: 0.18; }
+.legend .l-pub { fill: var(--surface); stroke: var(--ink2); stroke-width: 1.5; }
+.legend .l-open { fill: var(--surface); stroke: var(--inst); stroke-width: 1.5; }
+.legend .l-other { fill: var(--muted); }
+.caption { font-size: 12px; color: var(--muted); margin: 6px 2px 0; }
+.tooltip { position: absolute; pointer-events: none; background: var(--tip-bg); color: var(--ink); z-index: 5;
+  border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; font-size: 12.5px; line-height: 1.4;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.14); max-width: 290px; }
+.tooltip .strong { font-weight: 600; }
+.tooltip .dim { color: var(--ink2); }
+
+.readout h2 { font-size: 15px; margin: 0; }
+.readout .sub { color: var(--ink2); font-size: 12.5px; margin: 2px 0 10px; }
+.big { display: flex; align-items: baseline; gap: 4px 8px; flex-wrap: wrap; }
+.big .v { font-size: 32px; font-weight: 650; line-height: 1.1; letter-spacing: -0.01em; }
+.big .pm { font-size: 18px; color: var(--ink2); }
+.big .k { font-size: 12px; color: var(--muted); }
+.ratio { margin: 4px 0 10px; font-size: 13px; color: var(--ink2); }
+.verdicts { display: flex; flex-direction: column; gap: 5px; margin: 0 0 10px; }
+.verdict { border-radius: 8px; padding: 5px 8px; font-size: 13px; display: grid; grid-template-columns: 16px minmax(0, 1fr) auto;
+  gap: 6px; align-items: center; }
+.verdict .icon { font-weight: 700; text-align: center; }
+.verdict .val { font-variant-numeric: tabular-nums; color: var(--ink2); white-space: nowrap; }
+.verdict.good { background: var(--good-bg); } .verdict.good .icon { color: var(--good); }
+.verdict.warn { background: var(--warn-bg); } .verdict.warn .icon { color: var(--warn-ink); }
+.verdict.crit { background: var(--crit-bg); } .verdict.crit .icon { color: var(--crit); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+dl.kv { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 10px; margin: 8px 0; font-size: 13px; }
+dl.kv dt { color: var(--ink2); }
+dl.kv dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.published { font-size: 12.5px; color: var(--ink2); border-top: 1px solid var(--grid); padding-top: 8px; margin-top: 8px; }
+.published p { margin: 0 0 4px; }
+.msg { background: var(--warn-bg); color: var(--ink); border-radius: 8px; padding: 8px 10px; font-size: 13px; margin: 6px 0; }
+.mini { border-collapse: collapse; font-size: 12.5px; width: 100%; margin: 4px 0 2px; }
+.mini th, .mini td { padding: 3px 4px; border-bottom: 1px solid var(--grid); text-align: right; font-variant-numeric: tabular-nums;
+  white-space: nowrap; font-size: 12.5px; }
+.mini th:first-child, .mini td:first-child { text-align: left; }
+.mini th { color: var(--ink2); font-weight: 600; }
+.mini tr.out td { color: var(--muted); }
+
+.below { margin-top: 14px; }
+.tablewrap { overflow-x: auto; }
+table.data { border-collapse: collapse; font-size: 13px; margin-top: 6px; }
+table.data th, table.data td { padding: 4px 7px; border-bottom: 1px solid var(--grid); text-align: right;
+  font-variant-numeric: tabular-nums; white-space: nowrap; font-size: 13px; }
+table.data th:first-child, table.data td:first-child { text-align: left; }
+table.data th { color: var(--ink2); font-weight: 600; }
+table.data td.out { color: var(--muted); text-decoration: line-through; }
+table.data .grp { border-left: 1px solid var(--grid); }
+table.data sub { font-size: 9.5px; line-height: 0; }
+details { margin-top: 12px; }
+summary { cursor: pointer; color: var(--ink2); font-size: 14px; }
+.note { color: var(--ink2); font-size: 14.5px; max-width: 82ch; margin: 16px 0 0; }
+.note b { color: var(--ink); font-weight: 600; }
+.empty { max-width: 760px; }
+.empty h2 { font-size: 17px; margin: 0 0 6px; }
+.empty p { color: var(--ink2); margin: 0 0 8px; }
+.footnote { margin-top: 26px; font-size: 12.5px; color: var(--muted); max-width: 100ch; }
+@media (max-width: 520px) {
+  h1 { font-size: 22px; }
+  .tabs [role="tab"] { padding: 7px 8px 6px; font-size: 14px; }
+  .big .v { font-size: 28px; }
+}
+</style>
+<main>
+  <header>
+    <div class="intro">
+      <h1>Reduce the 1919 plates yourself</h1>
+      <p class="lead">On 29 May 1919 two British expeditions photographed the stars beside the eclipsed Sun, at Sobral
+        in Brazil and on the island of Príncipe, to measure how much the Sun's gravity bends starlight: Einstein's
+        theory predicted 1.75″ at the Sun's edge, a Newtonian calculation half as much. The 1920 report by Dyson,
+        Eddington and Davidson printed the micrometer measures of every plate, and whether those measures really
+        decided between the two has been argued over for a century. The measures are public, so you can refit them
+        here: choose the plates, stars and coordinates, or how to treat the plate scale, and the deflection and its
+        uncertainty are recomputed in your browser. A fourth tab is for the 1922 eclipse, observed from Wallal in
+        Western Australia with many more stars.</p>
+    </div>
+<!--__THEME_BUTTONS__-->
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Instrument">
+    <button type="button" role="tab" id="tab-inch4" aria-controls="panel-inch4" aria-selected="true" tabindex="0">
+      <svg class="mk" viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="4.6" style="fill:var(--blue)"/></svg>Sobral 4-inch</button>
+    <button type="button" role="tab" id="tab-astro" aria-controls="panel-astro" aria-selected="false" tabindex="-1">
+      <svg class="mk" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 0.8 11.2 6 6 11.2 0.8 6Z" style="fill:var(--aqua)"/></svg>Sobral astrographic</button>
+    <button type="button" role="tab" id="tab-principe" aria-controls="panel-principe" aria-selected="false" tabindex="-1">
+      <svg class="mk" viewBox="0 0 12 12" aria-hidden="true"><rect x="1.8" y="1.8" width="8.4" height="8.4" style="fill:var(--orange)"/></svg>Príncipe</button>
+    <button type="button" role="tab" id="tab-wallal" aria-controls="panel-wallal" aria-selected="false" tabindex="-1">
+      <svg class="mk" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1 11.2 10.5 0.8 10.5Z" style="fill:var(--blue)"/></svg>Wallal 1922</button>
+  </div>
+
+  <!-- ===================== Sobral 4-inch ===================== -->
+  <section class="panel" id="panel-inch4" role="tabpanel" aria-labelledby="tab-inch4">
+    <div class="controls">
+      <div class="ctl"><span class="label" id="i4-coords-l">Coordinates</span>
+        <div class="seg" id="i4-coords" role="group" aria-labelledby="i4-coords-l">
+          <button type="button" data-v="both" aria-pressed="true">R.A. + Dec.</button>
+          <button type="button" data-v="RA" aria-pressed="false">R.A. only</button>
+          <button type="button" data-v="Dec" aria-pressed="false">Dec. only</button>
+        </div></div>
+      <fieldset class="ctl"><legend>Eclipse plates, 29 May</legend><div class="checks" id="i4-ecl"></div></fieldset>
+      <fieldset class="ctl"><legend>Comparison plates, 14–18 July</legend><div class="checks" id="i4-cmp"></div></fieldset>
+      <fieldset class="ctl"><legend>Stars (Table I numbers)</legend><div class="checks" id="i4-stars"></div></fieldset>
+      <div class="ctl"><span class="label">Measures</span>
+        <label class="toggle"><input type="checkbox" id="i4-printed"><span>Use Table II exactly as printed</span></label>
+        <p class="hint">Two R.A. measures of star 2 are printed as −0.789 (plate I) and −0.396 (plate
+          14<sub>2a</sub>), but every later table of the paper follows −0.798 and −0.346, so the 1920 reduction used
+          those and the printed values are most likely typesetting slips.</p></div>
+      <div class="ctl"><span class="label">&nbsp;</span><button type="button" class="linkbtn" id="i4-reset">Reset to all plates and stars</button></div>
+    </div>
+    <div class="layout">
+      <div class="card chart-card">
+        <svg class="chart" id="i4-chart" role="img" aria-labelledby="i4-chart-t"><title id="i4-chart-t">The seven stars of the Sobral 4-inch plates around the Sun, with Einstein's predicted shifts and the fitted shifts drawn as arrows</title></svg>
+        <div class="legend" id="i4-legend">
+          <span><svg viewBox="0 0 28 14" aria-hidden="true"><line x1="2" y1="7" x2="20" y2="7" class="l-inst"/><path d="M27 7 19 3 19 11Z" class="l-inst-fill"/></svg><span id="i4-leg-fit">your fit</span></span>
+          <span><svg viewBox="0 0 28 14" aria-hidden="true"><line x1="2" y1="7" x2="21" y2="7" class="l-gr"/><path d="M27 7 20.5 4 20.5 10Z" class="l-ink-fill"/><line x1="12" y1="3.5" x2="12" y2="10.5" class="l-gr"/></svg>Einstein's shift; the tick marks the Newtonian half</span>
+          <span><svg viewBox="0 0 28 14" aria-hidden="true"><circle cx="14" cy="7" r="2.5" class="l-other"/></svg>other Table I stars (not on these plates)</span>
+        </div>
+        <p class="caption">Table I coordinates in units of 50′, east to the left as on the sky. Arrows are drawn
+          <span id="i4-factor">1500</span> times longer than the shifts. Star sizes follow brightness.</p>
+        <div class="tooltip" hidden></div>
+      </div>
+      <aside class="card readout" aria-labelledby="i4-h">
+        <h2 id="i4-h">Deflection at the Sun's limb</h2>
+        <p class="sub" id="i4-sub"></p>
+        <div class="big" aria-live="polite"><span class="v" id="i4-limb"></span><span class="pm" id="i4-limb-err"></span><span class="k">1σ</span></div>
+        <p class="ratio" id="i4-ratio"></p>
+        <div class="verdicts" id="i4-verdicts"></div>
+        <p class="msg" id="i4-msg" hidden></p>
+        <dl class="kv" id="i4-kv"></dl>
+        <div class="published">
+          <p id="i4-jk" hidden></p>
+          <p>1920 paper, each plate solved alone: <b>1.98″ ± 0.12″</b> probable error (± 0.18″ at 1σ); R.A. alone 2.06″, Dec. alone 1.94″.</p>
+          <p>Harvey 1979, ten of these plates (five eclipse, five comparison) remeasured with a modern measuring
+            machine: 1.90″ ± 0.11″ (standard error).</p>
+        </div>
+      </aside>
+    </div>
+    <div class="card below">
+      <h3 style="font-size:14px;margin:0 0 2px">The 1920 reduction, plate by plate (Table VII, recomputed from Table II)</h3>
+      <p class="hint" style="margin:0">Each plate's own deflection α at 50′ in revolutions of the screw (1 r = 6.25″).
+        The comparison plates should give zero; what they give measures the scale plate's own errors, so 1920 took
+        eclipse mean minus comparison mean, then (R.A. + 2 × Dec.)/3.</p>
+      <div class="tablewrap"><table class="data" id="i4-t7"></table></div>
+      <p class="hint" id="i4-t7-sum"></p>
+    </div>
+    <details>
+      <summary>Table view: the seven stars and their shifts</summary>
+      <div class="tablewrap"><table class="data" id="i4-stars-table"></table></div>
+    </details>
+    <p class="note"><b>The plates.</b> Of the eight plates taken with the 4-inch lens during totality, seven show the
+      same seven stars; plate VI, taken through cloud, shows only the prominences. The comparison plates were taken
+      from Sobral on 14–18 July, when the Sun had moved away from the field. At Greenwich each plate was measured
+      against one “scale plate” of the field laid film to film on it, in revolutions of the micrometer screw.
+      <b>The fit.</b> Instead of solving each plate alone, this page fits all the plates you select at once: every
+      plate has its own zero point and linear terms in x and y (scale and rotation), every star has one offset shared
+      by all plates (the scale plate's error at that star, beyond what linear terms can absorb), and a single
+      deflection α multiplies the 1/r pattern on the eclipse plates only. The scatter of each group of measures
+      (eclipse or comparison, R.A. or Dec.) is estimated from its own residuals and sets the weights, and α's error
+      follows from them.</p>
+  </section>
+
+  <!-- ===================== Sobral astrographic ===================== -->
+  <section class="panel" id="panel-astro" role="tabpanel" aria-labelledby="tab-astro" hidden>
+    <div class="controls">
+      <div class="ctl"><span class="label" id="ia-mode-l">Change of plate scale e between eclipse and comparison plate</span>
+        <div class="seg" id="ia-mode" role="group" aria-labelledby="ia-mode-l">
+          <button type="button" data-v="common" aria-pressed="true" title="one e for all plates, fitted with the deflection">common e, fitted</button>
+          <button type="button" data-v="per_plate" aria-pressed="false" title="a separate e fitted on every plate">e per plate</button>
+          <button type="button" data-v="fixed" aria-pressed="false" title="e held at the slider's value">e fixed</button>
+        </div></div>
+      <div class="ctl slider">
+        <label for="ia-e"><span>Fixed e (revolutions per 50′; moving it selects “e fixed”)</span><output id="ia-e-out" for="ia-e"></output></label>
+        <div class="slider-wrap">
+          <input type="range" id="ia-e" min="-0.02" max="0.12" step="0.001" value="0.082">
+          <div class="ticks">
+            <button type="button" data-e="0.020" style="left:28.571%">0.020 refraction only</button>
+            <button type="button" data-e="0.082" style="left:72.857%">0.082 plates' mean</button>
+          </div></div></div>
+      <fieldset class="ctl"><legend>Eclipse plates</legend><div class="checks" id="ia-plates"></div></fieldset>
+      <div class="ctl"><span class="label">&nbsp;</span><button type="button" class="linkbtn" id="ia-reset">Reset</button></div>
+    </div>
+    <div class="layout">
+      <div class="card chart-card">
+        <svg class="chart" id="ia-chart" role="img" aria-labelledby="ia-chart-t"><title id="ia-chart-t">Deflection at the limb from the astrographic plates against the assumed change of plate scale e</title></svg>
+        <div class="legend">
+          <span><svg viewBox="0 0 28 14" aria-hidden="true"><rect x="1" y="2" width="26" height="10" class="l-band"/><line x1="1" y1="7" x2="27" y2="7" class="l-inst"/></svg>your plates, e held fixed (band: 1σ)</span>
+          <span><svg viewBox="0 0 28 14" aria-hidden="true"><path d="M14 1.5 19.5 7 14 12.5 8.5 7Z" class="l-inst-fill"/></svg>your fit</span>
+          <span><svg viewBox="0 0 28 14" aria-hidden="true"><circle cx="14" cy="7" r="3.6" class="l-open"/></svg>each plate solved alone in 1920 (Table IX)</span>
+          <span><svg viewBox="0 0 28 14" aria-hidden="true"><line x1="1" y1="7" x2="27" y2="7" class="l-gr"/></svg>Einstein</span>
+          <span><svg viewBox="0 0 28 14" aria-hidden="true"><line x1="1" y1="7" x2="27" y2="7" class="l-newton"/></svg>Newtonian half</span>
+        </div>
+        <p class="caption" id="ia-caption"></p>
+        <div class="tooltip" hidden></div>
+      </div>
+      <aside class="card readout" aria-labelledby="ia-h">
+        <h2 id="ia-h">Deflection at the Sun's limb</h2>
+        <p class="sub" id="ia-sub"></p>
+        <div class="big" aria-live="polite"><span class="v" id="ia-limb"></span><span class="pm" id="ia-limb-err"></span><span class="k">1σ</span></div>
+        <p class="ratio" id="ia-ratio"></p>
+        <div class="verdicts" id="ia-verdicts"></div>
+        <p class="msg" id="ia-msg" hidden></p>
+        <dl class="kv" id="ia-kv"></dl>
+        <div class="published">
+          <p id="ia-jk" hidden></p>
+          <p>1920 paper: <b>0.93″</b> with the plates' own scale (e = 0.082 r); 1.52″ if only refraction and aberration
+            changed the scale (e = 0.020 r). No error was given; the authors attached little weight to this instrument.</p>
+          <p>Harvey 1979, all 16 eclipse plates remeasured, and the nine that show at least ten stars reduced in both
+            coordinates with the scale free on each: <b>1.55″&nbsp;±&nbsp;0.34″</b> (standard error).</p>
+        </div>
+      </aside>
+    </div>
+    <details>
+      <summary>Table view: the 16 plates in 1920 (Table IX) and in your fit</summary>
+      <div class="tablewrap"><table class="data" id="ia-table"></table></div>
+    </details>
+    <p class="note"><b>The plates.</b> The astrographic lens, stopped to 8 inches and fed by a 16-inch coelostat, gave
+      16 measurable plates, but its star images came out blurred; the authors blamed the Sun's heat on the coelostat mirror. The
+      plates were measured in declination only, each against a comparison plate taken in July, and the paper prints
+      the measures of five bright stars (numbers 5, 4, 3, 6 and 10), which are fitted here as
+      Dy = f + d x + e y + α E<sub>y</sub> on each plate. <b>Why scale and deflection trade off.</b> Four of the five
+      stars lie north of the Sun and one south of it, so the outward deflection mostly stretches the field in
+      declination, which is what a change of plate scale e also does. From declinations alone the two are only
+      partly separable (see the correlation of α with e above), so every assumption about e moves the
+      deflection<span id="ia-slope-note"></span>.</p>
+  </section>
+
+  <!-- ===================== Principe ===================== -->
+  <section class="panel" id="panel-principe" role="tabpanel" aria-labelledby="tab-principe" hidden>
+    <div class="controls">
+      <fieldset class="ctl"><legend>Comparisons (eclipse plate against Oxford plate)</legend><div class="checks" id="ip-comps"></div></fieldset>
+      <div class="ctl"><span class="label" id="ip-scale-l">Plate scale</span>
+        <div class="seg" id="ip-scale" role="group" aria-labelledby="ip-scale-l">
+          <button type="button" data-v="check" aria-pressed="true">from the Arcturus check plates (1920)</button>
+          <button type="button" data-v="free" aria-pressed="false">fitted from the five stars</button>
+        </div></div>
+      <div class="ctl"><span class="label">&nbsp;</span><button type="button" class="linkbtn" id="ip-reset">Reset</button></div>
+    </div>
+    <div class="layout">
+      <div class="card chart-card">
+        <svg class="chart" id="ip-chart" role="img" aria-labelledby="ip-chart-t"><title id="ip-chart-t">The deflection from each Príncipe comparison, each plate and their mean, beside the 1920 values</title></svg>
+        <div class="legend">
+          <span><svg viewBox="0 0 28 14" aria-hidden="true"><line x1="2" y1="7" x2="26" y2="7" class="l-inst"/><rect x="10" y="3" width="8" height="8" class="l-inst-fill"/></svg>your fit ± 1σ</span>
+          <span><svg viewBox="0 0 28 14" aria-hidden="true"><path d="M14 2 19 7 14 12 9 7Z" class="l-pub"/></svg>1920 paper</span>
+          <span><svg viewBox="0 0 28 14" aria-hidden="true"><line x1="14" y1="0" x2="14" y2="14" class="l-gr"/></svg>Einstein</span>
+          <span><svg viewBox="0 0 28 14" aria-hidden="true"><line x1="14" y1="0" x2="14" y2="14" class="l-newton"/></svg>Newtonian half</span>
+        </div>
+        <p class="caption" id="ip-caption"></p>
+        <div class="tooltip" hidden></div>
+      </div>
+      <aside class="card readout" aria-labelledby="ip-h">
+        <h2 id="ip-h">Deflection at the Sun's limb</h2>
+        <p class="sub" id="ip-sub"></p>
+        <div class="big" aria-live="polite"><span class="v" id="ip-limb"></span><span class="pm" id="ip-limb-err"></span><span class="k">1σ</span></div>
+        <p class="ratio" id="ip-ratio"></p>
+        <div class="verdicts" id="ip-verdicts"></div>
+        <p class="msg" id="ip-msg" hidden></p>
+        <table class="mini" id="ip-table" aria-label="Deflection at the limb for each comparison"></table>
+        <dl class="kv" id="ip-kv"></dl>
+        <div class="published">
+          <p>1920 paper: <b>1.61″ ± 0.30″</b> probable error (± 0.44″ at 1σ): the mean of the four comparisons, 1.65″,
+            less 0.04″ for the quarter of Einstein's x shift that was left in when the rotation was found.</p>
+        </div>
+      </aside>
+    </div>
+    <p class="note"><b>The plates.</b> Cloud interfered at Príncipe: of 16 eclipse plates only two, X and W, gave
+      results, with five stars each. They were measured, in units of 0.003″, against plates of the same field taken
+      at Oxford in January (G<sub>1</sub> and H<sub>1</sub> for X, D<sub>1</sub> and I<sub>2</sub> for W): both
+      comparisons of X at Príncipe a few days after the eclipse, and W, developed only after the expedition's
+      return, at Cambridge on 22–23 August. Rather than fit the plate scale from the five stars, the 1920 reduction
+      took it from plates of a field near Arcturus photographed both at Oxford and at Príncipe; its uncertainty,
+      0.14″ probable error or 0.21″ at 1σ at the limb, is common to all four comparisons and is added to the final
+      error unless you let the scale be fitted. <b>The fit.</b> The 1920 reduction used the x measures only to find
+      the rotation between the two plates, after removing three quarters of Einstein's x shift, and the y measures for
+      the deflection. Here each comparison is fitted in both coordinates at once for two zero points, a rotation and
+      the deflection, with the exact GR pattern; the noise is pooled per coordinate over the comparisons you select.
+      The two comparisons of one eclipse plate share that plate's measuring errors, so their mean is taken as √0.75
+      times as uncertain as one.</p>
+  </section>
+
+  <!-- ===================== Wallal 1922 ===================== -->
+  <section class="panel" id="panel-wallal" role="tabpanel" aria-labelledby="tab-wallal" hidden>
+    <div class="card empty" id="iw-empty">
+      <h2>Coming soon: the Wallal measures</h2>
+      <p>The radial displacements of every star on the Wallal plates (Campbell &amp; Trumpler 1928, Table 6: each
+        star's distance from the Sun and its displacement on six plate pairs, with weights) are still being transcribed
+        and checked. When they are in, this tab will fit the deflection law to them, with the power of the distance
+        free if you wish, and let you choose plate pairs and leave out the stars nearest the Sun.</p>
+      <p>Published results: 1.82″ ± 0.15″ from the two five-foot cameras (1928) and 1.72″ ± 0.11″ from the two
+        15-foot cameras (1923), combined 1.75″ ± 0.09″; all probable errors (divide by 0.6745 for 1σ).</p>
+    </div>
+    <div id="iw-live" hidden>
+      <div class="controls">
+        <fieldset class="ctl"><legend>Plate pairs (five-foot cameras M and N)</legend><div class="checks" id="iw-pairs"></div></fieldset>
+        <div class="ctl slider">
+          <label for="iw-rmin"><span>Leave out stars closer to the Sun's centre than</span><output id="iw-rmin-out" for="iw-rmin"></output></label>
+          <div class="slider-wrap"><input type="range" id="iw-rmin" min="0" max="10" step="0.1" value="0"></div></div>
+        <div class="ctl"><span class="label">Law</span>
+          <label class="toggle"><input type="checkbox" id="iw-power"><span>Fit the power n too: D = β (R/r)<sup>n</sup> − α r</span></label>
+          <label class="toggle"><input type="checkbox" id="iw-noscale"><span>Leave out the scale terms α (a pure 1/r law)</span></label></div>
+        <div class="ctl"><span class="label">&nbsp;</span><button type="button" class="linkbtn" id="iw-reset">Reset</button></div>
+      </div>
+      <div class="layout">
+        <div class="card chart-card">
+          <svg class="chart" id="iw-chart" role="img" aria-labelledby="iw-chart-t"><title id="iw-chart-t">Radial displacement of each Wallal star against its distance from the Sun, with the fitted law and the predictions</title></svg>
+          <div class="legend">
+            <span><svg viewBox="0 0 28 14" aria-hidden="true"><line x1="14" y1="1" x2="14" y2="13" class="l-inst" style="stroke-width:1.4;opacity:.55"/><circle cx="14" cy="7" r="3.3" class="l-inst-fill"/></svg><span id="iw-leg-pts">one star</span></span>
+            <span><svg viewBox="0 0 28 14" aria-hidden="true"><circle cx="14" cy="7" r="3.3" class="l-open"/></svg>left out</span>
+            <span><svg viewBox="0 0 28 14" aria-hidden="true"><line x1="1" y1="7" x2="27" y2="7" class="l-inst"/></svg><span>your fit, β (R/r)<sup>n</sup></span></span>
+            <span><svg viewBox="0 0 28 14" aria-hidden="true"><line x1="1" y1="7" x2="27" y2="7" class="l-gr"/></svg>Einstein, 1.75″ R/r</span>
+            <span><svg viewBox="0 0 28 14" aria-hidden="true"><line x1="1" y1="7" x2="27" y2="7" class="l-newton"/></svg>Newtonian half</span>
+          </div>
+          <p class="caption" id="iw-caption"></p>
+          <div class="tooltip" hidden></div>
+        </div>
+        <aside class="card readout" aria-labelledby="iw-h">
+          <h2 id="iw-h">Deflection at the Sun's limb, β</h2>
+          <p class="sub" id="iw-sub"></p>
+          <div class="big" aria-live="polite"><span class="v" id="iw-k"></span><span class="pm" id="iw-k-err"></span><span class="k">1σ</span></div>
+          <p class="ratio" id="iw-ratio"></p>
+          <div class="verdicts" id="iw-verdicts"></div>
+          <p class="msg" id="iw-msg" hidden></p>
+          <dl class="kv" id="iw-kv"></dl>
+          <table class="mini" id="iw-table-pairs" aria-label="Deflection from each plate pair alone"></table>
+          <div class="published">
+            <p>Campbell &amp; Trumpler 1928, these five-foot plates: <b>1.82″ ± 0.15″</b> probable error (± 0.22″ at
+              1σ). Combined with the 1923 result from the 15-foot cameras, 1.72″ ± 0.11″: <b>1.75″ ± 0.09″</b>
+              probable error (± 0.13″ at 1σ).</p>
+          </div>
+        </aside>
+      </div>
+      <details>
+        <summary>Table view: every star</summary>
+        <div class="tablewrap"><table class="data" id="iw-table"></table></div>
+      </details>
+    </div>
+    <p class="note"><b>The plates.</b> On 21 September 1922 a Lick Observatory expedition led by W. W. Campbell and
+      R. J. Trumpler photographed the eclipse from Wallal, Western Australia. Two cameras of 15-foot focal length gave
+      1.72″ ± 0.11″ (1923). Two five-foot cameras with a much wider field recorded many more stars, and the 1928
+      report lists, for every star, its distance r from the Sun's centre and the radial part of its displacement on
+      each of six plate pairs, with weights (weight 1 is a probable error of 0.33″). <b>The fit.</b> These
+      displacements are relative: each plate's scale was fixed so that the reference stars more than 5° from the Sun
+      average to zero, which takes out their own small deflection and leaves a term that grows in proportion to r.
+      So, as in 1928, each plate pair you select gets its own scale term α, and all their measures are fitted together
+      with one deflection β: D = β (R/r)<sup>n</sup> − α r, with R = 0.2661° (the radius the 1928 paper adopted) and
+      n = 1 unless you free it; GR predicts β = 1.75″ and n = 1. Each measure is weighted by its printed weight, and
+      the error is scaled up only if the scatter is larger than the weights imply. Leaving the scale terms out shows
+      what they do.</p>
+  </section>
+
+  <p class="footnote">Measures: Dyson, Eddington &amp; Davidson 1920, Phil. Trans. R. Soc. A 220, 291–333 (Table II; the
+    p. 311 declinations and Table IX; the Príncipe reductions of pp. 323–326), transcribed and checked for this
+    project<span id="fn-wallal">; the Wallal measures of Campbell &amp; Trumpler 1928 (Lick Obs. Bull. 13, 130) are
+    still being transcribed</span>. The GR pattern uses Gaia DR3 positions of
+    the stars carried back to 29 May 1919 and the Sun's place from JPL Horizons. Deflections at 50′ from the Sun's
+    centre are carried to the limb by the 1/r law with the Sun's true radius that day, 15.771′ (the 1920 paper used
+    15.8′). Errors on this page are 1σ standard errors; the papers of 1920–1928 quoted probable errors
+    (0.6745σ). The page's fits reproduce the project's Python code (eclipse1919.py, principe.py, wallal.py). Part of
+    project N2 of the astrophysics atlas, 56-light-bending.</p>
+</main>
+<script>
+"use strict";
+const D = /*__DATA__*/null;
+
+// <core> ======================================================================================
+// Pure fitting code (no DOM). Mirrors eclipse1919.joint_fit_4inch / fit_astro, principe.fit and wallal.fit_law.
+const GR_LIMB = D.meta.gr_limb;                       // 1.7512″: GR at the limb
+const NEWTON_LIMB = GR_LIMB / 2;                      // the Newtonian (Soldner) half
+const NEWTON_LABEL = "0.87";                          // ... labelled as in the 1920 paper (0″·87), the write-up and its figures
+const R_TRUE = D.meta.sun_radius_true_arcmin;         // 15.771′
+const TO_LIMB = D.meta.unit_arcmin / R_TRUE;          // 1/r law: deflection at 50′ -> at the limb
+const GR_ALPHA50 = GR_LIMB / TO_LIMB;                 // GR at 50′ from the Sun's centre (″)
+
+function mean(a) { return a.reduce((s, v) => s + v, 0) / a.length; }
+
+// Inverse of a symmetric positive-definite matrix (row-major Float64Array), via a Cholesky factorisation of the
+// matrix scaled to unit diagonal. Returns null when the matrix is singular (a parameter the data cannot fix).
+function spdInverse(N, n) {
+  const s = new Float64Array(n);
+  for (let i = 0; i < n; i++) {
+    const d = N[i * n + i];
+    if (!(d > 0)) return null;
+    s[i] = 1 / Math.sqrt(d);
+  }
+  const L = new Float64Array(n * n);
+  for (let j = 0; j < n; j++) {
+    let t = N[j * n + j] * s[j] * s[j];
+    for (let k = 0; k < j; k++) t -= L[j * n + k] * L[j * n + k];
+    if (!(t > 1e-12)) return null;
+    const ljj = Math.sqrt(t);
+    L[j * n + j] = ljj;
+    for (let i = j + 1; i < n; i++) {
+      let u = N[i * n + j] * s[i] * s[j];
+      for (let k = 0; k < j; k++) u -= L[i * n + k] * L[j * n + k];
+      L[i * n + j] = u / ljj;
+    }
+  }
+  const M = new Float64Array(n * n);                  // M = L^-1 (lower triangular)
+  for (let i = 0; i < n; i++) {
+    M[i * n + i] = 1 / L[i * n + i];
+    for (let j = 0; j < i; j++) {
+      let u = 0;
+      for (let k = j; k < i; k++) u -= L[i * n + k] * M[k * n + j];
+      M[i * n + j] = u / L[i * n + i];
+    }
+  }
+  const C = new Float64Array(n * n);                  // C = S M^T M S
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j <= i; j++) {
+      let u = 0;
+      for (let k = i; k < n; k++) u += M[k * n + i] * M[k * n + j];
+      C[i * n + j] = C[j * n + i] = u * s[i] * s[j];
+    }
+  }
+  return C;
+}
+
+// Weighted linear least squares on sparse rows {c: column indices, v: values}. Like the Python lsq():
+// beta, residuals, cov_unit = (A^T W A)^-1, dof = n - ncol (full rank), s2 = sum(w r^2) / dof.
+function lsqRows(rows, y, w, ncol) {
+  const N = new Float64Array(ncol * ncol), b = new Float64Array(ncol);
+  for (let i = 0; i < rows.length; i++) {
+    const c = rows[i].c, v = rows[i].v, wi = w ? w[i] : 1;
+    for (let p = 0; p < c.length; p++) {
+      const wv = wi * v[p], base = c[p] * ncol;
+      b[c[p]] += wv * y[i];
+      for (let q = 0; q < c.length; q++) N[base + c[q]] += wv * v[q];
+    }
+  }
+  const C = spdInverse(N, ncol);
+  if (!C) return null;
+  const mul = vec => {
+    const out = new Float64Array(ncol);
+    for (let i = 0; i < ncol; i++) {
+      let t = 0;
+      const base = i * ncol;
+      for (let j = 0; j < ncol; j++) t += C[base + j] * vec[j];
+      out[i] = t;
+    }
+    return out;
+  };
+  const beta = mul(b);
+  const r0 = new Float64Array(ncol);                  // one step of iterative refinement
+  for (let i = 0; i < ncol; i++) {
+    let t = b[i];
+    const base = i * ncol;
+    for (let j = 0; j < ncol; j++) t -= N[base + j] * beta[j];
+    r0[i] = t;
+  }
+  const corr = mul(r0);
+  for (let i = 0; i < ncol; i++) beta[i] += corr[i];
+  const resid = new Float64Array(rows.length);
+  let chi2 = 0;
+  for (let i = 0; i < rows.length; i++) {
+    const c = rows[i].c, v = rows[i].v;
+    let f = 0;
+    for (let p = 0; p < c.length; p++) f += v[p] * beta[c[p]];
+    resid[i] = y[i] - f;
+    chi2 += (w ? w[i] : 1) * resid[i] * resid[i];
+  }
+  const dof = rows.length - ncol;
+  return {beta, resid, C, ncol, dof, chi2, s2: dof > 0 ? chi2 / dof : NaN};
+}
+
+// Diagonal of the hat matrix H = A C A^T W.
+function leverage(rows, w, C, ncol) {
+  const lev = new Float64Array(rows.length);
+  for (let i = 0; i < rows.length; i++) {
+    const c = rows[i].c, v = rows[i].v;
+    let t = 0;
+    for (let p = 0; p < c.length; p++) {
+      const base = c[p] * ncol;
+      let u = 0;
+      for (let q = 0; q < c.length; q++) u += C[base + c[q]] * v[q];
+      t += v[p] * u;
+    }
+    lev[i] = (w ? w[i] : 1) * t;
+  }
+  return lev;
+}
+
+// Orthonormal basis of the star patterns orthogonal to (1, x, y): Gram-Schmidt of [1, x, y, I], keeping the
+// vectors after the first three (the same space as numpy's QR in eclipse1919.joint_fit_4inch).
+function complementBasis(x, y) {
+  const n = x.length, dot = (a, b) => a.reduce((s, ai, i) => s + ai * b[i], 0);
+  const cands = [x.map(() => 1), x.slice(), y.slice()];
+  for (let k = 0; k < n; k++) cands.push(x.map((_, i) => (i === k ? 1 : 0)));
+  const basis = [], out = [];
+  cands.forEach((c0, ci) => {
+    const v = c0.slice();
+    for (let pass = 0; pass < 2; pass++) {
+      for (const u of basis) {
+        const d = dot(u, v);
+        for (let i = 0; i < n; i++) v[i] -= d * u[i];
+      }
+    }
+    const nv = Math.sqrt(dot(v, v));
+    if (nv > 1e-9) {
+      const u = v.map(t => t / nv);
+      basis.push(u);
+      if (ci >= 3) out.push(u);
+    }
+  });
+  return out;
+}
+
+// Sobral 4-inch: joint least squares over the selected plates (eclipse1919.joint_fit_4inch).
+// o = {coords: ["RA", "Dec"], plates: [...], stars: [...], asPrinted: bool}
+function fit4inch(o) {
+  const I = D.inch4, rev = I.rev_arcsec;
+  const si = [], pj = [];
+  I.stars.forEach((s, i) => { if (o.stars.includes(s)) si.push(i); });
+  I.plates.forEach((p, j) => { if (o.plates.includes(p)) pj.push(j); });
+  const nEcl = pj.filter(j => I.eclipse.includes(I.plates[j])).length, npl = pj.length, ns = si.length;
+  if (ns < 4 || nEcl < 1 || npl - nEcl < 1 || !o.coords.length) {
+    return {ok: false, why: "Keep at least one eclipse plate, one comparison plate and four stars: the comparison " +
+      "plates are what measure the scale plate's own errors, and each plate's zero point, scale and rotation use up three stars."};
+  }
+  const x = si.map(i => I.x[i]), y = si.map(i => I.y[i]);
+  const P = complementBasis(x, y), nP = P.length;
+  const nPer = 3 * npl + nP, ncol = nPer * o.coords.length + 1, last = ncol - 1;
+  const rows = [], yv = [], grp = [];
+  o.coords.forEach((coord, ci) => {
+    const src = coord === "RA" ? (o.asPrinted ? I.Dx_as_printed : I.Dx) : I.Dy;
+    const E = coord === "RA" ? I.Ex : I.Ey;
+    const off = ci * nPer;
+    pj.forEach((j, q) => {
+      const ecl = I.eclipse.includes(I.plates[j]);
+      si.forEach((i, k) => {
+        const c = [off + 3 * q, off + 3 * q + 1, off + 3 * q + 2], v = [1, x[k], y[k]];
+        for (let m = 0; m < nP; m++) { c.push(off + 3 * npl + m); v.push(P[m][k]); }
+        if (ecl) { c.push(last); v.push(E[i]); }
+        rows.push({c, v});
+        yv.push(src[j][i] * rev);
+        grp.push(coord + (ecl ? "-ecl" : "-cmp"));
+      });
+    });
+  });
+  const groups = [...new Set(grp)].sort();
+  let vr = {};
+  groups.forEach(g => { vr[g] = 0.1 * 0.1; });
+  const tooFew = {ok: false, why: "Too few measures are left to estimate the scatter of every group of plates; select more plates or stars."};
+  let iters = 0;
+  for (let it = 0; it < 20; it++) {                   // noise per group, leverage-corrected (as in Python)
+    iters = it + 1;
+    const w = grp.map(g => 1 / vr[g]);
+    const f = lsqRows(rows, yv, w, ncol);
+    if (!f) return tooFew;
+    const lev = leverage(rows, w, f.C, ncol);
+    const ss = {}, dd = {}, nw = {};
+    groups.forEach(g => { ss[g] = 0; dd[g] = 0; });
+    for (let i = 0; i < rows.length; i++) { ss[grp[i]] += f.resid[i] * f.resid[i]; dd[grp[i]] += 1 - lev[i]; }
+    for (const g of groups) {
+      if (!(dd[g] > 1e-9) || !(ss[g] > 1e-18)) return tooFew;
+      nw[g] = ss[g] / dd[g];
+    }
+    const conv = groups.every(g => Math.abs(nw[g] / vr[g] - 1) < 1e-6);
+    vr = nw;
+    if (conv) break;
+  }
+  const w = grp.map(g => 1 / vr[g]);
+  const f = lsqRows(rows, yv, w, ncol);
+  if (!f) return tooFew;
+  const alpha = f.beta[last], alphaErr = Math.sqrt(f.C[last * ncol + last]);   // absolute weights: no rescaling
+  const sigma = {};
+  groups.forEach(g => { sigma[g] = Math.sqrt(vr[g]); });
+  return {ok: true, alpha, alphaErr, limb: alpha * TO_LIMB, limbErr: alphaErr * TO_LIMB,
+    ratio: alpha / GR_ALPHA50, ratioErr: alphaErr / GR_ALPHA50, sigma, nData: rows.length, nPar: ncol,
+    chi2: f.chi2, dof: f.dof, iters, nEcl, nCmp: npl - nEcl, ns};
+}
+
+// Sobral astrographic (eclipse1919.fit_astro): Dy = f_p + d_p x + e y + alpha Ey, declinations only.
+// o = {mode: "common" | "per_plate" | "fixed", e: rev (fixed mode), plates: [...]}
+function fitAstro(o) {
+  const A = D.astro, rev = A.rev_arcsec;
+  const pj = [];
+  A.plates.forEach((p, j) => { if (o.plates.includes(p)) pj.push(j); });
+  const npl = pj.length;
+  if (!npl) return {ok: false, why: "Select at least one plate."};
+  const nE = o.mode === "per_plate" ? npl : o.mode === "common" ? 1 : 0;
+  const ncol = 2 * npl + nE + 1, last = ncol - 1;
+  const rows = [], yv = [];
+  pj.forEach((j, q) => {
+    const vals = A.Dy[j];
+    for (let i = 0; i < A.stars.length; i++) {
+      const v0 = vals[i];
+      if (v0 === null || v0 === undefined || !Number.isFinite(v0)) continue;
+      const c = [2 * q, 2 * q + 1], v = [1, A.x[i]];
+      if (o.mode === "per_plate") { c.push(2 * npl + q); v.push(A.y[i]); }
+      else if (o.mode === "common") { c.push(2 * npl); v.push(A.y[i]); }
+      c.push(last); v.push(A.Ey[i]);
+      rows.push({c, v});
+      yv.push((v0 - (o.mode === "fixed" ? o.e * A.y[i] : 0)) * rev);
+    }
+  });
+  const few = {ok: false, why: "Too few measures for this many unknowns: select more plates, or fix the scale."};
+  if (rows.length <= ncol) return few;
+  const f = lsqRows(rows, yv, null, ncol);
+  if (!f) return few;
+  const cov = (i, j) => f.C[i * ncol + j] * f.s2;     // errors scaled by the residual variance
+  const out = {ok: true, mode: o.mode, alpha: f.beta[last], alphaErr: Math.sqrt(cov(last, last)),
+    sigma: Math.sqrt(f.s2), dof: f.dof, nData: rows.length, nPar: ncol, npl};
+  out.limb = out.alpha * TO_LIMB;
+  out.limbErr = out.alphaErr * TO_LIMB;
+  if (o.mode === "common") {
+    const k = 2 * npl;
+    out.e = f.beta[k] / rev;
+    out.eErr = Math.sqrt(cov(k, k)) / rev;
+    out.corr = cov(last, k) / Math.sqrt(cov(last, last) * cov(k, k));
+  } else if (o.mode === "per_plate") {
+    out.ePlates = pj.map((j, q) => f.beta[2 * npl + q] / rev);
+    out.e = mean(out.ePlates);
+  } else {
+    out.e = o.e;
+  }
+  return out;
+}
+
+// Principe (principe.fit): per comparison, rows x then y; noise pooled per coordinate over the comparisons.
+// o = {comps: [...], free: bool}
+function fitPrincipe(o) {
+  const P = D.principe, unit = P.gr_limb;
+  const comps = Object.keys(P.comparisons).filter(c => o.comps.includes(c));
+  if (!comps.length) return {ok: false, why: "Select at least one comparison."};
+  const sols = {};
+  let ssx = 0, ssy = 0, nx = 0, ny = 0, npar = 0;
+  for (const c of comps) {
+    const t = P.comparisons[c], n = t.x.length, ncol = o.free ? 6 : 4;
+    const rows = [], b = [], cols = Array.from({length: ncol}, (_, k) => k);
+    for (let i = 0; i < n; i++) {
+      const v = [1, 0, t.y[i], t.Ex[i]];
+      if (o.free) v.push(t.x[i], 0);
+      rows.push({c: cols, v});
+      b.push(t.d1x[i]);
+    }
+    for (let i = 0; i < n; i++) {
+      const v = [0, 1, -t.x[i], t.Ey[i]];
+      if (o.free) v.push(0, t.y[i]);
+      rows.push({c: cols, v});
+      b.push(t.d1y[i]);
+    }
+    const f = lsqRows(rows, b, null, ncol);
+    if (!f) return {ok: false, why: "This comparison cannot be solved."};
+    for (let i = 0; i < n; i++) { ssx += f.resid[i] ** 2; ssy += f.resid[n + i] ** 2; }
+    nx += n; ny += n; npar += ncol;
+    sols[c] = {rows, b, n, ncol};
+  }
+  const dof = nx + ny - npar;
+  if (dof <= 0) return {ok: false, why: "Too few measures."};
+  const s2x = ssx / (dof * nx / (nx + ny)), s2y = ssy / (dof * ny / (nx + ny));
+  const per = {};
+  for (const c of comps) {
+    const s = sols[c], w = s.rows.map((_, i) => (i < s.n ? 1 / s2x : 1 / s2y));
+    const f = lsqRows(s.rows, s.b, w, s.ncol), nc = s.ncol;
+    const lam = f.beta[3], lamErr = Math.sqrt(f.C[3 * nc + 3]);
+    per[c] = {lambda: lam, lambdaErr: lamErr, theta: f.beta[2], thetaErr: Math.sqrt(f.C[2 * nc + 2]),
+      limb: lam * unit, limbErr: lamErr * unit, plate: P.comparisons[c].plate};
+  }
+  const plateNames = [...new Set(comps.map(c => P.comparisons[c].plate))].sort();
+  const plates = {};
+  for (const pl of plateNames) {
+    const vals = comps.filter(c => P.comparisons[c].plate === pl).map(c => per[c]);
+    const lam = mean(vals.map(v => v.lambda));
+    const err = mean(vals.map(v => v.lambdaErr)) * (vals.length === 2 ? Math.sqrt(0.75) : 1);
+    plates[pl] = {lambda: lam, lambdaErr: err, limb: lam * unit, limbErr: err * unit, n: vals.length};
+  }
+  const pv = Object.values(plates);
+  const lam = mean(pv.map(v => v.lambda));
+  const err = Math.sqrt(pv.reduce((s, v) => s + v.lambdaErr ** 2, 0)) / pv.length;
+  const meas = err * unit, scale = o.free ? 0 : P.scale_err_limb_1sigma;
+  return {ok: true, lambda: lam, limb: lam * unit, limbErrMeas: meas, limbErrScale: scale, limbErr: Math.hypot(meas, scale),
+    ratio: lam * unit / GR_LIMB, per, plates, sigmaX: Math.sqrt(s2x) * P.unit_arcsec, sigmaY: Math.sqrt(s2y) * P.unit_arcsec, dof};
+}
+
+// Wallal (wallal.fit_5ft): D_r = beta (R/r)^n - alpha_p r for each selected plate pair p (r and R in degrees),
+// every measure of the selected pairs weighted by wt / sigma_unit^2, one beta (and n), one alpha per pair; the error
+// is the formal one times max(1, sqrt(chi2/dof)). o = {pairs: [...], rmin: in solar radii R, power: bool,
+// noScale: bool (leave the alpha_p out: a pure 1/r law, for comparison)}.
+function wallalMeasures(o) {
+  const W = D.wallal, R = W.R_deg, out = [];
+  o.pairs.forEach((p, k) => {
+    const dr = W.Dr[p], wt = W.wt[p];
+    for (let i = 0; i < W.r_deg.length; i++) {
+      const d = dr[i], w = wt[i], rd = W.r_deg[i];
+      if (d === null || w === null || rd === null || !Number.isFinite(d) || !Number.isFinite(w) || !(w > 0) || !(rd > 0)) continue;
+      if (rd / R < o.rmin) continue;
+      out.push({i, k, rDeg: rd, x: R / rd, y: d, w});
+    }
+  });
+  return out;
+}
+// Weighted least squares (Levenberg-Marquardt; one exact step when linear). model(q, m) -> [value, gradient].
+function lmFit(ms, np, model, q0, linear, wscale) {
+  const cost = q => ms.reduce((s, m) => s + m.w * wscale * (m.y - model(q, m)[0]) ** 2, 0);
+  const normal = q => {
+    const N = new Float64Array(np * np), g = new Float64Array(np);
+    for (const m of ms) {
+      const [v, J] = model(q, m), res = m.y - v, w = m.w * wscale;
+      for (let a = 0; a < np; a++) {
+        if (J[a] === 0) continue;
+        g[a] += w * J[a] * res;
+        for (let b = 0; b < np; b++) N[a * np + b] += w * J[a] * J[b];
+      }
+    }
+    return {N, g};
+  };
+  let q = q0.slice(), lam = linear ? 0 : 1e-3, c0 = cost(q);
+  for (let it = 0; it < 1000; it++) {
+    const {N, g} = normal(q), M = N.slice();
+    for (let a = 0; a < np; a++) M[a * np + a] *= 1 + lam;
+    const C = spdInverse(M, np);
+    if (!C) return null;
+    const d = Array.from({length: np}, (_, a) => g.reduce((s, gb, b) => s + C[a * np + b] * gb, 0));
+    const q1 = q.map((v, a) => v + d[a]), c1 = cost(q1);
+    if (Number.isFinite(c1) && c1 <= c0) {
+      q = q1; c0 = c1; lam /= 10;
+      if (linear) {                                   // one refinement step, then done
+        const r2 = normal(q), C2 = spdInverse(r2.N, np);
+        if (C2) q = q.map((v, a) => v + r2.g.reduce((s, gb, b) => s + C2[a * np + b] * gb, 0));
+        c0 = cost(q);
+        break;
+      }
+      if (d.every((da, a) => Math.abs(da) <= 1e-13 * (1 + Math.abs(q[a])))) break;
+    } else {
+      lam = Math.max(lam * 10, 1e-6);
+      if (lam > 1e15 || linear) break;
+    }
+  }
+  const C = spdInverse(normal(q).N, np);
+  if (!C) return null;
+  return {q, C, chi2: c0, dof: ms.length - np};
+}
+function fitWallal(o) {
+  const W = D.wallal, su2 = W.sigma_unit * W.sigma_unit, P = o.pairs.length, scale = !o.noScale;
+  if (!P) return {ok: false, why: "Select at least one plate pair."};
+  const ms = wallalMeasures(o);
+  const ia = o.power ? 2 : 1, np = ia + (scale ? P : 0);
+  if (ms.length <= np + 1) return {ok: false, why: "Too few measures are left beyond the distance cut."};
+  const model = (q, m) => {
+    const n = o.power ? q[1] : 1, t = Math.pow(m.x, n), J = new Array(np).fill(0);
+    J[0] = t;
+    if (o.power) J[1] = q[0] * t * Math.log(m.x);
+    if (scale) J[ia + m.k] = -m.rDeg;
+    return [q[0] * t - (scale ? q[ia + m.k] * m.rDeg : 0), J];
+  };
+  const q0 = [1.75].concat(o.power ? [1] : [], scale ? new Array(P).fill(0.01) : []);
+  const f = lmFit(ms, np, model, q0, !o.power, 1 / su2);
+  if (!f || !(f.dof > 0)) return {ok: false, why: "This law cannot be fitted to the selected measures."};
+  const inflate = Math.max(1, Math.sqrt(f.chi2 / f.dof));
+  const out = {ok: true, beta: f.q[0], betaErr: Math.sqrt(f.C[0]) * inflate, betaErrFormal: Math.sqrt(f.C[0]), n: 1, nErr: 0,
+    chi2: f.chi2, dof: f.dof, inflate, nMeasures: ms.length, nStars: new Set(ms.map(m => m.i)).size,
+    alpha: scale ? f.q.slice(ia) : new Array(P).fill(0), pairs: o.pairs.slice(), power: !!o.power, scale};
+  if (o.power) {
+    out.n = f.q[1];
+    out.nErr = Math.sqrt(f.C[np + 1]) * inflate;
+    out.corr = f.C[1] / Math.sqrt(f.C[0] * f.C[np + 1]);
+    if (!(Math.abs(out.n) <= 6) || !(Math.abs(out.beta) <= 50) || !Number.isFinite(out.nErr)) {
+      return {ok: false, why: "These stars cannot fix both β and n: far from the Sun the deflection is tiny and the " +
+        "power-law fit runs away. Lower the distance cut, or keep n = 1."};
+    }
+  }
+  return out;
+}
+// Each star's weighted mean over the selected pairs, with the scale term added back so that Einstein's law is
+// beta R/r: with all six pairs the printed mean plus alpha_mean r (as wallal.stars_for_plot), otherwise each
+// pair's fitted alpha_p.
+function wallalStars(o, fit) {
+  const W = D.wallal, R = W.R_deg, all = W.pairs.every(p => o.pairs.includes(p));
+  return W.r_deg.map((rd, i) => {
+    let y = NaN, w = NaN;
+    if (all) {
+      y = (W.Dr_mean[i] ?? NaN) + (o.noScale ? 0 : W.alpha_mean * rd);
+      w = W.wt_total[i] ?? NaN;
+    } else {
+      let sw = 0, swy = 0;
+      o.pairs.forEach((p, k) => {
+        const d = W.Dr[p][i], wp = W.wt[p][i];
+        if (d === null || wp === null || !Number.isFinite(d) || !Number.isFinite(wp) || !(wp > 0)) return;
+        const a = fit && fit.ok && fit.scale ? fit.alpha[k] : 0;
+        sw += wp;
+        swy += wp * (d + a * rd);
+      });
+      if (sw > 0) { y = swy / sw; w = sw; }
+    }
+    const r = rd / R, valid = Number.isFinite(y) && Number.isFinite(w) && w > 0 && Number.isFinite(r);
+    return {i, rDeg: rd, r, y, w, valid, used: valid && r >= o.rmin};
+  });
+}
+// </core> =====================================================================================
+
+// ---------- small helpers ----------
+const $ = id => document.getElementById(id);
+const SVGNS = "http://www.w3.org/2000/svg";
+function svgEl(name, attrs, parent, text) {
+  const e = document.createElementNS(SVGNS, name);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (text !== undefined) e.textContent = text;
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function fmt(v, d) {
+  if (!Number.isFinite(v)) return "—";
+  let s = v.toFixed(d);
+  if (/^-0\.?0*$/.test(s)) s = s.slice(1);
+  return s.replace("-", "−");
+}
+function fmtS(v, d) { const s = fmt(v, d); return (Number.isFinite(v) && v > 0 && s !== fmt(0, d)) ? "+" + s : s; }
+const SEC = "″", MIN = "′";
+const SUBS = {"0": "₀", "1": "₁", "2": "₂", "3": "₃", "4": "₄", "5": "₅", "6": "₆", "7": "₇", "8": "₈", "9": "₉"};
+function plateText(p) { const m = /^(\d+)_(\d+)(\w?)$/.exec(p); return m ? m[1] + m[2].replace(/\d/g, d => SUBS[d]) + m[3] : p; }
+function plateHTML(p) { const m = /^(\d+)_(\w+)$/.exec(p); return m ? `${m[1]}<sub>${m[2]}</sub>` : p; }
+function compText(c) { return c.replace("-", "−").replace(/(\d)$/, d => SUBS[d]); }
+function compHTML(c) { const [a, b] = c.split("-"); return `${a}−${b[0]}<sub>${b.slice(1)}</sub>`; }
+function setData(el, v) { el.dataset.value = Number.isFinite(v) ? String(v) : ""; }
+function chartWidth(svg) { return Math.max(260, Math.floor(svg.parentElement.clientWidth - 26)); }
+function isShown(svg) { return svg.parentElement.offsetParent !== null && svg.parentElement.clientWidth > 0; }
+function niceTicks(lo, hi, target) {
+  const span = hi - lo, raw = span / Math.max(1, target), mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const step = [1, 2, 5, 10].map(f => f * mag).find(s => s >= raw * 0.999) || 10 * mag;
+  const out = [];
+  for (let i = Math.ceil(lo / step - 1e-9); i * step <= hi + 1e-9 * step; i++) out.push(Math.abs(i * step) < 1e-12 ? 0 : i * step);
+  return {ticks: out, step};
+}
+function decimalsFor(step) {
+  for (let d = 0; d < 7; d++) { const v = step * Math.pow(10, d); if (Math.abs(v - Math.round(v)) < 1e-7) return d; }
+  return 6;
+}
+function arrowHead(x1, y1, x2, y2, len, half) {   // triangle at (x2, y2) pointing along (x1,y1)->(x2,y2)
+  const dx = x2 - x1, dy = y2 - y1, L = Math.hypot(dx, dy) || 1, ux = dx / L, uy = dy / L;
+  const bx = x2 - ux * len, by = y2 - uy * len;
+  return `M${x2.toFixed(1)},${y2.toFixed(1)}L${(bx - uy * half).toFixed(1)},${(by + ux * half).toFixed(1)}` +
+    `L${(bx + uy * half).toFixed(1)},${(by - ux * half).toFixed(1)}Z`;
+}
+function verdicts(el, limb, err, refs) {
+  el.replaceChildren();
+  if (!Number.isFinite(limb) || !Number.isFinite(err) || !(err > 0)) return;
+  for (const [name, val] of refs) {
+    const z = (limb - val) / err, az = Math.abs(z);
+    const st = az < 2 ? ["good", "✓", "within 2σ of"] : az < 3 ? ["warn", "!", "2 to 3σ from"] : ["crit", "✗", "more than 3σ from"];
+    const d = document.createElement("div");
+    d.className = "verdict " + st[0];
+    d.innerHTML = `<span class="icon" aria-hidden="true">${st[1]}</span><span class="name"><span class="sr">${st[2]} </span>${name}</span>` +
+      `<span class="val">${fmt(az, az < 0.1 ? 2 : 1)}σ ${z >= 0 ? "above" : "below"}</span>`;
+    d.dataset.z = String(z);
+    el.appendChild(d);
+  }
+}
+const REFS = [[`Einstein, ${fmt(GR_LIMB, 2)}${SEC}`, GR_LIMB], [`Newtonian half, ${NEWTON_LABEL}${SEC}`, NEWTON_LIMB]];
+function kv(dl, items) {   // items: [label (html), value (html), id?, data value?]
+  dl.replaceChildren();
+  for (const [k, v, id, dv] of items) {
+    const dt = document.createElement("dt"), dd = document.createElement("dd");
+    dt.innerHTML = k;
+    dd.innerHTML = v;
+    if (id) dd.id = id;
+    if (dv !== undefined) setData(dd, dv);
+    dl.append(dt, dd);
+  }
+}
+function showMsg(el, text) { el.textContent = text || ""; el.hidden = !text; }
+function checkboxes(box, prefix, items, set, onChange) {   // items: [value, html label, title?, id suffix?]
+  box.replaceChildren();
+  for (const [v, html, title, idSuffix] of items) {
+    const lab = document.createElement("label"), cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.id = prefix + (idSuffix ?? v);
+    cb.checked = set.has(v);
+    cb.addEventListener("change", () => { if (cb.checked) set.add(v); else set.delete(v); onChange(); });
+    lab.htmlFor = cb.id;
+    if (title) lab.title = title;
+    lab.appendChild(cb);
+    const span = document.createElement("span");
+    span.innerHTML = html;
+    lab.appendChild(span);
+    box.appendChild(lab);
+  }
+}
+function syncChecks(prefix, values, set) { for (const v of values) { const cb = $(prefix + v); if (cb) cb.checked = set.has(v); } }
+function segment(boxId, get, set) {
+  const box = $(boxId);
+  box.querySelectorAll("button").forEach(b => b.addEventListener("click", () => { set(b.dataset.v); }));
+  return () => box.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === get())));
+}
+
+// ---------- tooltips (nearest mark within 24 px; tap works too) ----------
+const HITS = {};
+function attachHover(svgId) {
+  const svg = $(svgId), card = svg.closest(".chart-card"), tip = card.querySelector(".tooltip");
+  function show(ev) {
+    const hits = HITS[svgId];
+    if (!hits || !hits.length) { tip.hidden = true; return; }
+    const rect = svg.getBoundingClientRect(), vb = svg.viewBox.baseVal;
+    if (!vb || !rect.width) return;
+    const sx = (ev.clientX - rect.left) * vb.width / rect.width, sy = (ev.clientY - rect.top) * vb.height / rect.height;
+    let best = null, bd = 24 * 24;
+    for (const h of hits) {
+      const d = h.band ? (Math.abs(sx - h.x) <= h.band ? (sy - h.y) ** 2 : Infinity) : (h.x - sx) ** 2 + (h.y - sy) ** 2;
+      if (d < bd) { bd = d; best = h; }
+    }
+    if (!best) { tip.hidden = true; return; }
+    tip.replaceChildren();
+    best.rows.forEach(([t, cls]) => {
+      const r = document.createElement("div");
+      if (cls) r.className = cls;
+      r.textContent = t;
+      tip.appendChild(r);
+    });
+    tip.hidden = false;
+    const c = card.getBoundingClientRect();
+    let left = ev.clientX - c.left + 14, top = ev.clientY - c.top + 14;
+    if (left + tip.offsetWidth > c.width - 4) left = ev.clientX - c.left - tip.offsetWidth - 14;
+    if (left < 4) left = 4;
+    if (top + tip.offsetHeight > c.height - 4) top = ev.clientY - c.top - tip.offsetHeight - 14;
+    if (top < 4) top = 4;
+    tip.style.left = left + "px";
+    tip.style.top = top + "px";
+  }
+  svg.addEventListener("pointermove", show);
+  svg.addEventListener("pointerdown", show);
+  svg.addEventListener("pointerleave", () => { tip.hidden = true; });
+}
+window.addEventListener("scroll", () => document.querySelectorAll(".tooltip").forEach(t => { t.hidden = true; }), {passive: true});
+
+// Label placement that avoids marks and other labels (boxes in px; text 11.5 px).
+function placeLabels(items, obstacles, bounds) {
+  const placed = [];
+  const hit = (b, list) => list.reduce((n, o) => n + (b.x0 < o.x1 && b.x1 > o.x0 && b.y0 < o.y1 && b.y1 > o.y0 ? 1 : 0), 0);
+  const dirs = [[1, 0], [-1, 0], [0, -1], [0, 1], [1, -1], [-1, -1], [1, 1], [-1, 1]];
+  for (const it of items) {
+    const w = it.text.length * 6.9 + 2, h = 13, r = it.r + 3;
+    let best = null, bestScore = Infinity;
+    dirs.forEach(([cx, cy], idx) => {
+      const k = cx !== 0 && cy !== 0 ? 0.7 : 1;
+      const x0 = cx > 0 ? it.x + r * k : cx < 0 ? it.x - r * k - w : it.x - w / 2;
+      const y0 = cy > 0 ? it.y + r * k : cy < 0 ? it.y - r * k - h : it.y - h / 2;
+      const b = {x0, y0, x1: x0 + w, y1: y0 + h};
+      let score = idx * 0.01 + 10 * hit(b, obstacles) + 10 * hit(b, placed);
+      if (bounds && (b.x0 < bounds.x0 || b.x1 > bounds.x1 || b.y0 < bounds.y0 || b.y1 > bounds.y1)) score += 50;
+      if (score < bestScore) { bestScore = score; best = b; }
+    });
+    placed.push(best);
+    it.box = best;
+  }
+  return items;
+}
+// An arrow from near (px, py) along (vx, vy), shifted sideways by `off` along the unit normal (nx, ny).
+function drawArrow(parent, px, py, vx, vy, nx, ny, off, gap, cls, head, half) {
+  const L = Math.hypot(vx, vy);
+  if (!(L > gap + 2)) return null;
+  const ux = vx / L, uy = vy / L;
+  const x1 = px + nx * off + ux * gap, y1 = py + ny * off + uy * gap, x2 = px + nx * off + vx, y2 = py + ny * off + vy;
+  const hl = Math.min(head, L - gap);
+  if (L - gap > hl + 1) svgEl("line", {x1, y1, x2: x2 - ux * hl * 0.8, y2: y2 - uy * hl * 0.8, class: cls[0]}, parent);
+  svgEl("path", {d: arrowHead(x1, y1, x2, y2, hl, half), class: cls[1]}, parent);
+  return {x2, y2};
+}
+function segmentBoxes(x1, y1, x2, y2, pad) {   // small boxes along a segment, as obstacles
+  const n = Math.max(1, Math.ceil(Math.hypot(x2 - x1, y2 - y1) / 5)), out = [];
+  for (let i = 0; i <= n; i++) {
+    const x = x1 + (x2 - x1) * i / n, y = y1 + (y2 - y1) * i / n;
+    out.push({x0: x - pad, y0: y - pad, x1: x + pad, y1: y + pad});
+  }
+  return out;
+}
+
+// ---------- state ----------
+const ST = {
+  tab: "inch4",
+  i4: {coords: "both", plates: new Set(D.inch4.plates), stars: new Set(D.inch4.stars), printed: false},
+  ia: {mode: "common", e: 0.082, plates: new Set(D.astro.plates)},
+  ip: {comps: new Set(Object.keys(D.principe.comparisons)), free: false},
+  iw: null,
+};
+const RES = {};
+window.__plateLab = {ready: false, results: RES, state: ST, D, fit4inch, fitAstro, fitPrincipe, fitWallal, wallalMeasures, GR_LIMB, TO_LIMB};
+
+// ======================= Sobral 4-inch =======================
+const STAR = Object.fromEntries(D.field.stars.map((s, i) => [s.no, Object.assign({idx: i}, s)]));
+function starName(no) {
+  const s = STAR[no];
+  return s.name_1920 && s.name_1920.replace(/\s+/g, "") !== s.name.replace(/\s+/g, "") ? `${s.name} (printed in 1920 as ${s.name_1920})` : s.name;
+}
+function i4Coords() { return ST.i4.coords === "both" ? ["RA", "Dec"] : [ST.i4.coords]; }
+function updateInch4() {
+  const o = {coords: i4Coords(), plates: D.inch4.plates.filter(p => ST.i4.plates.has(p)),
+    stars: D.inch4.stars.filter(s => ST.i4.stars.has(s)), asPrinted: ST.i4.printed};
+  const r = fit4inch(o);
+  RES.inch4 = Object.assign({options: o}, r);
+  const coordName = {both: "R.A. + Dec.", RA: "R.A. only", Dec: "Dec. only"}[ST.i4.coords];
+  showMsg($("i4-msg"), r.ok ? "" : r.why);
+  if (r.ok) {
+    $("i4-sub").textContent = `${r.nEcl} eclipse + ${r.nCmp} comparison plates · ${r.ns} stars · ${coordName} · ` +
+      `${r.nData} measures, ${r.nPar} unknowns${ST.i4.printed ? " · Table II as printed" : ""}`;
+  } else {
+    $("i4-sub").textContent = coordName;
+  }
+  $("i4-limb").textContent = r.ok ? fmt(r.limb, 2) + SEC : "—";
+  $("i4-limb-err").textContent = r.ok ? "± " + fmt(r.limbErr, 2) + SEC : "";
+  setData($("i4-limb"), r.ok ? r.limb : NaN);
+  setData($("i4-limb-err"), r.ok ? r.limbErr : NaN);
+  $("i4-ratio").textContent = r.ok ? `${fmt(r.ratio, 2)} ± ${fmt(r.ratioErr, 2)} times Einstein's prediction` : "";
+  verdicts($("i4-verdicts"), r.ok ? r.limb : NaN, r.ok ? r.limbErr : NaN, REFS);
+  const sig = g => (r.ok && r.sigma[g] !== undefined ? fmt(r.sigma[g], 3) + SEC : "—");
+  const items = [
+    [`α at 50${MIN} from the Sun's centre`, r.ok ? `${fmt(r.alpha, 4)}${SEC}` : "—", "i4-alpha50", r.ok ? r.alpha : NaN],
+    ["its standard error", r.ok ? `± ${fmt(r.alphaErr, 4)}${SEC}` : "—", "i4-alpha50-err", r.ok ? r.alphaErr : NaN],
+  ];
+  for (const c of o.coords) {
+    const nm = c === "RA" ? "R.A." : "Dec.";
+    items.push([`scatter of one ${nm} measure, eclipse / comparison plates`, `${sig(c + "-ecl")} / ${sig(c + "-cmp")}`, `i4-sigma-${c}`]);
+  }
+  kv($("i4-kv"), items);
+  $("i4-leg-fit").textContent = r.ok ? `your fit: ${fmt(r.ratio, 2)} × Einstein` : "your fit";
+  table7();
+  starsTable();
+  drawInch4();
+}
+function table7() {
+  const I = D.inch4, t = $("i4-t7"), a = {};
+  for (const row of I.per_plate_1920) a[row.coord + "|" + row.plate] = row.alpha;
+  const cmp = I.plates.filter(p => !I.eclipse.includes(p));
+  const m = (coord, list) => mean(list.map(p => a[coord + "|" + p]));
+  let html = `<thead><tr><th>α (r)</th>` + I.eclipse.map(p => `<th>${p}</th>`).join("") + `<th class="grp">mean</th>` +
+    cmp.map((p, i) => `<th${i === 0 ? ' class="grp"' : ""}>${plateHTML(p)}</th>`).join("") + `<th class="grp">mean</th><th class="grp">difference</th></tr></thead><tbody>`;
+  const res = {};
+  for (const coord of ["RA", "Dec"]) {
+    const me = m(coord, I.eclipse), mc = m(coord, cmp);
+    res[coord] = me - mc;
+    html += `<tr><td>${coord === "RA" ? "R.A." : "Dec."}</td>` +
+      I.eclipse.map(p => `<td class="${ST.i4.plates.has(p) ? "" : "out"}" ${ST.i4.plates.has(p) ? "" : 'title="not in your fit"'}>${fmtS(a[coord + "|" + p], 3)}</td>`).join("") +
+      `<td class="grp">${fmtS(me, 3)}</td>` +
+      cmp.map((p, i) => `<td class="${(i === 0 ? "grp " : "") + (ST.i4.plates.has(p) ? "" : "out")}" ${ST.i4.plates.has(p) ? "" : 'title="not in your fit"'}>${fmtS(a[coord + "|" + p], 3)}</td>`).join("") +
+      `<td class="grp">${fmtS(mc, 3)}</td><td class="grp">${fmtS(me - mc, 3)}</td></tr>`;
+  }
+  t.innerHTML = html + "</tbody>";
+  const comb = (res.RA + 2 * res.Dec) / 3, at50 = comb * I.rev_arcsec;
+  $("i4-t7-sum").innerHTML = `(R.A. + 2 × Dec.)/3 = ${fmtS(comb, 4)} r = ${fmt(at50, 3)}${SEC} at 50${MIN}, or ` +
+    `<b>${fmt(at50 * 50 / 15.8, 2)}${SEC}</b> at the limb with the Sun's radius taken as 15.8${MIN} (with the true 15.771${MIN}: ` +
+    `${fmt(at50 * TO_LIMB, 2)}${SEC}). Struck-out plates are the ones you left out; this table always shows the 1920 values.`;
+}
+function starsTable() {
+  const I = D.inch4, sun = D.field.sun.sobral, r = RES.inch4;
+  let html = `<thead><tr><th>Star</th><th>Name</th><th>distance from the Sun's centre</th><th>Einstein's shift</th><th>your fitted shift</th><th>in your fit</th></tr></thead><tbody>`;
+  for (const no of [...I.stars].sort((a, b) => a - b)) {
+    const s = STAR[no], dist = Math.hypot(s.x - sun.x, s.y - sun.y) * D.meta.unit_arcmin;
+    const g = Math.hypot(sun.gr_dx[s.idx], sun.gr_dy[s.idx]);
+    html += `<tr><td>${no}</td><td style="text-align:left">${starName(no)}</td><td>${fmt(dist, 1)}${MIN}</td><td>${fmt(g, 3)}${SEC}</td>` +
+      `<td>${r.ok ? fmt(g * r.ratio, 3) + SEC : "—"}</td><td>${ST.i4.stars.has(no) ? "yes" : "left out"}</td></tr>`;
+  }
+  $("i4-stars-table").innerHTML = html + "</tbody>";
+}
+function drawInch4() {
+  const svg = $("i4-chart");
+  if (!isShown(svg)) return;
+  const r = RES.inch4, sun = D.field.sun.sobral, W = chartWidth(svg);
+  const xLo = -1.58, xHi = 1.66, yLo = -1.45, yHi = 1.62;          // Table I units (50′)
+  const m = {l: 48, r: 8, t: 8, b: 40};
+  const s = Math.min((W - m.l - m.r) / (xHi - xLo), 600 / (yHi - yLo));
+  const plotW = (xHi - xLo) * s, plotH = (yHi - yLo) * s;
+  const ox = m.l + Math.max(0, (W - m.l - m.r - plotW) / 2), H = Math.round(plotH + m.t + m.b);
+  const X = x => ox + (xHi - x) * s, Y = y => m.t + (yHi - y) * s;    // east (larger x) to the left
+  const factor = 1500;                   // arrows: 1″ drawn 1500 times longer (1″ = 1/3000 of a 50′ unit)
+  const F = factor / 3000, small = s < 140;
+  $("i4-factor").textContent = String(factor);
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("width", W);
+  svg.setAttribute("height", H);
+  const title = svg.querySelector("title");
+  svg.replaceChildren(title);
+  const defs = svgEl("defs", {}, svg), cp = svgEl("clipPath", {id: "i4-clip"}, defs);
+  svgEl("rect", {x: ox, y: m.t, width: plotW, height: plotH}, cp);
+  const g = svgEl("g", {}, svg);
+  for (const v of [-1.5, -1, -0.5, 0, 0.5, 1, 1.5]) {
+    if (v >= xLo && v <= xHi) {
+      svgEl("line", {x1: X(v), x2: X(v), y1: m.t, y2: m.t + plotH, class: "grid"}, g);
+      svgEl("text", {x: X(v), y: m.t + plotH + 15, "text-anchor": "middle"}, g, fmt(v, Number.isInteger(v) ? 0 : 1));
+    }
+    if (v >= yLo && v <= yHi) {
+      svgEl("line", {x1: ox, x2: ox + plotW, y1: Y(v), y2: Y(v), class: "grid"}, g);
+      svgEl("text", {x: ox - 6, y: Y(v) + 4, "text-anchor": "end"}, g, fmt(v, Number.isInteger(v) ? 0 : 1));
+    }
+  }
+  svgEl("rect", {x: ox, y: m.t, width: plotW, height: plotH, fill: "none", class: "axis"}, g);
+  svgEl("text", {x: ox + plotW / 2, y: H - 6, "text-anchor": "middle", class: "ttl"}, g, `← east     x (units of 50${MIN})`);
+  const yc = m.t + plotH / 2, ytx = ox - 36;
+  svgEl("text", {x: ytx, y: yc, "text-anchor": "middle", class: "ttl", transform: `rotate(-90 ${ytx} ${yc})`}, g, `y (units of 50${MIN})     north →`);
+  const plot = svgEl("g", {"clip-path": "url(#i4-clip)"}, svg);
+  // the Sun (behind the Moon)
+  const sx = X(sun.x), sy = Y(sun.y), sr = sun.radius_units * s;
+  svgEl("circle", {cx: sx, cy: sy, r: sr, class: "sun"}, plot);
+  svgEl("text", {x: sx, y: sy + 4, "text-anchor": "middle", class: "lab"}, plot, "Sun");
+  const obstacles = [{x0: sx - sr * 0.8, y0: sy - sr * 0.8, x1: sx + sr * 0.8, y1: sy + sr * 0.8}];
+  const ratio = r.ok ? r.ratio : NaN;
+  const hits = [], labels = [], arrows = svgEl("g", {}, plot), marks = svgEl("g", {}, plot);
+  const radiusOf = mag => (small ? 0.85 : 1) * Math.max(2.2, Math.min(6.2, 2.2 + (7.6 - mag) * 1.25));
+  for (const st of D.field.stars) {
+    const on4 = D.inch4.stars.includes(st.no), sel = on4 && ST.i4.stars.has(st.no);
+    const px = X(st.x), py = Y(st.y), rad = radiusOf(st.mag), idx = STAR[st.no].idx;
+    const gx = sun.gr_dx[idx], gy = sun.gr_dy[idx], gmag = Math.hypot(gx, gy);
+    if (sel) {
+      const ex = -gx * F * s, ey = -gy * F * s, L = Math.hypot(ex, ey), nx = ey / L, ny = -ex / L;
+      if (Number.isFinite(ratio)) {    // the fitted shift, in the instrument colour, on one side
+        const tip = drawArrow(arrows, px, py, ex * ratio, ey * ratio, nx, ny, 2.6, rad + 1, ["inst-wide", "inst-fill"], 8, 4.2);
+        if (tip) obstacles.push(...segmentBoxes(px, py, tip.x2, tip.y2, 4));
+      }
+      const tip = drawArrow(arrows, px, py, ex, ey, nx, ny, -2.2, rad + 1, ["gr", "ink-fill"], 6.5, 3.2);   // Einstein
+      if (tip) obstacles.push(...segmentBoxes(px, py, tip.x2, tip.y2, 4));
+      if (L / 2 > rad + 2) {           // tick at the Newtonian half
+        const hx = px - nx * 2.2 + ex / 2, hy = py - ny * 2.2 + ey / 2;
+        svgEl("line", {x1: hx - nx * 4, y1: hy - ny * 4, x2: hx + nx * 4, y2: hy + ny * 4, class: "gr-thin"}, arrows);
+      }
+    }
+    if (on4) {
+      svgEl("circle", {cx: px, cy: py, r: rad + 1, class: sel ? "inst-fill ring" : "open"}, marks);
+    } else {
+      svgEl("circle", {cx: px, cy: py, r: rad, class: "other ring"}, marks);
+    }
+    obstacles.push({x0: px - rad - 1, y0: py - rad - 1, x1: px + rad + 1, y1: py + rad + 1});
+    labels.push({x: px, y: py, r: rad + 1, text: String(st.no), on4, sel});
+    const dist = Math.hypot(st.x - sun.x, st.y - sun.y) * D.meta.unit_arcmin;
+    const rows = [[`Star ${st.no}: ${starName(st.no)}`, "strong"], [`magnitude ${fmt(st.mag, 1)} · ${fmt(dist, 0)}${MIN} from the Sun's centre`, "dim"],
+      [`Einstein's shift ${fmt(gmag, 2)}${SEC}`]];
+    if (sel && Number.isFinite(ratio)) rows.push([`your fit ${fmt(gmag * ratio, 2)}${SEC}`]);
+    if (on4 && !sel) rows.push(["left out of your fit", "dim"]);
+    if (!on4) rows.push(["not on the 4-inch plates", "dim"]);
+    hits.push({x: px, y: py, rows});
+  }
+  placeLabels(labels, obstacles, {x0: ox, y0: m.t, x1: ox + plotW, y1: m.t + plotH});
+  const lg = svgEl("g", {}, svg);
+  for (const L of labels) {
+    svgEl("text", {x: L.box.x0 + 1, y: L.box.y0 + 10.5, class: (L.sel ? "lab-ink" : "lab") + " halo"}, lg, L.text);
+  }
+  // compass
+  const cx = ox + plotW - 14, cy = m.t + 30;
+  svgEl("line", {x1: cx, y1: cy, x2: cx, y2: cy - 16, class: "gr-thin"}, lg);
+  svgEl("path", {d: arrowHead(cx, cy, cx, cy - 18, 5, 2.5), class: "ink-fill"}, lg);
+  svgEl("text", {x: cx, y: cy - 21, "text-anchor": "middle", class: "lab"}, lg, "N");
+  svgEl("line", {x1: cx, y1: cy, x2: cx - 16, y2: cy, class: "gr-thin"}, lg);
+  svgEl("path", {d: arrowHead(cx, cy, cx - 18, cy, 5, 2.5), class: "ink-fill"}, lg);
+  svgEl("text", {x: cx - 22, y: cy + 4, "text-anchor": "end", class: "lab"}, lg, "E");
+  HITS["i4-chart"] = hits;
+}
+
+// ======================= Sobral astrographic =======================
+function updateAstro() {
+  const plates = D.astro.plates.filter(p => ST.ia.plates.has(p));
+  const r = fitAstro({mode: ST.ia.mode, e: ST.ia.e, plates});
+  RES.astro = Object.assign({options: {mode: ST.ia.mode, e: ST.ia.e, plates}}, r);
+  // the line for a fixed e, over the chart's range
+  const line = [];
+  for (let i = 0; i <= 78; i++) {
+    const e = -0.025 + i * 0.0025;
+    const f = fitAstro({mode: "fixed", e, plates});
+    if (f.ok) line.push({e, limb: f.limb, err: f.limbErr});
+  }
+  RES.astroLine = line;
+  const modeName = {common: "one e fitted for all plates", per_plate: "e free on every plate", fixed: `e fixed at ${fmt(ST.ia.e, 3)} r`}[ST.ia.mode];
+  showMsg($("ia-msg"), r.ok ? "" : r.why);
+  $("ia-sub").textContent = r.ok ? `${r.npl} plates · 5 stars, declinations · ${modeName} · ${r.nData} measures, ${r.nPar} unknowns` : modeName;
+  $("ia-limb").textContent = r.ok ? fmt(r.limb, 2) + SEC : "—";
+  $("ia-limb-err").textContent = r.ok ? "± " + fmt(r.limbErr, 2) + SEC : "";
+  setData($("ia-limb"), r.ok ? r.limb : NaN);
+  setData($("ia-limb-err"), r.ok ? r.limbErr : NaN);
+  $("ia-ratio").textContent = r.ok ? `${fmt(r.limb / GR_LIMB, 2)} ± ${fmt(r.limbErr / GR_LIMB, 2)} times Einstein's prediction` : "";
+  verdicts($("ia-verdicts"), r.ok ? r.limb : NaN, r.ok ? r.limbErr : NaN, REFS);
+  const items = [
+    [`α at 50${MIN} from the Sun's centre`, r.ok ? `${fmt(r.alpha, 4)}${SEC}` : "—", "ia-alpha50", r.ok ? r.alpha : NaN],
+    ["its standard error", r.ok ? `± ${fmt(r.alphaErr, 4)}${SEC}` : "—", "ia-alpha50-err", r.ok ? r.alphaErr : NaN],
+  ];
+  if (r.ok && r.mode === "common") {
+    items.push(["fitted e", `${fmt(r.e, 4)} r`, "ia-efit", r.e]);
+    items.push(["its standard error", `± ${fmt(r.eErr, 4)} r`, "ia-efit-err", r.eErr]);
+    items.push(["correlation of α with e", fmt(r.corr, 2)]);
+  } else if (r.ok && r.mode === "per_plate") {
+    items.push(["fitted e, mean of the plates", `${fmt(r.e, 4)} r`, "ia-efit", r.e]);
+  }
+  if (r.ok) items.push([`scatter of one measure (${r.dof} degrees of freedom)`, `${fmt(r.sigma, 3)}${SEC}`]);
+  // slope of the fixed-e line and where it meets the two predictions
+  if (line.length > 2) {
+    const a = line[0], b = line[line.length - 1], slope = (b.limb - a.limb) / (b.e - a.e);
+    const eAt = v => a.e + (v - a.limb) / slope;
+    items.push(["with e fixed, +0.01 r in e changes the deflection by", `${fmtS(slope * 0.01, 3)}${SEC}`, "ia-slope", slope * 0.01]);
+    items.push([`e for Einstein's ${fmt(GR_LIMB, 2)}${SEC} / the Newtonian ${NEWTON_LABEL}${SEC}, your plates`,
+      `${fmtS(eAt(GR_LIMB), 3)} / ${fmtS(eAt(NEWTON_LIMB), 3)} r`]);
+    // the report's own combination (p.311: α + 0.24 e on each plate, with d from Table IX, averaged over the
+    // plates) weights the five stars differently from this least squares
+    items.push(["the same in the 1920 arithmetic (p.311, all 16 plates)", "−0.007 / +0.086 r"]);
+    $("ia-slope-note").textContent = ` (with your plates, each +0.01 r of assumed scale change moves it by ${fmtS(slope * 0.01, 2)}${SEC})`;
+  }
+  kv($("ia-kv"), items);
+  $("ia-caption").textContent = "Error bars and band: 1σ. " + (ST.ia.mode === "per_plate"
+    ? "With e free on every plate there is no single e: your fit is drawn at the mean of the plates' fitted e."
+    : ST.ia.mode === "common" ? "Your fit's horizontal bar is the 1σ range of the fitted e." : "In “e fixed” mode your fit lies on the line.");
+  $("ia-e-out").textContent = `${fmt(ST.ia.e, 3)} r`;
+  $("ia-e").setAttribute("aria-valuetext", `${fmt(ST.ia.e, 3)} revolutions`);
+  astroTable();
+  drawAstro();
+}
+function astroTable() {
+  const A = D.astro, r = RES.astro;
+  const eOf = {};
+  if (r.ok && r.ePlates) r.options.plates.forEach((p, q) => { eOf[p] = r.ePlates[q]; });
+  let html = `<thead><tr><th>Plate</th><th>compared with</th><th>stars used in 1920</th><th>e (1920)</th><th>deflection at the limb (1920)</th>` +
+    `<th>e, your fit (e free per plate)</th><th>in your fit</th></tr></thead><tbody>`;
+  for (const t of A.table9) {
+    html += `<tr><td>${t.plate}</td><td>${plateHTML(t.comparison)}</td><td>${t.n_stars}</td><td>${fmtS(t.e_rev, 3)} r</td><td>${fmt(t.limb, 2)}${SEC}</td>` +
+      `<td>${eOf[t.plate] !== undefined ? fmtS(eOf[t.plate], 3) + " r" : "—"}</td><td>${ST.ia.plates.has(t.plate) ? "yes" : "left out"}</td></tr>`;
+  }
+  $("ia-table").innerHTML = html + "</tbody>";
+}
+function drawAstro() {
+  const svg = $("ia-chart");
+  if (!isShown(svg)) return;
+  const r = RES.astro, line = RES.astroLine, W = chartWidth(svg);
+  const H = Math.round(Math.max(300, Math.min(500, W * 0.66)));
+  const m = {l: 48, r: 14, t: 26, b: 42};
+  const eLo = -0.025, eHi = 0.17;
+  let vals = line.flatMap(p => [p.limb - p.err, p.limb + p.err]).concat(D.astro.table9.map(t => t.limb), [GR_LIMB]);
+  if (r.ok) vals.push(r.limb - r.limbErr, r.limb + r.limbErr);
+  let yLo = Math.min(-0.25, Math.floor(Math.min(...vals) * 2) / 2), yHi = Math.max(2.5, Math.ceil(Math.max(...vals) * 2) / 2);
+  yLo = Math.max(yLo, -2); yHi = Math.min(yHi, 4.5);
+  const X = e => m.l + (e - eLo) / (eHi - eLo) * (W - m.l - m.r), Y = v => m.t + (yHi - v) / (yHi - yLo) * (H - m.t - m.b);
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("width", W);
+  svg.setAttribute("height", H);
+  const title = svg.querySelector("title");
+  svg.replaceChildren(title);
+  const defs = svgEl("defs", {}, svg), cp = svgEl("clipPath", {id: "ia-clip"}, defs);
+  svgEl("rect", {x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b}, cp);
+  const g = svgEl("g", {}, svg);
+  const xt = niceTicks(eLo, eHi, W < 480 ? 4 : 10), yt = niceTicks(yLo, yHi, 6);
+  for (const v of xt.ticks) {
+    svgEl("line", {x1: X(v), x2: X(v), y1: m.t, y2: H - m.b, class: "grid"}, g);
+    svgEl("text", {x: X(v), y: H - m.b + 15, "text-anchor": "middle"}, g, fmt(v, decimalsFor(xt.step)));
+  }
+  for (const v of yt.ticks) {
+    svgEl("line", {x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v), class: "grid"}, g);
+    svgEl("text", {x: m.l - 6, y: Y(v) + 4, "text-anchor": "end"}, g, fmt(v, decimalsFor(yt.step)));
+  }
+  svgEl("line", {x1: m.l, x2: W - m.r, y1: H - m.b, y2: H - m.b, class: "axis"}, g);
+  svgEl("line", {x1: m.l, x2: m.l, y1: m.t, y2: H - m.b, class: "axis"}, g);
+  svgEl("text", {x: (m.l + W - m.r) / 2, y: H - 6, "text-anchor": "middle", class: "ttl"}, g,
+    W < 480 ? "assumed scale change e (r per 50′)" : "assumed change of plate scale e (micrometer revolutions per 50′; 0.01 r = 0.12″)");
+  const yc = (m.t + H - m.b) / 2;
+  svgEl("text", {x: 12, y: yc, "text-anchor": "middle", class: "ttl", transform: `rotate(-90 12 ${yc})`}, g, "deflection at the limb (″)");
+  const plot = svgEl("g", {"clip-path": "url(#ia-clip)"}, svg);
+  // the two 1920 choices of e
+  for (const [e, lab] of [[0.020, "refraction only"], [0.082, "plates' mean"]]) {
+    svgEl("line", {x1: X(e), x2: X(e), y1: m.t, y2: H - m.b, class: "dotted"}, plot);
+    svgEl("text", {x: X(e), y: m.t - 8, "text-anchor": "middle", class: "lab"}, svg, W < 560 ? lab : `${lab}, ${fmt(e, 3)}`);
+  }
+  // predictions
+  svgEl("line", {x1: m.l, x2: W - m.r, y1: Y(GR_LIMB), y2: Y(GR_LIMB), class: "gr"}, plot);
+  svgEl("line", {x1: m.l, x2: W - m.r, y1: Y(NEWTON_LIMB), y2: Y(NEWTON_LIMB), class: "newton"}, plot);
+  // the fixed-e line and its band
+  const obs = [];                                     // marks that labels must not cover
+  if (line.length > 1) {
+    const up = line.map(p => `${X(p.e).toFixed(1)},${Y(p.limb + p.err).toFixed(1)}`), dn = line.map(p => `${X(p.e).toFixed(1)},${Y(p.limb - p.err).toFixed(1)}`).reverse();
+    svgEl("path", {d: "M" + up.join("L") + "L" + dn.join("L") + "Z", class: "inst-band"}, plot);
+    svgEl("polyline", {points: line.map(p => `${X(p.e).toFixed(1)},${Y(p.limb).toFixed(1)}`).join(" "), class: "inst"}, plot);
+    for (let i = 1; i < line.length; i++) obs.push(...segmentBoxes(X(line[i - 1].e), Y(line[i - 1].limb), X(line[i].e), Y(line[i].limb), 2));
+  }
+  const hits = [];
+  // Table IX: each plate alone (1920)
+  for (const t of D.astro.table9) {
+    const on = ST.ia.plates.has(t.plate), px = X(t.e_rev), py = Y(t.limb);
+    svgEl("circle", {cx: px, cy: py, r: 3.8, class: "open" + (on ? "" : " faded")}, plot);
+    obs.push({x0: px - 5, y0: py - 5, x1: px + 5, y1: py + 5});
+    hits.push({x: px, y: py, rows: [[`Plate ${t.plate} against ${plateText(t.comparison)} (1920, Table IX)`, "strong"],
+      [`${t.n_stars} stars · e = ${fmtS(t.e_rev, 3)} r`], [`deflection at the limb ${fmt(t.limb, 2)}″`], on ? ["in your fit", "dim"] : ["left out of your fit", "dim"]]});
+  }
+  // a label at the first candidate position where it covers no mark; where there is none it is left out (the
+  // legend and the result card carry the same information)
+  const placeText = (text, cands, cls) => {
+    const t = svgEl("text", {x: 0, y: -50, class: cls + " halo"}, svg, text), w = t.getComputedTextLength() + 4;
+    for (const c of cands) {
+      const x0 = c.anchor === "end" ? c.x - w : c.anchor === "middle" ? c.x - w / 2 : c.x;
+      const b = {x0, y0: c.y - 11, x1: x0 + w, y1: c.y + 3};
+      if (b.x0 < m.l + 2 || b.x1 > W - m.r - 2 || b.y0 < m.t + 1 || b.y1 > H - m.b - 1) continue;
+      if (obs.some(o => b.x0 < o.x1 && b.x1 > o.x0 && b.y0 < o.y1 && b.y1 > o.y0)) continue;
+      t.setAttribute("x", c.x);
+      t.setAttribute("y", c.y);
+      t.setAttribute("text-anchor", c.anchor);
+      obs.push(b);
+      return;
+    }
+    t.remove();
+  };
+  // the current fit
+  if (r.ok) {
+    const px = X(r.e), py = Y(r.limb), top = Y(r.limb + r.limbErr), bot = Y(r.limb - r.limbErr);
+    svgEl("line", {x1: px, x2: px, y1: top, y2: bot, class: "inst-wide"}, plot);
+    obs.push(...segmentBoxes(px, top, px, bot, 3), {x0: px - 9, y0: py - 9, x1: px + 9, y1: py + 9});
+    if (r.mode === "common") {
+      svgEl("line", {x1: X(r.e - r.eErr), x2: X(r.e + r.eErr), y1: py, y2: py, class: "inst-wide"}, plot);
+      obs.push(...segmentBoxes(X(r.e - r.eErr), py, X(r.e + r.eErr), py, 3));
+    }
+    svgEl("path", {d: `M${px},${py - 8}L${px + 8},${py}L${px},${py + 8}L${px - 8},${py}Z`, class: "inst-fill ring"}, plot);
+    placeText(`your fit: ${fmt(r.limb, 2)}″`, [{x: px, y: top - 6, anchor: "middle"}, {x: px, y: bot + 15, anchor: "middle"},
+      {x: px + 12, y: py - 8, anchor: "start"}, {x: px - 12, y: py - 8, anchor: "end"}, {x: px + 12, y: py + 17, anchor: "start"},
+      {x: px - 12, y: py + 17, anchor: "end"}, {x: px + 30, y: top - 6, anchor: "start"}, {x: px - 30, y: top - 6, anchor: "end"}], "lab-ink");
+    const rows = [[`your fit: ${fmt(r.limb, 2)} ± ${fmt(r.limbErr, 2)}″`, "strong"]];
+    if (r.mode === "common") rows.push([`e = ${fmt(r.e, 3)} ± ${fmt(r.eErr, 3)} r (fitted)`]);
+    else if (r.mode === "per_plate") rows.push([`e free on every plate (mean ${fmt(r.e, 3)} r)`]);
+    else rows.push([`e fixed at ${fmt(r.e, 3)} r`]);
+    hits.push({x: px, y: py, rows});
+  }
+  const lineLabel = (text, v) => {
+    const xr = W - m.r - 4, xl = m.l + 4, xc = (m.l + W - m.r) / 2;
+    placeText(text, [{x: xr, y: Y(v) - 6, anchor: "end"}, {x: xr, y: Y(v) + 15, anchor: "end"}, {x: xl, y: Y(v) - 6, anchor: "start"},
+      {x: xl, y: Y(v) + 15, anchor: "start"}, {x: xc, y: Y(v) - 6, anchor: "middle"}, {x: xc, y: Y(v) + 15, anchor: "middle"}], "lab");
+  };
+  lineLabel(`Einstein ${fmt(GR_LIMB, 2)}″`, GR_LIMB);
+  lineLabel(`Newtonian half ${NEWTON_LABEL}″`, NEWTON_LIMB);
+  for (const p of line) hits.push({x: X(p.e), y: Y(p.limb), rows: [[`e fixed at ${fmt(p.e, 3)} r`, "strong"], [`deflection ${fmt(p.limb, 2)} ± ${fmt(p.err, 2)}″`]]});
+  HITS["ia-chart"] = hits;
+}
+
+// ======================= Principe =======================
+function updatePrincipe() {
+  const comps = Object.keys(D.principe.comparisons).filter(c => ST.ip.comps.has(c));
+  const r = fitPrincipe({comps, free: ST.ip.free});
+  RES.principe = Object.assign({options: {comps, free: ST.ip.free}}, r);
+  showMsg($("ip-msg"), r.ok ? "" : r.why);
+  $("ip-sub").textContent = `${comps.length} comparison${comps.length === 1 ? "" : "s"} · both coordinates · scale ` +
+    (ST.ip.free ? "fitted" : "from the check plates");
+  $("ip-limb").textContent = r.ok ? fmt(r.limb, 2) + SEC : "—";
+  $("ip-limb-err").textContent = r.ok ? "± " + fmt(r.limbErr, 2) + SEC : "";
+  setData($("ip-limb"), r.ok ? r.limb : NaN);
+  setData($("ip-limb-err"), r.ok ? r.limbErr : NaN);
+  $("ip-ratio").textContent = r.ok ? `${fmt(r.ratio, 2)} ± ${fmt(r.limbErr / GR_LIMB, 2)} times Einstein's prediction` : "";
+  verdicts($("ip-verdicts"), r.ok ? r.limb : NaN, r.ok ? r.limbErr : NaN, REFS);
+  const pub = D.principe.published.per_comparison;
+  let html = `<thead><tr><th>Comparison</th><th>your fit</th><th>1920</th></tr></thead><tbody>`;
+  for (const c of Object.keys(D.principe.comparisons)) {
+    const v = r.ok && r.per[c];
+    html += `<tr class="${v ? "" : "out"}"><td>${compHTML(c)}</td><td id="ip-c-${c}" data-value="${v ? v.limb : ""}">` +
+      `${v ? `${fmt(v.limb, 2)} ± ${fmt(v.limbErr, 2)}″` : "left out"}</td><td>${fmt(pub[c], 2)}″</td></tr>`;
+  }
+  $("ip-table").innerHTML = html + "</tbody>";
+  const items = [];
+  if (r.ok) {
+    items.push(["error from the measures", `± ${fmt(r.limbErrMeas, 3)}″`, "ip-err-meas", r.limbErrMeas]);
+    items.push(["error from the check-plate scale", ST.ip.free ? "none (scale fitted)" : `± ${fmt(r.limbErrScale, 3)}″`]);
+    items.push(["scatter of one measure, x / y", `${fmt(r.sigmaX, 3)}″ / ${fmt(r.sigmaY, 3)}″`]);
+    items.push(["degrees of freedom", String(r.dof)]);
+  }
+  kv($("ip-kv"), items);
+  $("ip-caption").textContent = ST.ip.free
+    ? "Error bars: 1σ from the measures. With the scale fitted there is no separate scale error."
+    : "Error bars on single comparisons and plates: 1σ from the measures only. The last row also includes the scale error (0.21″ at 1σ) shared by all four.";
+  drawPrincipe();
+}
+function drawPrincipe() {
+  const svg = $("ip-chart");
+  if (!isShown(svg)) return;
+  const r = RES.principe, P = D.principe, W = chartWidth(svg);
+  const rows = Object.keys(P.comparisons).map(c => ({key: c, label: compText(c), kind: "comp"}));
+  rows.push({key: "X", label: "plate X", kind: "plate"}, {key: "W", label: "plate W", kind: "plate"}, {key: "mean", label: "result", kind: "mean"});
+  const rowH = 34, m = {l: W < 460 ? 66 : 88, r: 14, t: 28, b: 40};
+  const gap = 12, H = m.t + rows.length * rowH + 2 * gap + m.b;
+  const vals = [GR_LIMB, NEWTON_LIMB, 0, 3, P.published.limb + P.published.pe / 0.6745];
+  if (r.ok) {
+    for (const v of Object.values(r.per)) vals.push(v.limb - v.limbErr, v.limb + v.limbErr);
+    vals.push(r.limb - r.limbErr, r.limb + r.limbErr);
+  }
+  const xLo = Math.max(-2, Math.floor(Math.min(...vals) * 2) / 2), xHi = Math.min(6, Math.ceil(Math.max(...vals) * 2) / 2);
+  const X = v => m.l + (v - xLo) / (xHi - xLo) * (W - m.l - m.r);
+  const rowY = i => m.t + i * rowH + rowH / 2 + (i >= 4 ? gap : 0) + (i >= 6 ? gap : 0);
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("width", W);
+  svg.setAttribute("height", H);
+  const title = svg.querySelector("title");
+  svg.replaceChildren(title);
+  const g = svgEl("g", {}, svg);
+  const xt = niceTicks(xLo, xHi, W < 460 ? 5 : 8);
+  for (const v of xt.ticks) {
+    svgEl("line", {x1: X(v), x2: X(v), y1: m.t, y2: H - m.b, class: "grid"}, g);
+    svgEl("text", {x: X(v), y: H - m.b + 15, "text-anchor": "middle"}, g, fmt(v, decimalsFor(xt.step)));
+  }
+  svgEl("line", {x1: m.l, x2: W - m.r, y1: H - m.b, y2: H - m.b, class: "axis"}, g);
+  svgEl("text", {x: (m.l + W - m.r) / 2, y: H - 6, "text-anchor": "middle", class: "ttl"}, g, "deflection at the Sun's limb (″)");
+  for (const yy of [rowY(4) - rowH / 2 - gap / 2, rowY(6) - rowH / 2 - gap / 2]) svgEl("line", {x1: 4, x2: W - m.r, y1: yy, y2: yy, class: "sep"}, g);
+  svgEl("line", {x1: X(GR_LIMB), x2: X(GR_LIMB), y1: m.t - 4, y2: H - m.b, class: "gr"}, g);
+  svgEl("line", {x1: X(NEWTON_LIMB), x2: X(NEWTON_LIMB), y1: m.t - 4, y2: H - m.b, class: "newton"}, g);
+  svgEl("text", {x: X(GR_LIMB) + 4, y: m.t - 10, "text-anchor": "start", class: "lab"}, g, `Einstein ${fmt(GR_LIMB, 2)}`);
+  svgEl("text", {x: X(NEWTON_LIMB) - 4, y: m.t - 10, "text-anchor": "end", class: "lab"}, g, `Newton ${NEWTON_LABEL}`);
+  const hits = [];
+  rows.forEach((row, i) => {
+    const y = rowY(i);
+    let v = null, pubv = null, pubErr = null;
+    if (row.kind === "comp") { v = r.ok ? r.per[row.key] : null; pubv = P.published.per_comparison[row.key]; }
+    else if (row.kind === "plate") { v = r.ok ? r.plates[row.key] : null; }
+    else { v = r.ok ? {limb: r.limb, limbErr: r.limbErr} : null; pubv = P.published.limb; pubErr = P.published.pe / 0.6745; }
+    svgEl("text", {x: m.l - 8, y: y + 4, "text-anchor": "end", class: v ? (row.kind === "mean" ? "lab-ink" : "lab") : ""}, g, row.label);
+    const tip = [[row.kind === "comp" ? `Comparison ${row.label}` : row.kind === "plate" ? `Eclipse ${row.label}, mean of its comparisons` : "The result", "strong"]];
+    if (pubv !== null) {
+      const py = y + 7;
+      if (pubErr) svgEl("line", {x1: X(pubv - pubErr), x2: X(pubv + pubErr), y1: py, y2: py, class: "pub-line"}, g);
+      svgEl("path", {d: `M${X(pubv)},${py - 5}L${X(pubv) + 5},${py}L${X(pubv)},${py + 5}L${X(pubv) - 5},${py}Z`, class: "pub"}, g);
+      tip.push([`1920: ${fmt(pubv, 2)}″${pubErr ? ` ± ${fmt(pubErr, 2)}″ (1σ)` : ""}`]);
+    }
+    if (v) {
+      const yy = y - 5;
+      svgEl("line", {x1: X(v.limb - v.limbErr), x2: X(v.limb + v.limbErr), y1: yy, y2: yy, class: "inst"}, g);
+      svgEl("rect", {x: X(v.limb) - 5, y: yy - 5, width: 10, height: 10, class: "inst-fill ring"}, g);
+      tip.splice(1, 0, [`your fit: ${fmt(v.limb, 2)} ± ${fmt(v.limbErr, 2)}″`]);
+      if (row.kind === "comp") tip.push([`rotation θ = ${fmt(r.per[row.key].theta, 1)} ± ${fmt(r.per[row.key].thetaErr, 1)} units`, "dim"]);
+    } else if (row.kind !== "mean") {
+      tip.push([row.kind === "comp" ? "left out of your fit" : "no comparison of this plate selected", "dim"]);
+      svgEl("text", {x: m.l + 6, y: y + 4, class: "lab"}, g, row.kind === "comp" ? "left out" : "");
+    }
+    hits.push({x: (m.l + W - m.r) / 2, band: W, y, rows: tip});
+  });
+  HITS["ip-chart"] = hits;
+}
+
+// ======================= Wallal 1922 =======================
+function wallalOptions() {
+  return {pairs: D.wallal.pairs.filter(p => ST.iw.pairs.has(p)), rmin: ST.iw.rmin, power: ST.iw.power, noScale: ST.iw.noScale};
+}
+function pairText(p) { return String(p).replace(/[-_]/g, "–"); }
+function updateWallal() {
+  if (!D.wallal) return;
+  const Wd = D.wallal, o = wallalOptions(), R = Wd.R_deg;
+  const r = fitWallal(o);
+  const stars = wallalStars(o, r);
+  RES.wallal = Object.assign({options: o, stars}, r);
+  // each pair alone, n = 1 (the 1928 Table 9 solutions), with the same distance cut and scale-term choice
+  RES.wallalPairs = Object.fromEntries(Wd.pairs.map(p => [p, fitWallal({pairs: [p], rmin: o.rmin, power: false, noScale: o.noScale})]));
+  showMsg($("iw-msg"), r.ok ? "" : r.why);
+  const cut = ST.iw.rmin > ST.iw.rminMin + 1e-9;
+  $("iw-rmin-out").textContent = cut ? `${fmt(ST.iw.rmin, 1)} R (${fmt(ST.iw.rmin * R, 2)}°)` : "no cut";
+  $("iw-rmin").setAttribute("aria-valuetext", cut ? `${fmt(ST.iw.rmin, 1)} solar radii` : "no cut");
+  const law = (o.power ? "D = β (R/r)ⁿ" : "D = β R/r") + (o.noScale ? "" : " − α r");
+  $("iw-sub").textContent = r.ok ? `${o.pairs.length} of ${Wd.pairs.length} plate pairs · ${r.nStars} stars, ${r.nMeasures} measures · ${law}`
+    : `${o.pairs.length} plate pairs · ${law}`;
+  $("iw-k").textContent = r.ok ? fmt(r.beta, 2) + SEC : "—";
+  $("iw-k-err").textContent = r.ok ? "± " + fmt(r.betaErr, 2) + SEC : "";
+  setData($("iw-k"), r.ok ? r.beta : NaN);
+  setData($("iw-k-err"), r.ok ? r.betaErr : NaN);
+  $("iw-ratio").textContent = r.ok ? `${fmt(r.beta / GR_LIMB, 2)} ± ${fmt(r.betaErr / GR_LIMB, 2)} times Einstein's prediction` : "";
+  verdicts($("iw-verdicts"), r.ok ? r.beta : NaN, r.ok ? r.betaErr : NaN, REFS);
+  const items = [];
+  if (r.ok) {
+    items.push(["power n", o.power ? `${fmt(r.n, 3)} ± ${fmt(r.nErr, 3)}` : "1 (fixed)", "iw-n", r.n]);
+    if (o.power) {
+      items.push(["its standard error", `± ${fmt(r.nErr, 4)}`, "iw-n-err", r.nErr]);
+      items.push(["correlation of β with n", fmt(r.corr, 2)]);
+    }
+    if (r.scale) {
+      const lo = Math.min(...r.alpha), hi = Math.max(...r.alpha);
+      items.push(["scale terms α of the plate pairs", r.alpha.length > 1 ? `${fmtS(lo, 3)} to ${fmtS(hi, 3)}″/°` : `${fmtS(lo, 4)}″/°`]);
+    } else {
+      items.push(["scale terms α", "left out"]);
+    }
+    items.push(["χ² / degrees of freedom", `${fmt(r.chi2, 1)} / ${r.dof}`, "iw-chi2", r.chi2]);
+    items.push(["error scaled up for the scatter", r.inflate > 1 ? `× ${fmt(r.inflate, 3)}` : "no (χ²/dof ≤ 1)"]);
+  }
+  kv($("iw-kv"), items);
+  const pub = Wd.published.per_pair || {};
+  let html = `<thead><tr><th>Plate pair alone (n = 1)</th><th>your fit</th><th>1928</th></tr></thead><tbody>`;
+  for (const p of Wd.pairs) {
+    const v = RES.wallalPairs[p], on = ST.iw.pairs.has(p);
+    html += `<tr class="${on ? "" : "out"}"><td>${pairText(p)}</td><td id="iw-p-${Wd.pairs.indexOf(p)}" data-value="${v.ok ? v.beta : ""}">` +
+      `${v.ok ? `${fmt(v.beta, 2)} ± ${fmt(v.betaErr, 2)}″` : "—"}</td><td>${pub[p] !== undefined ? fmt(pub[p], 2) + "″" : "—"}</td></tr>`;
+  }
+  $("iw-table-pairs").innerHTML = html + "</tbody>";
+  $("iw-leg-pts").textContent = o.noScale ? "one star: weighted mean of the selected pairs ± 1σ"
+    : "one star: weighted mean of the selected pairs, scale term added back, ± 1σ";
+  $("iw-caption").textContent = "Error bars: 1σ from each star's weights (weight 1 = 0.49″)" + (r.ok && r.inflate > 1 ? ", scaled up with the fit's error." : ".") +
+    (o.noScale ? " Scale terms left out: the points are the printed relative displacements." :
+      " The points have the plate-scale term α r added back, so that Einstein's law is the curve 1.75″ R/r.");
+  wallalTable();
+  drawWallal();
+}
+function wallalTable() {
+  const r = RES.wallal, s2 = r.ok ? r.inflate : 1;
+  let html = `<thead><tr><th>#</th><th>distance</th><th>in solar radii</th><th>printed mean D</th><th>D as plotted</th><th>± 1σ</th><th>weight</th><th>in your fit</th></tr></thead><tbody>`;
+  for (const p of r.stars) {
+    const mean = D.wallal.Dr_mean[p.i];
+    html += `<tr><td>${p.i + 1}</td><td>${fmt(p.rDeg, 2)}°</td><td>${fmt(p.r, 2)}</td><td>${mean === null ? "—" : fmtS(mean, 2) + "″"}</td>` +
+      `<td>${fmtS(p.y, 3)}″</td><td>${p.valid ? fmt(D.wallal.sigma_unit * s2 / Math.sqrt(p.w), 2) + "″" : "—"}</td><td>${fmt(p.w, 2)}</td>` +
+      `<td>${p.used ? "yes" : p.valid ? "cut" : "not measured"}</td></tr>`;
+  }
+  $("iw-table").innerHTML = html + "</tbody>";
+}
+function drawWallal() {
+  const svg = $("iw-chart");
+  if (!D.wallal || !isShown(svg)) return;
+  const r = RES.wallal, Wd = D.wallal, W = chartWidth(svg), H = Math.round(Math.max(300, Math.min(500, W * 0.62)));
+  const m = {l: 48, r: 14, t: 14, b: 42};
+  const pts = r.stars.filter(p => p.valid);
+  const inflate = r.ok ? r.inflate : 1;
+  // axes from every star of the table, so they stay put while plate pairs are switched
+  const rAll = Wd.r_deg.filter(v => v !== null && v > 0).map(v => v / Wd.R_deg);
+  const rMin = Math.min(...rAll), rMax = Math.max(...rAll);
+  const lxLo = Math.log10(rMin / 1.15), lxHi = Math.log10(rMax * 1.1);
+  const ys = (pts.length ? pts : r.stars).map(p => p.y).filter(Number.isFinite).sort((a, b) => a - b);
+  const q = f => (ys.length ? ys[Math.min(ys.length - 1, Math.max(0, Math.round(f * (ys.length - 1))))] : 0);
+  const yLo = Math.min(-0.3, Math.floor(q(0.01) * 4) / 4 - 0.25), yHi = Math.max(GR_LIMB / rMin + 0.3, Math.ceil(q(0.99) * 4) / 4 + 0.25);
+  const X = rr => m.l + (Math.log10(rr) - lxLo) / (lxHi - lxLo) * (W - m.l - m.r), Y = v => m.t + (yHi - v) / (yHi - yLo) * (H - m.t - m.b);
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("width", W);
+  svg.setAttribute("height", H);
+  const title = svg.querySelector("title");
+  svg.replaceChildren(title);
+  const defs = svgEl("defs", {}, svg), cp = svgEl("clipPath", {id: "iw-clip"}, defs);
+  svgEl("rect", {x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b}, cp);
+  const g = svgEl("g", {}, svg);
+  const cand = [1, 1.5, 2, 3, 4, 5, 7, 10, 15, 20, 30, 40, 50, 70, 100];
+  for (const v of cand.filter(v => Math.log10(v) >= lxLo && Math.log10(v) <= lxHi)) {
+    svgEl("line", {x1: X(v), x2: X(v), y1: m.t, y2: H - m.b, class: "grid"}, g);
+    svgEl("text", {x: X(v), y: H - m.b + 15, "text-anchor": "middle"}, g, String(v));
+  }
+  const yt = niceTicks(yLo, yHi, 6);
+  for (const v of yt.ticks) {
+    svgEl("line", {x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v), class: "grid"}, g);
+    svgEl("text", {x: m.l - 6, y: Y(v) + 4, "text-anchor": "end"}, g, fmt(v, decimalsFor(yt.step)));
+  }
+  svgEl("line", {x1: m.l, x2: W - m.r, y1: H - m.b, y2: H - m.b, class: "axis"}, g);
+  svgEl("line", {x1: m.l, x2: m.l, y1: m.t, y2: H - m.b, class: "axis"}, g);
+  svgEl("text", {x: (m.l + W - m.r) / 2, y: H - 6, "text-anchor": "middle", class: "ttl"}, g,
+    W < 520 ? "distance r (solar radii, log scale)" : "distance from the Sun's centre r (solar radii R = 0.2661°, log scale)");
+  const yc = (m.t + H - m.b) / 2;
+  svgEl("text", {x: 12, y: yc, "text-anchor": "middle", class: "ttl", transform: `rotate(-90 12 ${yc})`}, g, "radial displacement D (″)");
+  const plot = svgEl("g", {"clip-path": "url(#iw-clip)"}, svg);
+  svgEl("line", {x1: m.l, x2: W - m.r, y1: Y(0), y2: Y(0), class: "axis"}, plot);
+  if (ST.iw.rmin > ST.iw.rminMin + 1e-9) {
+    svgEl("rect", {x: m.l, y: m.t, width: Math.max(0, X(ST.iw.rmin) - m.l), height: H - m.t - m.b, class: "cutband"}, plot);
+  }
+  const curve = (k, n) => {
+    const out = [];
+    for (let i = 0; i <= 80; i++) { const rr = Math.pow(10, lxLo + (lxHi - lxLo) * i / 80); out.push(`${X(rr).toFixed(1)},${Y(k * Math.pow(rr, -n)).toFixed(1)}`); }
+    return out.join(" ");
+  };
+  svgEl("polyline", {points: curve(GR_LIMB, 1), class: "gr"}, plot);
+  svgEl("polyline", {points: curve(NEWTON_LIMB, 1), class: "newton"}, plot);
+  const hits = [];
+  for (const p of pts) {
+    const px = X(p.r), py = Y(p.y), e = Wd.sigma_unit * inflate / Math.sqrt(p.w);
+    svgEl("line", {x1: px, x2: px, y1: Y(p.y + e), y2: Y(p.y - e), class: "inst-err" + (p.used ? "" : " faded")}, plot);
+    svgEl("circle", {cx: px, cy: py, r: 3.3, class: p.used ? "inst-fill ring" : "open"}, plot);
+    hits.push({x: px, y: py, rows: [[`Star ${p.i + 1}: D = ${fmtS(p.y, 2)} ± ${fmt(e, 2)}″`, "strong"],
+      [`r = ${fmt(p.rDeg, 2)}° = ${fmt(p.r, 1)} R · weight ${fmt(p.w, 2)}`], [p.used ? "in your fit" : "left out (distance cut)", "dim"]]});
+  }
+  if (r.ok) svgEl("polyline", {points: curve(r.beta, r.n), class: "inst"}, plot);
+  HITS["iw-chart"] = hits;
+}
+
+// ---------- jackknife notes ----------
+// The 4-inch and astrographic fits with every plate selected, refitted with one plate (or star) left out at a time in
+// Python (D.*.jackknife). The write-up adopts the largest of these errors and the formal one; the result cards above
+// them always show the formal error of your selection.
+function jackknifeNotes() {
+  const pm = v => `±\u00a0${fmt(v, 2)}${SEC}`;           // no line break after ±
+  const away = (limb, err) => [[`Einstein's ${fmt(GR_LIMB, 2)}${SEC}`, GR_LIMB], [`the Newtonian ${NEWTON_LABEL}${SEC}`, NEWTON_LIMB]]
+    .map(([name, v]) => { const z = (limb - v) / err; return `${fmt(Math.abs(z), 1)}σ ${z >= 0 ? "above" : "below"} ${name}`; }).join(" and ");
+  const j4 = D.inch4.jackknife, r4 = D.inch4.reference.both;
+  if (j4 && r4) {
+    const limb = r4.alpha50 * TO_LIMB, formal = r4.alpha50_err * TO_LIMB;
+    const jp = j4.alpha50_err_plates * TO_LIMB, js = j4.alpha50_err_stars * TO_LIMB, err = Math.max(formal, jp, js);
+    $("i4-jk").textContent = `All plates and stars: ${fmt(limb, 2)}${SEC}\u00a0${pm(formal)}, the formal error. A jackknife ` +
+      `(refitting with one plate left out at a time) gives ${pm(jp)}, one star at a time ${pm(js)}. The project's ` +
+      `write-up adopts the largest of these errors: the deflection is then ${away(limb, err)}.`;
+    $("i4-jk").hidden = false;
+  }
+  const ja = D.astro.jackknife, ra = D.astro.reference.common;
+  if (ja && ra) {
+    const limb = ra.alpha50 * TO_LIMB, formal = ra.alpha50_err * TO_LIMB, jp = ja.alpha50_err_plates * TO_LIMB;
+    const err = Math.max(formal, jp);
+    $("ia-jk").textContent = `One e for all ${D.astro.plates.length} plates: ${fmt(limb, 2)}${SEC}\u00a0${pm(formal)}, the formal ` +
+      `error. A jackknife (refitting with one plate left out at a time) gives ${pm(jp)}. The project's write-up adopts ` +
+      `the larger: the deflection is then ${away(limb, err)}.`;
+    $("ia-jk").hidden = false;
+  }
+}
+
+// ---------- controls ----------
+function buildControls() {
+  // tabs
+  const order = ["inch4", "astro", "principe", "wallal"];
+  order.forEach(t => $("tab-" + t).addEventListener("click", () => selectTab(t)));
+  document.querySelector(".tabs").addEventListener("keydown", ev => {
+    const i = order.indexOf(ST.tab);
+    let j = null;
+    if (ev.key === "ArrowRight") j = (i + 1) % order.length;
+    else if (ev.key === "ArrowLeft") j = (i + order.length - 1) % order.length;
+    else if (ev.key === "Home") j = 0;
+    else if (ev.key === "End") j = order.length - 1;
+    if (j === null) return;
+    ev.preventDefault();
+    selectTab(order[j]);
+    $("tab-" + order[j]).focus();
+  });
+  // 4-inch
+  const I = D.inch4;
+  const sync4 = segment("i4-coords", () => ST.i4.coords, v => { ST.i4.coords = v; sync4(); updateInch4(); });
+  checkboxes($("i4-ecl"), "i4-plate-", I.eclipse.map(p => [p, p]), ST.i4.plates, updateInch4);
+  checkboxes($("i4-cmp"), "i4-plate-", I.plates.filter(p => !I.eclipse.includes(p)).map(p => [p, plateHTML(p)]), ST.i4.plates, updateInch4);
+  checkboxes($("i4-stars"), "i4-star-", I.stars.map(s => [s, String(s), starName(s)]), ST.i4.stars, updateInch4);
+  $("i4-printed").addEventListener("change", ev => { ST.i4.printed = ev.target.checked; updateInch4(); });
+  $("i4-reset").addEventListener("click", () => {
+    Object.assign(ST.i4, {coords: "both", plates: new Set(I.plates), stars: new Set(I.stars), printed: false});
+    checkboxes($("i4-ecl"), "i4-plate-", I.eclipse.map(p => [p, p]), ST.i4.plates, updateInch4);
+    checkboxes($("i4-cmp"), "i4-plate-", I.plates.filter(p => !I.eclipse.includes(p)).map(p => [p, plateHTML(p)]), ST.i4.plates, updateInch4);
+    checkboxes($("i4-stars"), "i4-star-", I.stars.map(s => [s, String(s), starName(s)]), ST.i4.stars, updateInch4);
+    $("i4-printed").checked = false;
+    sync4();
+    updateInch4();
+  });
+  sync4();
+  // astrographic
+  const A = D.astro;
+  const syncA = segment("ia-mode", () => ST.ia.mode, v => { ST.ia.mode = v; syncA(); updateAstro(); });
+  checkboxes($("ia-plates"), "ia-plate-", A.plates.map(p => [p, p]), ST.ia.plates, updateAstro);
+  const eIn = $("ia-e");
+  eIn.addEventListener("input", () => {
+    ST.ia.e = Math.round(parseFloat(eIn.value) * 1000) / 1000;
+    ST.ia.mode = "fixed";
+    syncA();
+    updateAstro();
+  });
+  document.querySelectorAll("#panel-astro .ticks button").forEach(b => b.addEventListener("click", () => {
+    ST.ia.e = parseFloat(b.dataset.e);
+    eIn.value = b.dataset.e;
+    ST.ia.mode = "fixed";
+    syncA();
+    updateAstro();
+  }));
+  $("ia-reset").addEventListener("click", () => {
+    Object.assign(ST.ia, {mode: "common", e: 0.082, plates: new Set(A.plates)});
+    eIn.value = "0.082";
+    checkboxes($("ia-plates"), "ia-plate-", A.plates.map(p => [p, p]), ST.ia.plates, updateAstro);
+    syncA();
+    updateAstro();
+  });
+  syncA();
+  // Principe
+  const comps = Object.keys(D.principe.comparisons);
+  const syncP = segment("ip-scale", () => (ST.ip.free ? "free" : "check"), v => { ST.ip.free = v === "free"; syncP(); updatePrincipe(); });
+  checkboxes($("ip-comps"), "ip-comp-", comps.map(c => [c, compHTML(c)]), ST.ip.comps, updatePrincipe);
+  $("ip-reset").addEventListener("click", () => {
+    Object.assign(ST.ip, {comps: new Set(comps), free: false});
+    checkboxes($("ip-comps"), "ip-comp-", comps.map(c => [c, compHTML(c)]), ST.ip.comps, updatePrincipe);
+    syncP();
+    updatePrincipe();
+  });
+  syncP();
+  // Wallal
+  if (D.wallal) {
+    $("iw-empty").hidden = true;
+    $("iw-live").hidden = false;
+    const Wd = D.wallal, rs = Wd.r_deg.filter(v => v !== null && v > 0).map(v => v / Wd.R_deg).sort((a, b) => a - b);
+    const lo = Math.max(0, Math.floor(rs[0] * 10) - 1) / 10;                     // just below the nearest star: no cut
+    const hi = Math.max(Math.round(lo * 10) + 5, Math.floor(rs[Math.max(0, rs.length - 10)] * 10)) / 10;   // keeps >= 10 stars
+    ST.iw = {pairs: new Set(Wd.pairs), rmin: lo, rminMin: lo, power: false, noScale: false};
+    const rIn = $("iw-rmin");
+    rIn.min = String(lo);
+    rIn.max = String(hi);
+    rIn.value = String(lo);
+    const pairItems = Wd.pairs.map((p, i) => [p, pairText(p), undefined, String(i)]);
+    const buildPairs = () => checkboxes($("iw-pairs"), "iw-pair-", pairItems, ST.iw.pairs, updateWallal);
+    $("fn-wallal").textContent = "; Campbell & Trumpler 1928, Lick Obs. Bull. 13, 130 (Table 6), likewise";
+    buildPairs();
+    rIn.addEventListener("input", () => { ST.iw.rmin = Math.round(parseFloat(rIn.value) * 10) / 10; updateWallal(); });
+    $("iw-power").addEventListener("change", ev => { ST.iw.power = ev.target.checked; updateWallal(); });
+    $("iw-noscale").addEventListener("change", ev => { ST.iw.noScale = ev.target.checked; updateWallal(); });
+    $("iw-reset").addEventListener("click", () => {
+      Object.assign(ST.iw, {pairs: new Set(Wd.pairs), rmin: lo, power: false, noScale: false});
+      rIn.value = String(lo);
+      $("iw-power").checked = false;
+      $("iw-noscale").checked = false;
+      buildPairs();
+      updateWallal();
+    });
+  }
+  // theme buttons (standalone page only)
+  document.querySelectorAll("[data-theme-set]").forEach(b => b.addEventListener("click", () => {
+    const root = document.documentElement, want = b.dataset.themeSet;
+    const on = root.getAttribute("data-theme") === want;
+    if (on) root.removeAttribute("data-theme"); else root.setAttribute("data-theme", want);
+    document.querySelectorAll("[data-theme-set]").forEach(x => x.setAttribute("aria-pressed", String(!on && x === b)));
+  }));
+  ["i4-chart", "ia-chart", "ip-chart", "iw-chart"].forEach(attachHover);
+}
+function selectTab(name) {
+  ST.tab = name;
+  for (const t of ["inch4", "astro", "principe", "wallal"]) {
+    const on = t === name, b = $("tab-" + t);
+    b.setAttribute("aria-selected", String(on));
+    b.tabIndex = on ? 0 : -1;
+    $("panel-" + t).hidden = !on;
+  }
+  document.querySelectorAll(".tooltip").forEach(t => { t.hidden = true; });
+  drawActive();
+}
+function drawActive() {
+  ({inch4: drawInch4, astro: drawAstro, principe: drawPrincipe, wallal: drawWallal})[ST.tab]();
+}
+let resizeTimer = null;
+window.addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(drawActive, 60); });
+
+buildControls();
+updateInch4();
+updateAstro();
+updatePrincipe();
+updateWallal();
+jackknifeNotes();
+const hashTab = {"#inch4": "inch4", "#sobral-4-inch": "inch4", "#astro": "astro", "#astrographic": "astro", "#principe": "principe", "#wallal": "wallal"}[location.hash];
+if (hashTab) selectTab(hashTab);
+window.__plateLab.ready = true;
+</script>

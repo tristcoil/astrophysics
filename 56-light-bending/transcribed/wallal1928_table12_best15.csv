@@ -1,0 +1,26 @@
+# Campbell, W. W. & Trumpler, R. J. 1928, Lick Observatory Bulletin 13, 130-160 (No. 397), "Observations made with a pair of five-foot cameras on the light-deflections in the Sun's gravitational field at the total solar eclipse of September 21, 1922" (ADS 1928LicOB..13..130C; printed page p = PDF page p-129).
+# Table 12, "Observed displacements of the 15 best measured stars (Mean of the two instruments)", printed p.155 (PDF 26):
+#   "All stars of weight 4.6 or more within 2deg5 from the Sun's center" (p.154).
+# n15: 1923 Table II number; n5: 1928 Table 4 number. Dx_obs, Dy_obs: "Observed displacement" (arcsec, relative to the
+#   5-foot reference stars, the two instruments combined as in Table 10); Dx_theory, Dy_theory: "Einstein Theory - scale
+#   corr." (the theory minus 0".009 per degree, along the radius vector); Dx_omt, Dy_omt: "Observation - Theory".
+# Checks: omt = obs - theory exactly (30 of 30); theory = (1".75 R/r - 0".009 r) x/r, y/r to <= 0.011" (Table 4 x, y and
+#   Table 6 distances; <= 0.006" with the 1923 coordinates); obs = combination of 1923 Table II (Ax, Ay with +0".060 per
+#   degree radial scale correction, weight w15) and 1928 Table 4 means (weight w5/3) to <= 0.0074".
+# Transcribed by hand from the 600-dpi page images embedded in the ADS scan, checked against the paper's own arithmetic and an independent per-cell OCR; see wallal1928_notes.md.
+n15,n5,Dx_obs,Dy_obs,Dx_theory,Dy_theory,Dx_omt,Dy_omt,page
+63,74,+0.25,+0.65,+0.30,+0.78,-0.05,-0.13,155
+78,83,+0.43,+0.16,+0.45,+0.14,-0.02,+0.02,155
+81,85,+0.41,-0.01,+0.40,-0.02,+0.01,+0.01,155
+59,71,+0.18,-0.41,+0.03,-0.39,+0.15,-0.02,155
+36,58,-0.14,+0.32,-0.18,+0.22,+0.04,+0.10,155
+51,68,-0.03,-0.23,-0.02,-0.27,-0.01,+0.04,155
+25,50,-0.25,-0.06,-0.22,-0.14,-0.03,+0.08,155
+86,89,+0.19,+0.06,+0.18,+0.18,+0.01,-0.12,155
+64,75,+0.12,+0.30,+0.03,+0.25,+0.09,+0.05,155
+102,100,+0.25,-0.01,+0.22,-0.06,+0.03,+0.05,155
+99,97,+0.23,0.00,+0.19,-0.11,+0.04,+0.11,155
+58,69,+0.22,-0.20,+0.01,-0.21,+0.21,+0.01,155
+28,53,-0.15,+0.11,-0.12,+0.17,-0.03,-0.06,155
+68,76,+0.11,-0.19,+0.04,-0.20,+0.07,+0.01,155
+105,103,+0.25,-0.06,+0.20,-0.05,+0.05,-0.01,155

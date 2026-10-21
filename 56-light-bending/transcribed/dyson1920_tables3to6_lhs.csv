@@ -1,0 +1,59 @@
+# Dyson, Eddington & Davidson 1920, Tables III-VI (pp.304-305): the printed left-hand-side coefficients of the
+#   normal equations and of the successive reduced equations (printed once per table, shared by all plates).
+# Source: Dyson, F. W., Eddington, A. S. & Davidson, C. 1920, Phil. Trans. R. Soc. A 220, 291-333, "A Determination of the Deflection of Light by the Sun's Gravitational Field, from Observations made at the Total Eclipse of May 29, 1919". Scan: archive.org item philtrans06337895, leaves 13-14 (full resolution 06337895_0013.jp2, 06337895_0014.jp2).
+# row: 1-10, the same numbering as rhs1..rhs10 in dyson1920_tables3to6_normal_equations.csv.
+# block: 1 = normal equations (rows 1-4), 2 = after eliminating the 1st unknown (rows 5-7), 3 = after
+#   eliminating the 2nd (rows 8-9), 4 = the final equation in alpha (row 10).
+# unknowns: the order of the four unknowns; coef1..coef4 multiply them in that order
+#   (III, IV: c, b, a, alpha;  V, VI: f, d, e, alpha).
+# Only the upper triangle of each symmetric block is printed; empty cell = nothing printed. Only the first row of
+#   each block carries the unknown symbols on the page (e.g. "+7.000c +1.657b +1.787a +0.226alpha").
+# Values exactly as printed. Discrepancies, kept as printed (details in dyson1920_sobral4inch_notes.md):
+#   row 6 coef3 is printed +3.683 in Tables III and IV where 4.094 - 1.787^2/7 = 3.638 and the later rows
+#     (2.988 = 3.638 - 1.666^2/4.271) use 3.638, the value printed as "+3.638d" in Tables V and VI: misprint.
+#   row 3 coef4 is +2.534 in Table III but +2.535 in Table IV (sum x Ex from p.304 = 2.5344).
+#   sum x^2 is printed 4.094 (III/IV row 3 coef3, V/VI row 2 coef2) but the p.304 x values give 4.0968; the
+#     later rows follow 4.094 (1920 arithmetic). Other printed sums differ from the p.304 values by <= 0.002:
+#     sum y Ex 0.335 (0.3343), sum y Ey 3.694 (3.6920), sum x Ey 1.840 (1.8392); the Decl. reduction carries
+#     these to row 10 = 2.224 (2.2286 from the p.304 coefficients).
+table,row,block,unknowns,coef1,coef2,coef3,coef4
+III,1,1,c b a alpha,+7.000,+1.657,+1.787,+0.226
+III,2,1,c b a alpha,,+4.664,+2.089,+0.335
+III,3,1,c b a alpha,,,+4.094,+2.534
+III,4,1,c b a alpha,,,,+3.142
+III,5,2,c b a alpha,,+4.271,+1.666,+0.281
+III,6,2,c b a alpha,,,+3.683,+2.476
+III,7,2,c b a alpha,,,,+3.135
+III,8,3,c b a alpha,,,+2.988,+2.366
+III,9,3,c b a alpha,,,,+3.116
+III,10,4,c b a alpha,,,,+1.242
+IV,1,1,c b a alpha,+7.000,+1.657,+1.787,+0.226
+IV,2,1,c b a alpha,,+4.664,+2.089,+0.335
+IV,3,1,c b a alpha,,,+4.094,+2.535
+IV,4,1,c b a alpha,,,,+3.142
+IV,5,2,c b a alpha,,+4.271,+1.666,+0.281
+IV,6,2,c b a alpha,,,+3.683,+2.476
+IV,7,2,c b a alpha,,,,+3.135
+IV,8,3,c b a alpha,,,+2.988,+2.366
+IV,9,3,c b a alpha,,,,+3.116
+IV,10,4,c b a alpha,,,,+1.242
+V,1,1,f d e alpha,+7.000,+1.787,+1.657,+3.316
+V,2,1,f d e alpha,,+4.094,+2.089,+1.840
+V,3,1,f d e alpha,,,+4.664,+3.694
+V,4,1,f d e alpha,,,,+5.784
+V,5,2,f d e alpha,,+3.638,+1.666,+0.994
+V,6,2,f d e alpha,,,+4.271,+2.908
+V,7,2,f d e alpha,,,,+4.212
+V,8,3,f d e alpha,,,+3.508,+2.453
+V,9,3,f d e alpha,,,,+3.941
+V,10,4,f d e alpha,,,,+2.224
+VI,1,1,f d e alpha,+7.000,+1.787,+1.657,+3.316
+VI,2,1,f d e alpha,,+4.094,+2.089,+1.840
+VI,3,1,f d e alpha,,,+4.664,+3.694
+VI,4,1,f d e alpha,,,,+5.784
+VI,5,2,f d e alpha,,+3.638,+1.666,+0.994
+VI,6,2,f d e alpha,,,+4.271,+2.908
+VI,7,2,f d e alpha,,,,+4.212
+VI,8,3,f d e alpha,,,+3.508,+2.453
+VI,9,3,f d e alpha,,,,+3.941
+VI,10,4,f d e alpha,,,,+2.224
