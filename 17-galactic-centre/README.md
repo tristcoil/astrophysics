@@ -388,7 +388,7 @@ reproduced.
 ## Reproduce
 
 ```bash
-cd ~/Desktop/astrophysics/17-galactic-centre
+cd astrophysics/17-galactic-centre
 ../.venv/bin/python fetch_data.py     # ~18 MB, once
 ../.venv/bin/python run.py            # every fit, number, figure and the explorer
 ../.venv/bin/python test_physics.py   # 18 self-checks

@@ -1,0 +1,50 @@
+# Dyson, Eddington & Davidson 1920, Table VII, printed page 306 (section 21: "The values of alpha are collected in Table VII :-").
+# Source: Dyson, F. W., Eddington, A. S. & Davidson, C. 1920, Phil. Trans. R. Soc. A 220, 291-333, "A Determination of the Deflection of Light by the Sun's Gravitational Field, from Observations made at the Total Eclipse of May 29, 1919".
+# Scan: archive.org item philtrans06337895, leaf 15 (pages/leaf015.jpg); every digit read on the full-resolution 06337895_0015.jp2.
+# Content: Sobral 4-inch lens. alpha = coefficient of the gravitational displacement, i.e. the deflection at 50' from the
+#   sun's centre (unit distance of the Table I co-ordinates), solved plate by plate from the normal equations of Tables
+#   III-VI (pp.304-305); each plate was measured against the scale plate 18_1 (pp.301-302), hence "- Scale".
+# Printed heads: "Right Ascension." {"Eclipse - Scale." "Comparison - Scale."}  "Declination." {"Eclipse - Scale."
+#   "Comparison - Scale."}; unit "r" (micrometer revolutions; 1 r = 6.25 arcsec, p.302) over each column; last row "Mean".
+# The table prints NO plate labels. eclipse_plate / comparison_plate are added here: row i of the two Eclipse columns is
+#   eclipse plate I II III IV V VII VIII and row i of the two Comparison columns is plate 14_2a 14_2b 15_1 15_2 17_1 17_2 18_2,
+#   because all 28 values equal the printed alpha solutions of Tables III-VI in that order
+#   (dyson1920_tables3to6_normal_equations.csv). The eclipse and comparison plate on one row are not otherwise paired.
+# Columns: row (1-7, or Mean), eclipse_plate, comparison_plate (empty on the Mean row), ra_eclipse_minus_scale_rev,
+#   ra_comparison_minus_scale_rev, dec_eclipse_minus_scale_rev, dec_comparison_minus_scale_rev (as printed: sign, 3 decimals).
+# Text results, pp.306-307, quoted exactly (old typesetting written plainly: 0r.105 = 0.105 revolutions, 1".98 = 1.98 arcsec,
+#   15'.8 = 15.8 arcmin):
+#   p.306: "By subtracting the alpha of the comparison plates the scale plate is eliminated, and we derive from right
+#     ascensions alpha = +0r.105 and from declinations alpha = +0r.098."
+#   p.306: "Reference to the normal equations shows that the declination result is of double the weight of that from the
+#     right ascensions."
+#   p.306: "Thus  alpha = +0r.100 = +0".625."
+#   p.306: "This is at a distance 50' from the sun's centre. At the time of the eclipse the sun's radius was 15'.8; thus the
+#     deflection at the limb is 1".98."
+#   p.306: "The range in the values of alpha is attributable to the errors inherent to the star images of the different
+#     plates, and cannot be reduced by further measurement. The mean values +0r.015 and 0r.031 arise from the errors in the
+#     intermediary scale plate." ("0r.031" is printed without a sign.)
+#   p.306: "22. The probable error of the result judging from the accordance of the separate determinations is about 6 per
+#     cent. It is desirable to consider carefully the possibility of systematic error. The eclipse and comparison
+#     photographs were taken under precisely similar instrumental conditions, but there is the difference that the eclipse
+#     photographs were taken on the day of May 29, and the comparison photographs on nights between July 14 and July 18."
+#   p.306 (last paragraph; the tables follow on p.307): "The satisfactory accordance of the eclipse and comparison
+#     plates is shown by a study of the plate constants. The following corrections for differential refraction and
+#     aberration are calculated from the times and dates of exposure." (-> dyson1920_p307_refraction_aberration.csv,
+#     dyson1920_p307_scale_orientation.csv)
+# The same result restated in section 39 (pp.330-331), quoted for reference: "These plates gave / From declinations . . .
+#   1".94 / From right ascensions . . . 2".06" and "The result from declinations is about twice the weight of that from right
+#   ascensions, so that the mean result is 1".98 with a probable error of about +-0".12."
+#   NOTE: with the paper's own factors (6".25 per r; 50'/15'.8) 0r.098 gives 1".94 but 0r.105 gives 2".08, not 2".06;
+#   kept as printed (dyson1920_sobral4inch_results_notes.md, R5).
+# Checks (notes file): the Mean row reproduces the column means (max dev 0.0004 r); 0.120 - 0.015 = 0.105;
+#   0.129 - 0.031 = 0.098; (0.105 + 2 x 0.098)/3 = 0.1003; 0.100 r x 6.25 = 0.625"; 0.625" x 50/15.8 = 1.978" -> 1".98.
+row,eclipse_plate,comparison_plate,ra_eclipse_minus_scale_rev,ra_comparison_minus_scale_rev,dec_eclipse_minus_scale_rev,dec_comparison_minus_scale_rev
+1,I,14_2a,+0.098,+0.042,+0.126,+0.044
+2,II,14_2b,+0.126,+0.024,+0.139,+0.007
+3,III,15_1,+0.107,-0.015,+0.114,+0.021
+4,IV,15_2,+0.148,+0.018,+0.111,+0.010
+5,V,17_1,+0.140,+0.020,+0.137,+0.040
+6,VII,17_2,+0.073,+0.005,+0.139,+0.060
+7,VIII,18_2,+0.145,+0.008,+0.136,+0.036
+Mean,,,+0.120,+0.015,+0.129,+0.031

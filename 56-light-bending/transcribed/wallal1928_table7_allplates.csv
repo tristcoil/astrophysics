@@ -1,0 +1,21 @@
+# Campbell, W. W. & Trumpler, R. J. 1928, Lick Observatory Bulletin 13, 130-160 (No. 397), "Observations made with a pair of five-foot cameras on the light-deflections in the Sun's gravitational field at the total solar eclipse of September 21, 1922" (ADS 1928LicOB..13..130C; printed page p = PDF page p-129).
+# Table 7 (Continued), "Mean of all plates", printed p.150 (PDF 21). "(All radial displacements are relative to the
+#   reference stars.)"
+# dist_deg: "Dist. f. center" (deg); Dr: "Radial displ." (arcsec); pe: "P. e." (probable error, arcsec; printed +-".12);
+#   weight; n_stars: "Stars"; einstein_rel: "Einstein -''009r" = 1".75 R/r - 0".009 r with R = 0.2661 deg, r in deg
+#   (pp.150, 154); obs_minus_theory: "Observ. -Theory" (arcsec).
+# Checks: n_stars and weight reproduce Table 6 exactly (groups of 5, 6, 9, 25, 20, 19, 19, 20, 22 stars); Dr = weighted
+#   mean of the Table 6 plate values to <= 0.0043" (of the star means to <= 0.006"); obs_minus_theory = Dr - einstein_rel
+#   exactly; einstein_rel = formula at
+#   dist_deg to <= 0.006" (group 4: +.20 printed, +0.194 at 2.18 deg).
+# Transcribed by hand from the 600-dpi page images embedded in the ADS scan, checked against the paper's own arithmetic and an independent per-cell OCR; see wallal1928_notes.md.
+group,dist_deg,Dr,pe,weight,n_stars,einstein_rel,obs_minus_theory,page
+1,0.65,+0.46,0.12,7.2,5,+0.71,-0.25,150
+2,1.13,+0.36,0.07,21.7,6,+0.40,-0.04,150
+3,1.65,+0.40,0.06,34.85,9,+0.27,+0.13,150
+4,2.18,+0.25,0.03,112.8,25,+0.20,+0.05,150
+5,3.08,+0.14,0.03,110.8,20,+0.12,+0.02,150
+6,4.03,+0.08,0.03,104.3,19,+0.08,0.00,150
+7,5.33,+0.03,0.03,103.15,19,+0.04,-0.01,150
+8,6.56,-0.03,0.03,103.6,20,+0.01,-0.04,150
+9,8.29,-0.01,0.04,86.35,22,-0.02,+0.01,150

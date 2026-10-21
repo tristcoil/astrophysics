@@ -1,0 +1,27 @@
+# Dyson, Eddington & Davidson 1920, Table II (printed page 303): the numbers printed BELOW the line in each
+#   Dx and Dy column (one pair per plate).
+# Source: Dyson, F. W., Eddington, A. S. & Davidson, C. 1920, Phil. Trans. R. Soc. A 220, 291-333, "A Determination of the Deflection of Light by the Sun's Gravitational Field, from Observations made at the Total Eclipse of May 29, 1919". Scan: archive.org item philtrans06337895, leaf 12 (full resolution 06337895_0012.jp2).
+# Footnote (quoted exactly; the minus signs are printed as long dashes): "* The numbers -1.500, -0.554, &c.,
+#   given below the line, were taken out to make the values of Dx, Dy small and positive for arithmetical
+#   convenience."
+# The asterisk is printed on the first offset of each half of the table (plate I Dx "-1.500*" and plate 14_2a Dx
+#   "-0.552*"); it is the footnote reference, not a flag on that number.
+# Units: micrometer revolutions (1 rev = 6.25 arcsec). Convention confirmed from the numbers: value used in the
+#   normal equations = Dx - Dx_offset (resp. Dy - Dy_offset), which is >= 0 for every star except plate VIII Dy
+#   star 5 (see note) and reproduces Tables III-VI (dyson1920_sobral4inch_notes.md).
+# Columns: plate, Dx_offset, Dy_offset (as printed, explicit signs, asterisk removed), note.
+plate,Dx_offset,Dy_offset,note
+I,-1.500,-0.554,Dx offset printed with an asterisk (-1.500*) = the footnote reference mark
+II,-1.500,-1.324,
+III,+0.500,+0.843,
+IV,+0.500,+1.226,
+V,+0.400,+0.861,
+VII,-1.500,+0.777,
+VIII,-1.300,-1.322,Dy offset printed -1.322 but the column minimum (star 5) is -1.332 and Table V rhs1-rhs4 of plate VIII were computed with -1.332 (rhs1 1.906 = 1.836 + 7 x 0.010); with -1.322 star 5 would be negative (-0.010) contrary to the footnote: probable misprint of the offset; printed value kept
+14_2a,-0.552,-0.206,Dx offset printed with an asterisk (-0.552*) = the footnote reference mark
+14_2b,+0.967,+1.170,
+15_1,+0.899,+0.960,
+15_2,+0.690,+0.824,
+17_1,-1.424,-1.330,
+17_2,+1.161,-0.423,
+18_2,-1.195,-1.572,

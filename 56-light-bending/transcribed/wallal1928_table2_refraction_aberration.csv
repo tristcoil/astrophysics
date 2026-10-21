@@ -1,0 +1,307 @@
+# Campbell, W. W. & Trumpler, R. J. 1928, Lick Observatory Bulletin 13, 130-160 (No. 397), "Observations made with a pair of five-foot cameras on the light-deflections in the Sun's gravitational field at the total solar eclipse of September 21, 1922" (ADS 1928LicOB..13..130C; printed page p = PDF page p-129).
+# Table 2, "Corrections for differential refraction" (p.134, PDF 5) and "(Continued) Corrections for differential
+#   aberration" plus "Inclination correction due to difference in plate center" (p.135, PDF 6). Long format, one printed number per row.
+# Refraction:  R_x = b_r x + c_r y + d_r x^2 + e_r xy + f_r y^2 + g_r x^3 + h_r x^2y + i_r xy^2 + k_r y^3, R_y the same with
+#   primed coefficients (coef b..k = x-coordinate, b'..k' = y-coordinate).
+# Aberration:  A_x = b_a x + c_a y + d_a x^2 + e_a xy + f_a y^2 + g_a x^3 + i_a xy^2,  A_y = b'_a x + c'_a y + d'_a x^2 + e'_a xy
+#   + f'_a y^2 + h'_a x^2y + k'_a y^3 (as printed; no g_a or h'_a row is printed in the table).
+# x, y in units of 200 mm = 27084" (p.132); coefficients in arcsec (printed 9".48 -> 9.48). plates/field = printed column
+#   headings (Ecl. F. = eclipse field, Check F. = check field).
+# Inclination: I_x = d_i x^2 + e_i xy, I_y = e'_i xy + f'_i y^2, "to be applied to check field measures"; "p and q are the
+#   coordinates of the check field center of the Tahiti plate, measured from that of the Wallal plate, when both plates are so
+#   adjusted that the centers of the eclipse field photographs coincide" (p, q in arcsec; printed +18", - 8").
+# Note: i_a of "M7 and N9, Check F." is printed -.01 although i_a = k'_a (+.01) in every other column; see wallal1928_notes.md.
+# Transcribed by hand from the 600-dpi page images embedded in the ADS scan, checked against the paper's own arithmetic and an independent per-cell OCR; see wallal1928_notes.md.
+block,coef,plates,field,value,page
+refraction,b,M7 and N9,eclipse,+9.48,134
+refraction,b,M7 and N9,check,+9.48,134
+refraction,b,M9 and N11,eclipse,+9.42,134
+refraction,b,M9 and N11,check,+9.58,134
+refraction,b,"M11, N13",eclipse,+9.49,134
+refraction,b,M15 and N18,eclipse,+8.92,134
+refraction,b,M15 and N18,check,+9.03,134
+refraction,b,M17 and N20,eclipse,+9.07,134
+refraction,b,M17 and N20,check,+9.20,134
+refraction,b,"M16, N19",eclipse,+9.00,134
+refraction,c,M7 and N9,eclipse,-1.50,134
+refraction,c,M7 and N9,check,-1.51,134
+refraction,c,M9 and N11,eclipse,-1.50,134
+refraction,c,M9 and N11,check,-1.57,134
+refraction,c,"M11, N13",eclipse,-1.53,134
+refraction,c,M15 and N18,eclipse,-1.46,134
+refraction,c,M15 and N18,check,-1.47,134
+refraction,c,M17 and N20,eclipse,-1.54,134
+refraction,c,M17 and N20,check,-1.55,134
+refraction,c,"M16, N19",eclipse,-1.50,134
+refraction,d,M7 and N9,eclipse,-0.63,134
+refraction,d,M7 and N9,check,-0.64,134
+refraction,d,M9 and N11,eclipse,-0.63,134
+refraction,d,M9 and N11,check,-0.67,134
+refraction,d,"M11, N13",eclipse,-0.65,134
+refraction,d,M15 and N18,eclipse,-0.53,134
+refraction,d,M15 and N18,check,-0.54,134
+refraction,d,M17 and N20,eclipse,-0.57,134
+refraction,d,M17 and N20,check,-0.58,134
+refraction,d,"M16, N19",eclipse,-0.55,134
+refraction,e,M7 and N9,eclipse,+0.19,134
+refraction,e,M7 and N9,check,+0.19,134
+refraction,e,M9 and N11,eclipse,+0.19,134
+refraction,e,M9 and N11,check,+0.21,134
+refraction,e,"M11, N13",eclipse,+0.20,134
+refraction,e,M15 and N18,eclipse,+0.17,134
+refraction,e,M15 and N18,check,+0.17,134
+refraction,e,M17 and N20,eclipse,+0.18,134
+refraction,e,M17 and N20,check,+0.18,134
+refraction,e,"M16, N19",eclipse,+0.18,134
+refraction,f,M7 and N9,eclipse,-0.58,134
+refraction,f,M7 and N9,check,-0.58,134
+refraction,f,M9 and N11,eclipse,-0.57,134
+refraction,f,M9 and N11,check,-0.58,134
+refraction,f,"M11, N13",eclipse,-0.58,134
+refraction,f,M15 and N18,eclipse,-0.52,134
+refraction,f,M15 and N18,check,-0.52,134
+refraction,f,M17 and N20,eclipse,-0.54,134
+refraction,f,M17 and N20,check,-0.55,134
+refraction,f,"M16, N19",eclipse,-0.53,134
+refraction,g,M7 and N9,eclipse,+0.21,134
+refraction,g,M7 and N9,check,+0.21,134
+refraction,g,M9 and N11,eclipse,+0.20,134
+refraction,g,M9 and N11,check,+0.21,134
+refraction,g,"M11, N13",eclipse,+0.21,134
+refraction,g,M15 and N18,eclipse,+0.19,134
+refraction,g,M15 and N18,check,+0.19,134
+refraction,g,M17 and N20,eclipse,+0.19,134
+refraction,g,M17 and N20,check,+0.19,134
+refraction,g,"M16, N19",eclipse,+0.19,134
+refraction,h,M7 and N9,eclipse,-0.09,134
+refraction,h,M7 and N9,check,-0.09,134
+refraction,h,M9 and N11,eclipse,-0.09,134
+refraction,h,M9 and N11,check,-0.10,134
+refraction,h,"M11, N13",eclipse,-0.10,134
+refraction,h,M15 and N18,eclipse,-0.09,134
+refraction,h,M15 and N18,check,-0.09,134
+refraction,h,M17 and N20,eclipse,-0.09,134
+refraction,h,M17 and N20,check,-0.09,134
+refraction,h,"M16, N19",eclipse,-0.09,134
+refraction,i,M7 and N9,eclipse,+0.20,134
+refraction,i,M7 and N9,check,+0.20,134
+refraction,i,M9 and N11,eclipse,+0.19,134
+refraction,i,M9 and N11,check,+0.20,134
+refraction,i,"M11, N13",eclipse,+0.20,134
+refraction,i,M15 and N18,eclipse,+0.19,134
+refraction,i,M15 and N18,check,+0.19,134
+refraction,i,M17 and N20,eclipse,+0.19,134
+refraction,i,M17 and N20,check,+0.19,134
+refraction,i,"M16, N19",eclipse,+0.19,134
+refraction,k,M7 and N9,eclipse,-0.03,134
+refraction,k,M7 and N9,check,-0.03,134
+refraction,k,M9 and N11,eclipse,-0.03,134
+refraction,k,M9 and N11,check,-0.03,134
+refraction,k,"M11, N13",eclipse,-0.03,134
+refraction,k,M15 and N18,eclipse,-0.03,134
+refraction,k,M15 and N18,check,-0.03,134
+refraction,k,M17 and N20,eclipse,-0.03,134
+refraction,k,M17 and N20,check,-0.03,134
+refraction,k,"M16, N19",eclipse,-0.03,134
+refraction,b',M7 and N9,eclipse,-1.37,134
+refraction,b',M7 and N9,check,-1.37,134
+refraction,b',M9 and N11,eclipse,-1.36,134
+refraction,b',M9 and N11,check,-1.42,134
+refraction,b',"M11, N13",eclipse,-1.39,134
+refraction,b',M15 and N18,eclipse,-1.34,134
+refraction,b',M15 and N18,check,-1.35,134
+refraction,b',M17 and N20,eclipse,-1.42,134
+refraction,b',M17 and N20,check,-1.43,134
+refraction,b',"M16, N19",eclipse,-1.38,134
+refraction,c',M7 and N9,eclipse,+8.57,134
+refraction,c',M7 and N9,check,+8.57,134
+refraction,c',M9 and N11,eclipse,+8.52,134
+refraction,c',M9 and N11,check,+8.54,134
+refraction,c',"M11, N13",eclipse,+8.52,134
+refraction,c',M15 and N18,eclipse,+8.67,134
+refraction,c',M15 and N18,check,+8.78,134
+refraction,c',M17 and N20,eclipse,+8.68,134
+refraction,c',M17 and N20,check,+8.84,134
+refraction,c',"M16, N19",eclipse,+8.68,134
+refraction,d',M7 and N9,eclipse,+0.47,134
+refraction,d',M7 and N9,check,+0.47,134
+refraction,d',M9 and N11,eclipse,+0.46,134
+refraction,d',M9 and N11,check,+0.47,134
+refraction,d',"M11, N13",eclipse,+0.47,134
+refraction,d',M15 and N18,eclipse,+0.49,134
+refraction,d',M15 and N18,check,+0.49,134
+refraction,d',M17 and N20,eclipse,+0.50,134
+refraction,d',M17 and N20,check,+0.51,134
+refraction,d',"M16, N19",eclipse,+0.49,134
+refraction,e',M7 and N9,eclipse,-0.14,134
+refraction,e',M7 and N9,check,-0.14,134
+refraction,e',M9 and N11,eclipse,-0.14,134
+refraction,e',M9 and N11,check,-0.15,134
+refraction,e',"M11, N13",eclipse,-0.14,134
+refraction,e',M15 and N18,eclipse,-0.15,134
+refraction,e',M15 and N18,check,-0.15,134
+refraction,e',M17 and N20,eclipse,-0.16,134
+refraction,e',M17 and N20,check,-0.16,134
+refraction,e',"M16, N19",eclipse,-0.16,134
+refraction,f',M7 and N9,eclipse,+0.42,134
+refraction,f',M7 and N9,check,+0.42,134
+refraction,f',M9 and N11,eclipse,+0.42,134
+refraction,f',M9 and N11,check,+0.42,134
+refraction,f',"M11, N13",eclipse,+0.42,134
+refraction,f',M15 and N18,eclipse,+0.47,134
+refraction,f',M15 and N18,check,+0.48,134
+refraction,f',M17 and N20,eclipse,+0.48,134
+refraction,f',M17 and N20,check,+0.49,134
+refraction,f',"M16, N19",eclipse,+0.48,134
+refraction,g',M7 and N9,eclipse,-0.03,134
+refraction,g',M7 and N9,check,-0.03,134
+refraction,g',M9 and N11,eclipse,-0.03,134
+refraction,g',M9 and N11,check,-0.03,134
+refraction,g',"M11, N13",eclipse,-0.03,134
+refraction,g',M15 and N18,eclipse,-0.03,134
+refraction,g',M15 and N18,check,-0.03,134
+refraction,g',M17 and N20,eclipse,-0.03,134
+refraction,g',M17 and N20,check,-0.03,134
+refraction,g',"M16, N19",eclipse,-0.03,134
+refraction,h',M7 and N9,eclipse,+0.20,134
+refraction,h',M7 and N9,check,+0.20,134
+refraction,h',M9 and N11,eclipse,+0.19,134
+refraction,h',M9 and N11,check,+0.20,134
+refraction,h',"M11, N13",eclipse,+0.20,134
+refraction,h',M15 and N18,eclipse,+0.19,134
+refraction,h',M15 and N18,check,+0.19,134
+refraction,h',M17 and N20,eclipse,+0.19,134
+refraction,h',M17 and N20,check,+0.19,134
+refraction,h',"M16, N19",eclipse,+0.19,134
+refraction,i',M7 and N9,eclipse,-0.08,134
+refraction,i',M7 and N9,check,-0.08,134
+refraction,i',M9 and N11,eclipse,-0.08,134
+refraction,i',M9 and N11,check,-0.09,134
+refraction,i',"M11, N13",eclipse,-0.09,134
+refraction,i',M15 and N18,eclipse,-0.09,134
+refraction,i',M15 and N18,check,-0.09,134
+refraction,i',M17 and N20,eclipse,-0.09,134
+refraction,i',M17 and N20,check,-0.09,134
+refraction,i',"M16, N19",eclipse,-0.09,134
+refraction,k',M7 and N9,eclipse,+0.17,134
+refraction,k',M7 and N9,check,+0.17,134
+refraction,k',M9 and N11,eclipse,+0.17,134
+refraction,k',M9 and N11,check,+0.17,134
+refraction,k',"M11, N13",eclipse,+0.17,134
+refraction,k',M15 and N18,eclipse,+0.18,134
+refraction,k',M15 and N18,check,+0.18,134
+refraction,k',M17 and N20,eclipse,+0.18,134
+refraction,k',M17 and N20,check,+0.18,134
+refraction,k',"M16, N19",eclipse,+0.18,134
+aberration,b,M7 and N9,eclipse,-2.49,135
+aberration,b,M7 and N9,check,+1.11,135
+aberration,b,M9 and N11,eclipse,-2.54,135
+aberration,b,M9 and N11,check,+0.96,135
+aberration,b,"M11, N13",eclipse,-2.56,135
+aberration,b,"M15, M16, M17, N18, N19, N20",eclipse,0.00,135
+aberration,b,"M15, N18",check,-2.43,135
+aberration,b,"M17, N20",check,-2.44,135
+aberration,c,M7 and N9,eclipse,-0.02,135
+aberration,c,M7 and N9,check,-0.04,135
+aberration,c,M9 and N11,eclipse,-0.01,135
+aberration,c,M9 and N11,check,-0.04,135
+aberration,c,"M11, N13",eclipse,-0.01,135
+aberration,c,"M15, M16, M17, N18, N19, N20",eclipse,+0.04,135
+aberration,c,"M15, N18",check,0.00,135
+aberration,c,"M17, N20",check,0.00,135
+aberration,d,M7 and N9,eclipse,+0.06,135
+aberration,d,M7 and N9,check,+0.16,135
+aberration,d,M9 and N11,eclipse,+0.05,135
+aberration,d,M9 and N11,check,+0.16,135
+aberration,d,"M11, N13",eclipse,+0.05,135
+aberration,d,"M15, M16, M17, N18, N19, N20",eclipse,-0.16,135
+aberration,d,"M15, N18",check,+0.01,135
+aberration,d,"M17, N20",check,+0.01,135
+aberration,e,M7 and N9,eclipse,-0.05,135
+aberration,e,M7 and N9,check,-0.06,135
+aberration,e,M9 and N11,eclipse,-0.05,135
+aberration,e,M9 and N11,check,-0.05,135
+aberration,e,"M11, N13",eclipse,-0.04,135
+aberration,e,"M15, M16, M17, N18, N19, N20",eclipse,+0.14,135
+aberration,e,"M15, N18",check,+0.15,135
+aberration,e,"M17, N20",check,+0.15,135
+aberration,f,M7 and N9,eclipse,-0.06,135
+aberration,f,M7 and N9,check,-0.16,135
+aberration,f,M9 and N11,eclipse,-0.05,135
+aberration,f,M9 and N11,check,-0.16,135
+aberration,f,"M11, N13",eclipse,-0.05,135
+aberration,f,"M15, M16, M17, N18, N19, N20",eclipse,+0.16,135
+aberration,f,"M15, N18",check,-0.01,135
+aberration,f,"M17, N20",check,-0.01,135
+aberration,i,M7 and N9,eclipse,-0.02,135
+aberration,i,M7 and N9,check,-0.01,135
+aberration,i,M9 and N11,eclipse,-0.02,135
+aberration,i,M9 and N11,check,+0.01,135
+aberration,i,"M11, N13",eclipse,-0.02,135
+aberration,i,"M15, M16, M17, N18, N19, N20",eclipse,0.00,135
+aberration,i,"M15, N18",check,-0.02,135
+aberration,i,"M17, N20",check,-0.02,135
+aberration,b',M7 and N9,eclipse,+0.02,135
+aberration,b',M7 and N9,check,+0.04,135
+aberration,b',M9 and N11,eclipse,+0.01,135
+aberration,b',M9 and N11,check,+0.04,135
+aberration,b',"M11, N13",eclipse,+0.01,135
+aberration,b',"M15, M16, M17, N18, N19, N20",eclipse,-0.04,135
+aberration,b',"M15, N18",check,0.00,135
+aberration,b',"M17, N20",check,0.00,135
+aberration,c',M7 and N9,eclipse,-2.49,135
+aberration,c',M7 and N9,check,+1.11,135
+aberration,c',M9 and N11,eclipse,-2.54,135
+aberration,c',M9 and N11,check,+0.96,135
+aberration,c',"M11, N13",eclipse,-2.56,135
+aberration,c',"M15, M16, M17, N18, N19, N20",eclipse,0.00,135
+aberration,c',"M15, N18",check,-2.43,135
+aberration,c',"M17, N20",check,-2.44,135
+aberration,d',M7 and N9,eclipse,+0.03,135
+aberration,d',M7 and N9,check,+0.03,135
+aberration,d',M9 and N11,eclipse,+0.02,135
+aberration,d',M9 and N11,check,+0.03,135
+aberration,d',"M11, N13",eclipse,+0.02,135
+aberration,d',"M15, M16, M17, N18, N19, N20",eclipse,-0.07,135
+aberration,d',"M15, N18",check,-0.07,135
+aberration,d',"M17, N20",check,-0.07,135
+aberration,e',M7 and N9,eclipse,+0.12,135
+aberration,e',M7 and N9,check,+0.32,135
+aberration,e',M9 and N11,eclipse,+0.10,135
+aberration,e',M9 and N11,check,+0.32,135
+aberration,e',"M11, N13",eclipse,+0.10,135
+aberration,e',"M15, M16, M17, N18, N19, N20",eclipse,-0.32,135
+aberration,e',"M15, N18",check,+0.03,135
+aberration,e',"M17, N20",check,+0.02,135
+aberration,f',M7 and N9,eclipse,-0.03,135
+aberration,f',M7 and N9,check,-0.03,135
+aberration,f',M9 and N11,eclipse,-0.02,135
+aberration,f',M9 and N11,check,-0.03,135
+aberration,f',"M11, N13",eclipse,-0.02,135
+aberration,f',"M15, M16, M17, N18, N19, N20",eclipse,+0.07,135
+aberration,f',"M15, N18",check,+0.07,135
+aberration,f',"M17, N20",check,+0.07,135
+aberration,k',M7 and N9,eclipse,-0.02,135
+aberration,k',M7 and N9,check,+0.01,135
+aberration,k',M9 and N11,eclipse,-0.02,135
+aberration,k',M9 and N11,check,+0.01,135
+aberration,k',"M11, N13",eclipse,-0.02,135
+aberration,k',"M15, M16, M17, N18, N19, N20",eclipse,0.00,135
+aberration,k',"M15, N18",check,-0.02,135
+aberration,k',"M17, N20",check,-0.02,135
+inclination,p,M15-M7,check,+18,135
+inclination,p,M17-M9,check,+5,135
+inclination,p,N18-N11,check,+2,135
+inclination,p,N20-N9,check,+27,135
+inclination,q,M15-M7,check,-8,135
+inclination,q,M17-M9,check,-7,135
+inclination,q,N18-N11,check,-2,135
+inclination,q,N20-N9,check,-8,135
+inclination,d_i=e'_i,M15-M7,check,+0.31,135
+inclination,d_i=e'_i,M17-M9,check,+0.08,135
+inclination,d_i=e'_i,N18-N11,check,+0.03,135
+inclination,d_i=e'_i,N20-N9,check,+0.46,135
+inclination,e_i=f'_i,M15-M7,check,-0.14,135
+inclination,e_i=f'_i,M17-M9,check,-0.12,135
+inclination,e_i=f'_i,N18-N11,check,-0.03,135
+inclination,e_i=f'_i,N20-N9,check,-0.13,135

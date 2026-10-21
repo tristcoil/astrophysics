@@ -1,0 +1,63 @@
+# Source: Dyson, F. W., Eddington, A. S. & Davidson, C. 1920, Phil. Trans. R. Soc. A 220, 291-333.
+# Values: the list "alpha + 0.240e = ..." at the foot of printed page 311 (archive.org philtrans06337895 leaf 020; read on the
+#   full-resolution 5120x6600 JPEG-2000 06337895_0020.jp2), Sobral astrographic plates. One line per eclipse plate, printed in
+#   two columns (plates 1-8, 9-18) as "alpha + 0.240e = + 0.056   1" (value, then eclipse plate number); a superscript r
+#   (revolutions) heads each column of values.
+# Columns: eclipse_plate; coeff_e = the printed coefficient of e (0.240 for every plate except plate 15, printed 0.283);
+#   value_rev = the printed right-hand side, in revolutions (1 r = 12.3 arcsec, at 50' from the Sun's centre).
+# Typography in the quotes below (ASCII): "alpha" = Greek alpha; printed 0r.0435 = 0.0435 revolutions (superscript r, raised
+#   decimal point); 0".93 = 0.93 arcsec; Dy5 = D y subscript 5; 1/2 = printed fraction one half.
+# Condition equations, p.311 (verbatim): "The equations given by these stars are
+#   - 0.160d - 1.107e - 0.789alpha + f = Dy5   (1)
+#   + 0.334d + 0.472e + 1.336alpha + f = Dy4   (2)
+#   + 0.348d + 0.360e + 1.574alpha + f = Dy3   (3)
+#   + 0.587d + 1.099e + 0.726alpha + f = Dy6   (4)
+#   + 0.860d + 1.321e + 0.589alpha + f = Dy10  (5)"
+#   (identical coefficients appear for stars 5, 4, 3, 6, 10 in the declination equations of the 4-inch reduction, p.304)
+# p.311 (verbatim): "The mean of (4) and (5) added to (1) gives
+#   + 0.564d + 0.103e - 0.131alpha + 2f = Dy5 + 1/2 (Dy6 + Dy10).
+#   While the sum of (2) and (3) gives
+#   + 0.682d + 0.832e + 2.910alpha + 2f = Dy3 + Dy4.
+#   Subtracting these we get
+#   3.041alpha + 0.729e + 0.118d = Dy3 + Dy4 - Dy5 - 1/2 (Dy6 + Dy10).
+#   This equation has a small coefficient for e and a very small one for d.
+#   Calculating the quantities on the right-hand side, assuming e to be the same for all the plates, and substituting the values
+#   of d from the previous table, we find :-" [then the list below]
+# p.312 (verbatim): "In photograph No. 15, star 10 is not shown, and the equation is slightly modified. It may also be noticed
+#   that the values are somewhat smaller for Nos. 15 to 18.
+#   The means of the 16 photographs treated in this manner give
+#   alpha + 243e = + 0r.0435,
+#   or with the value of the scale 0r.082 from the previous table
+#   alpha = + 0r.024 = 0".93 at the limb.
+#   It may be noticed that the change of scale arising from differences of refraction and aberration is 0r.020. If this value of
+#   e be taken instead of 0r.082 we obtain
+#   alpha = + 0r.039 = + 1".52 at the sun's limb.
+#   The equations on p. 311 were also solved by least squares for each plate. There is a considerable range in the deduced values
+#   of alpha, as is to be expected when alpha and e are determined independently for each plate. The mean result for alpha is
+#   0".99, or very nearly the same as that already found.
+#   The photographs taken with the astrographic telescope support those obtained by the "4-inch" to the extent that they show
+#   considerable outward deflection, but for the reasons already given are of much less weight."
+# Misprint kept as printed in the quote above: p.312 prints "alpha + 243e" (the "0." is missing); the mean coefficient is
+#   (15 x 0.240 + 0.283)/16 = 0.2427 = 0.243. See dyson1920_astrographic_notes.md.
+# Checks (details in dyson1920_astrographic_notes.md): sum of the 16 printed values = 0.696 = 16 x 0.0435 exactly; the plate-15
+#   coefficient 0.283 = 0.840/2.973 follows from using equation (4) alone in place of the mean of (4) and (5). Recomputing each
+#   value from the p.311 Dy and the Table IX d reproduces 11 of 16 plates within rounding (+-0.0005 r) when plates 7 and 12 use
+#   the d of comparison 18_3 and the mean d of 11_1/17_2 respectively; plates 2 (+0.0036), 15 (-0.0018), 6 (-0.0012),
+#   3 (+0.0006) and 17 (+0.0005) differ (printed minus recomputed).
+eclipse_plate,coeff_e,value_rev
+1,0.240,+0.056
+2,0.240,+0.049
+3,0.240,+0.047
+4,0.240,+0.059
+5,0.240,+0.050
+6,0.240,+0.059
+7,0.240,+0.036
+8,0.240,+0.046
+9,0.240,+0.035
+10,0.240,+0.048
+11,0.240,+0.045
+12,0.240,+0.059
+15,0.283,+0.026
+16,0.240,+0.024
+17,0.240,+0.028
+18,0.240,+0.029

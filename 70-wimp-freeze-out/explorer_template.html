@@ -1,0 +1,539 @@
+<title>WIMP Freeze-out Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a lab bench - the dial (what you set, what comes out) beside the freeze-out trace; below it the WIMP plane and short notes. */
+:root {
+  --bg: #edf1f3;
+  --surface: #fbfcfc;
+  --ink: #0f1a21;
+  --ink-2: #44525c;
+  --muted: #6f7d87;
+  --rule: #d2dade;
+  --track: #dde4e8;
+  --you: #e2622f;
+  --target: #2a78d6;
+  --on-accent: #ffffff;
+  --eq: #8b979f;
+  --limit: #0f1a21;
+  --shade: rgba(15, 26, 33, 0.07);
+  --good: #17805a;
+  --warn: #9a5d00;
+  --bad: #b8382c;
+  --good-soft: #e1f2ea;
+  --warn-soft: #f6ecdc;
+  --bad-soft: #f7e3e0;
+  --font-display: "Archivo", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", Roboto, system-ui, sans-serif;
+  --font-mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0c1317; --surface: #121b20; --ink: #e5ecef; --ink-2: #b2bec5; --muted: #84929a;
+    --rule: #25323a; --track: #22303a; --you: #d95926; --target: #3987e5; --eq: #7b8990;
+    --limit: #e5ecef; --shade: rgba(229, 236, 239, 0.07);
+    --good: #3fb985; --warn: #d79b35; --bad: #e46d5f;
+    --good-soft: #13291f; --warn-soft: #2b2212; --bad-soft: #2d1714;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0c1317; --surface: #121b20; --ink: #e5ecef; --ink-2: #b2bec5; --muted: #84929a;
+  --rule: #25323a; --track: #22303a; --you: #d95926; --target: #3987e5; --eq: #7b8990;
+  --limit: #e5ecef; --shade: rgba(229, 236, 239, 0.07);
+  --good: #3fb985; --warn: #d79b35; --bad: #e46d5f;
+  --good-soft: #13291f; --warn-soft: #2b2212; --bad-soft: #2d1714;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 15px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 48px;
+}
+.page { max-width: 1120px; margin: 0 auto; display: grid; gap: 22px; }
+h1, h2 { margin: 0; text-wrap: balance; font-family: var(--font-display); }
+h1 { font-size: clamp(32px, 5.4vw, 52px); font-weight: 780; font-stretch: 112%; letter-spacing: -0.01em; line-height: 1.0; }
+h2 { font-size: 19px; font-weight: 700; font-stretch: 108%; }
+.eyebrow { margin: 0 0 8px; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.lede { margin: 10px 0 0; max-width: 68ch; color: var(--ink-2); font-size: 16px; }
+.mono { font-family: var(--font-mono); }
+
+.bench { display: grid; grid-template-columns: minmax(300px, 400px) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 860px) { .bench { grid-template-columns: minmax(0, 1fr); } }
+.card { background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 16px; min-width: 0; }
+.dial { display: grid; gap: 16px; }
+.control { display: grid; gap: 4px; }
+.control-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.control label, .label { font-size: 13px; font-weight: 700; color: var(--ink-2); }
+.value { font-family: var(--font-mono); font-size: 14px; color: var(--ink); font-variant-numeric: tabular-nums; }
+input[type="range"] { width: 100%; margin: 0; height: 28px; background: transparent; -webkit-appearance: none; appearance: none; cursor: pointer; }
+input[type="range"]:focus-visible { outline: 2px solid var(--target); outline-offset: 3px; border-radius: 6px; }
+input[type="range"]::-webkit-slider-runnable-track { height: 6px; border-radius: 3px; background: var(--track); }
+input[type="range"]::-moz-range-track { height: 6px; border-radius: 3px; background: var(--track); }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; margin-top: -7px; border-radius: 50%; background: var(--surface); border: 3px solid var(--you); }
+input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--surface); border: 3px solid var(--you); }
+.scale { position: relative; height: 16px; margin: 0 10px; font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+.scale span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+select { font: inherit; font-size: 14px; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 6px 8px; max-width: 100%; }
+select:focus-visible { outline: 2px solid var(--target); outline-offset: 2px; }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg label { padding: 6px 12px; font-size: 13.5px; font-weight: 400; color: var(--ink-2); cursor: pointer; }
+.seg input:checked + label { background: var(--ink); color: var(--surface); }
+.seg input:focus-visible + label { outline: 2px solid var(--target); outline-offset: -2px; }
+button { font: inherit; font-size: 13.5px; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: 999px; padding: 6px 13px; cursor: pointer; }
+button:hover { border-color: var(--ink-2); }
+button:focus-visible { outline: 2px solid var(--target); outline-offset: 2px; }
+button.primary { background: var(--target); border-color: var(--target); color: var(--on-accent); font-weight: 700; }
+
+.out { display: grid; gap: 10px; border-top: 1px solid var(--rule); padding-top: 14px; }
+.big { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.big .num { font-family: var(--font-display); font-weight: 760; font-stretch: 110%; font-size: clamp(34px, 6vw, 46px); line-height: 1; font-variant-numeric: tabular-nums; }
+.big .unit { color: var(--ink-2); font-size: 14px; }
+.chip { display: inline-block; font-size: 12.5px; font-weight: 700; padding: 3px 10px; border-radius: 999px; border: 1px solid transparent; }
+.chip.good { color: var(--good); background: var(--good-soft); border-color: var(--good); }
+.chip.warn { color: var(--warn); background: var(--warn-soft); border-color: var(--warn); }
+.chip.bad { color: var(--bad); background: var(--bad-soft); border-color: var(--bad); }
+.chip.neutral { color: var(--ink-2); background: var(--bg); border-color: var(--rule); }
+dl.facts { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 12px; font-size: 14px; }
+dl.facts dt { color: var(--muted); }
+dl.facts dd { margin: 0; font-family: var(--font-mono); font-size: 13.5px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.checks { display: grid; gap: 6px; }
+.check { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; font-size: 13.5px; }
+
+figure { margin: 0; display: grid; gap: 8px; min-width: 0; }
+figcaption { font-size: 13px; color: var(--ink-2); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--ink-2); }
+.key { display: inline-flex; align-items: center; gap: 6px; }
+.key svg { width: 26px; height: 10px; flex: none; }
+.chart { width: 100%; height: auto; display: block; }
+.chart text { font-family: var(--font-mono); font-size: 11px; fill: var(--muted); }
+.chart .lab { font-family: var(--font-body); font-size: 12px; }
+.chart .axis-title { font-family: var(--font-body); font-size: 12px; fill: var(--ink-2); }
+.chart .grid { stroke: var(--rule); stroke-width: 1; }
+.chart .frame { fill: none; stroke: var(--rule); }
+.l-you { fill: none; stroke: var(--you); stroke-width: 2.6; stroke-linejoin: round; }
+.l-eq { fill: none; stroke: var(--eq); stroke-width: 1.5; stroke-dasharray: 5 4; }
+.l-target { fill: none; stroke: var(--target); stroke-width: 1.6; }
+.l-thermal { fill: none; stroke: var(--target); stroke-width: 3; }
+.l-limit { fill: none; stroke: var(--limit); stroke-width: 1.6; }
+.l-limit2 { fill: none; stroke: var(--limit); stroke-width: 1.4; stroke-dasharray: 6 4; }
+.a-shade { fill: var(--shade); stroke: none; }
+.dot-you { fill: var(--you); stroke: var(--surface); stroke-width: 2; }
+.t-you { fill: var(--you); }
+.t-target { fill: var(--target); }
+.t-limit { fill: var(--limit); }
+.t-eq { fill: var(--eq); }
+.l-cross { stroke: var(--you); stroke-width: 1; stroke-dasharray: 2 3; opacity: 0.7; }
+
+.notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.notes p { margin: 6px 0 0; max-width: 62ch; color: var(--ink-2); font-size: 14.5px; }
+.credits { font-size: 12.5px; color: var(--muted); max-width: 90ch; }
+.credits a { color: var(--ink-2); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<main class="page">
+  <header>
+    <p class="eyebrow">Atlas project P4 · the first second</p>
+    <h1>WIMP Freeze-out Lab</h1>
+    <p class="lede">A dark-matter particle that once annihilated in pairs stopped doing so when the universe expanded faster than the particles could find each other. Set its mass and how strongly it annihilates, and this page solves the same Boltzmann equation as the project, in your browser, to tell you how much of it would be left today.</p>
+  </header>
+
+  <section class="bench" aria-label="Freeze-out calculator">
+    <div class="card dial">
+      <div class="control">
+        <div class="control-head"><label for="mass">Mass</label><span class="value" id="mass-out"></span></div>
+        <input type="range" id="mass" min="-2" max="5" step="0.005" value="2" aria-describedby="mass-out">
+        <div class="scale"><span style="left:0%">10 MeV</span><span style="left:28.571%">1 GeV</span><span style="left:57.143%">100 GeV</span><span style="left:85.714%">10 TeV</span></div>
+      </div>
+      <div class="control">
+        <div class="control-head"><label for="sigv" id="sigv-label">Annihilation ⟨σv⟩</label><span class="value" id="sigv-out"></span></div>
+        <input type="range" id="sigv" min="-28" max="-23" step="0.005" value="-25.65" aria-describedby="sigv-out">
+        <div class="scale"><span style="left:0%">10⁻²⁸</span><span style="left:40%">10⁻²⁶</span><span style="left:80%">10⁻²⁴</span><span style="left:100%">cm³/s</span></div>
+      </div>
+      <div class="control">
+        <span class="label">Particle</span>
+        <div class="row">
+          <select id="ptype" aria-label="Particle type">
+            <option value="2">Majorana fermion (its own antiparticle)</option>
+            <option value="4">Dirac fermion (particle + antiparticle)</option>
+            <option value="1">Real scalar</option>
+            <option value="3">Real vector</option>
+          </select>
+          <span class="seg" role="radiogroup" aria-label="Annihilation type">
+            <input type="radio" name="wave" id="wave-s" value="s" checked><label for="wave-s">s-wave</label>
+            <input type="radio" name="wave" id="wave-p" value="p"><label for="wave-p">p-wave</label>
+          </span>
+        </div>
+      </div>
+      <div class="row">
+        <button class="primary" id="btn-thermal" type="button">Make it all the dark matter</button>
+        <button id="btn-canon" type="button">Textbook 3×10⁻²⁶</button>
+      </div>
+      <div class="out" aria-live="polite">
+        <div>
+          <div class="label">Relic density today</div>
+          <div class="big"><span class="num" id="omega">–</span><span class="unit">Ω h²</span><span class="chip neutral" id="verdict">–</span></div>
+          <div class="value" id="ratio" style="font-size:13px;color:var(--ink-2)"></div>
+        </div>
+        <dl class="facts">
+          <dt>freezes out at</dt><dd id="f-x">–</dd>
+          <dt>temperature</dt><dd id="f-T">–</dd>
+          <dt>cosmic time</dt><dd id="f-t">–</dd>
+          <dt>thermal value</dt><dd id="f-th">–</dd>
+        </dl>
+        <div class="checks" id="checks"></div>
+      </div>
+    </div>
+
+    <figure class="card">
+      <h2>The abundance, as the universe cools</h2>
+      <svg class="chart" id="trace" role="img" aria-label="Abundance per unit entropy against m/T"></svg>
+      <div class="legend">
+        <span class="key"><svg viewBox="0 0 26 10" aria-hidden="true"><line x1="0" y1="5" x2="26" y2="5" class="l-you"></line></svg>your WIMP</span>
+        <span class="key"><svg viewBox="0 0 26 10" aria-hidden="true"><line x1="0" y1="5" x2="26" y2="5" class="l-eq"></line></svg>if annihilation kept up (equilibrium)</span>
+        <span class="key"><svg viewBox="0 0 26 10" aria-hidden="true"><line x1="0" y1="5" x2="26" y2="5" class="l-target"></line></svg>amount that would make all the dark matter</span>
+      </div>
+      <figcaption>Time runs to the right. While annihilations keep up, the abundance follows the plunging equilibrium curve; once the annihilation rate falls below the expansion rate it peels off and freezes.</figcaption>
+    </figure>
+  </section>
+
+  <figure class="card">
+    <h2>Where your WIMP sits among the searches</h2>
+    <svg class="chart" id="plane" role="img" aria-label="Annihilation cross section against mass, with the thermal-relic line and Fermi-LAT dwarf-galaxy limits"></svg>
+    <div class="legend" id="plane-legend">
+      <span class="key"><svg viewBox="0 0 26 10" aria-hidden="true"><line x1="0" y1="5" x2="26" y2="5" class="l-thermal"></line></svg>thermal relic: all the dark matter</span>
+      <span class="key"><svg viewBox="0 0 26 10" aria-hidden="true"><line x1="0" y1="5" x2="26" y2="5" class="l-limit"></line></svg>Fermi-LAT dwarfs, 14 yr: if it annihilates to b quarks</span>
+      <span class="key"><svg viewBox="0 0 26 10" aria-hidden="true"><line x1="0" y1="5" x2="26" y2="5" class="l-limit2"></line></svg>… to τ leptons</span>
+      <span class="key"><svg viewBox="0 0 26 10" aria-hidden="true"><circle cx="13" cy="5" r="4" class="dot-you"></circle></svg>your WIMP</span>
+    </div>
+    <figcaption id="plane-cap">Above a limit line, 42 Milky Way dwarf galaxies would glow in gamma rays that Fermi-LAT does not see (95% confidence, if every annihilation goes into that one channel). Limits are this project's own, from McDaniel et al.'s 2024 likelihoods.</figcaption>
+  </figure>
+
+  <section class="notes" aria-label="Notes">
+    <div class="card">
+      <h2>The race</h2>
+      <p>Each WIMP meets a partner at a rate n⟨σv⟩, while the universe expands at a rate H. Early on, collisions win and the abundance tracks equilibrium, which falls as e<sup>−m/T</sup>. At x = m/T ≈ 20 the dwindling WIMPs can no longer find each other, and what is left is frozen in. Twice the cross section leaves about half as much.</p>
+    </div>
+    <div class="card">
+      <h2>What the numbers come from</h2>
+      <p>The plasma's degrees of freedom g*(T) are Saikawa &amp; Shirai's (2020), lattice QCD included. The project's solver reproduces their published relic cross sections to 0.1%. Here the same implicit scheme runs with 300 steps per e-fold, so the page agrees with the project to about 0.02%. The target is Planck's Ω<sub>c</sub>h² = 0.120.</p>
+    </div>
+    <div class="card">
+      <h2>What this leaves out</h2>
+      <p>One particle species, annihilating to Standard Model particles that stay in thermal equilibrium. Co-annihilation with a heavier partner, resonances, Sommerfeld enhancement, or dark matter made another way (freeze-in, axions) change the story. A p-wave WIMP annihilates a million times more slowly today, so dwarf galaxies cannot test it.</p>
+    </div>
+  </section>
+
+  <p class="credits">Data: g*(T) from K. Saikawa &amp; S. Shirai (JCAP 08 (2020) 011); Fermi-LAT dwarf likelihoods from McDaniel et al. 2024 (PRD 109, 063024; figshare 10.6084/m9.figshare.24058650) with PPPC 4 DM ID photon spectra (Cirelli et al. 2011); Planck 2018 Ω<sub>c</sub>h². Everything else computed by the Astrophysics Atlas, project P4. AI-generated, not reviewed by a professional.</p>
+</main>
+
+<script>
+const DATA = __DATA__;
+
+(function () {
+  "use strict";
+  const PI = Math.PI;
+  const SQRT_PI_45 = Math.sqrt(PI / 45);
+  const C0 = Math.log(45 / (4 * Math.pow(PI, 4)));
+  const K = DATA.consts;
+
+  // ---- interpolation tables -------------------------------------------------
+  function interp(x, xs, ys) {
+    const n = xs.length;
+    if (x <= xs[0]) return ys[0];
+    if (x >= xs[n - 1]) return ys[n - 1];
+    let lo = 0, hi = n - 1;
+    while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (xs[mid] <= x) lo = mid; else hi = mid; }
+    const t = (x - xs[lo]) / (xs[hi] - xs[lo]);
+    return ys[lo] + t * (ys[hi] - ys[lo]);
+  }
+  const E = DATA.eos;
+  const gs = (T) => interp(Math.log(T), E.lnT, E.gs);
+  const gh = (T) => interp(Math.log(T), E.lnT, E.gh);
+  const tOfT = (T) => Math.exp(interp(-Math.log(T), E.time_mlnT, E.time_lnt));
+
+  // ln(K2(x) e^x) for x >= 2 (Abramowitz & Stegun 9.8.6, 9.8.8; asymptotic series above 1000)
+  function lnK2e(x) {
+    if (x > 1000) {
+      const t = 1 / x;
+      return 0.5 * Math.log(PI / (2 * x)) + Math.log1p(1.875 * t + 0.8203125 * t * t - 0.3076171875 * t * t * t);
+    }
+    const y = 2 / x;
+    const k0 = (1.25331414 + y * (-0.07832358 + y * (0.02189568 + y * (-0.01062446 + y * (0.00587872 + y * (-0.00251540 + y * 0.00053208)))))) / Math.sqrt(x);
+    const k1 = (1.25331414 + y * (0.23498619 + y * (-0.03655620 + y * (0.01504268 + y * (-0.00780353 + y * (0.00325614 + y * -0.00068245)))))) / Math.sqrt(x);
+    return Math.log(k0 + (2 / x) * k1);
+  }
+  function lnYeq(x, g, gsv) { return C0 + Math.log(g / gsv) + 2 * Math.log(x) + lnK2e(x) - x; }
+
+  // ---- the Boltzmann equation: backward Euler in u = ln x, exact tail -----------------
+  const X0 = 3, XMID = 150, T_END = 1e-9;
+  function run(m, a, b, g, nPer, record) {
+    const pref = SQRT_PI_45 * K.M_PL * m / K.GEV2_TO_CM3S;   // sigma v in cm^3/s
+    const u0 = Math.log(X0), um = Math.log(XMID);
+    const n = Math.ceil((um - u0) * nPer), h = (um - u0) / n;
+    let Y = Math.exp(lnYeq(X0, g, gs(m / X0)));
+    const xs = record ? [X0] : null, ys = record ? [Y] : null, eqs = record ? [Y] : null;
+    let xf = NaN;
+    for (let k = 1; k <= n; k++) {
+      const x = Math.exp(u0 + k * h), T = m / x;
+      const A = h * pref * gh(T) * (a + 6 * b / x) / x;
+      const le = lnYeq(x, g, gs(T));
+      const yeq2 = Math.exp(2 * le);
+      const c = Y + A * yeq2;
+      Y = 2 * c / (1 + Math.sqrt(1 + 4 * A * c));
+      if (isNaN(xf) && Y > 2 * Math.exp(le)) xf = x;
+      if (record && (k % 4 === 0 || k === n)) { xs.push(x); ys.push(Y); eqs.push(Math.exp(le)); }
+    }
+    // after x = 150 the equilibrium term is ~e^-300: d(1/Y)/du = x lambda(x), integrated exactly
+    const uf = Math.log(m / T_END), N = 400, hu = (uf - um) / N;
+    let inv = 1 / Y, prev = null;
+    const f = (u) => { const x = Math.exp(u); return pref * gh(m / x) * (a + 6 * b / x) / x; };
+    let fa = f(um);
+    for (let k = 1; k <= N; k++) {
+      const u = um + k * hu, fb = f(u);
+      inv += 0.5 * hu * (fa + fb);
+      fa = fb;
+      if (record && k % 8 === 0) { const x = Math.exp(u); if (x <= 1e5) { xs.push(x); ys.push(1 / inv); eqs.push(0); } }
+    }
+    return { Y0: 1 / inv, xf, xs, ys, eqs };
+  }
+  function relic(m, sv, g, wave, record) {
+    const a = wave === "s" ? sv : 0, b = wave === "p" ? sv : 0;
+    const r1 = run(m, a, b, g, 150, false);
+    const r2 = run(m, a, b, g, 300, record);
+    const Y0 = 2 * r2.Y0 - r1.Y0;                         // Richardson: second order
+    return { Y0, omega: m * Y0 * K.OMEGA_PER_MY, xf: r2.xf, xs: r2.xs, ys: r2.ys, eqs: r2.eqs };
+  }
+  function thermalValue(m, g, wave) {
+    let l = wave === "s" ? Math.log(2.2e-26) : Math.log(1.6e-25);
+    let f = Math.log(relic(m, Math.exp(l), g, wave, false).omega / K.OMEGA_TARGET), slope = -0.96;
+    for (let i = 0; i < 12 && Math.abs(f) > 1e-7; i++) {
+      const l2 = l - f / slope;
+      const f2 = Math.log(relic(m, Math.exp(l2), g, wave, false).omega / K.OMEGA_TARGET);
+      if (l2 !== l) { const s = (f2 - f) / (l2 - l); if (s < -0.2 && isFinite(s)) slope = s; }
+      l = l2; f = f2;
+    }
+    return Math.exp(l);
+  }
+  window.__freezeout = { relic, thermalValue };   // used by the project's tests
+
+  // ---- formatting -----------------------------------------------------------------
+  const SUP = { "-": "⁻", "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹" };
+  const sup = (n) => String(n).split("").map((c) => SUP[c] || c).join("");
+  function sci(v, d) {
+    if (!isFinite(v) || v <= 0) return "–";
+    const e = Math.floor(Math.log10(v)), mnt = v / Math.pow(10, e);
+    if (mnt.toFixed(d) === (10).toFixed(d)) return (1).toFixed(d) + "×10" + sup(e + 1);
+    return mnt.toFixed(d) + "×10" + sup(e);
+  }
+  function fmtMass(m) {
+    if (m >= 1000) return (m / 1000).toPrecision(3) + " TeV";
+    if (m >= 1) return m.toPrecision(3) + " GeV";
+    return (m * 1000).toPrecision(3) + " MeV";
+  }
+  function fmtDecade(e) {          // a power of ten in GeV, as a clean label
+    if (e >= 3) return Math.pow(10, e - 3) + " TeV";
+    if (e >= 0) return Math.pow(10, e) + " GeV";
+    if (e >= -3) return Math.round(Math.pow(10, e + 3)) + " MeV";
+    return Math.round(Math.pow(10, e + 6)) + " keV";
+  }
+  function fmtT(T) { return T >= 1 ? T.toPrecision(3) + " GeV" : (T >= 1e-3 ? (T * 1e3).toPrecision(3) + " MeV" : (T * 1e6).toPrecision(3) + " keV"); }
+  function fmtTime(t) {
+    if (t < 1e-6) return (t * 1e9).toPrecision(2) + " ns";
+    if (t < 1e-3) return (t * 1e6).toPrecision(2) + " µs";
+    if (t < 1) return (t * 1e3).toPrecision(2) + " ms";
+    return t.toPrecision(2) + " s";
+  }
+
+  // ---- charts ---------------------------------------------------------------------
+  const NS = "http://www.w3.org/2000/svg";
+  function el(tag, attrs, parent, text) {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function logAxis(lo, hi) { const t = []; for (let e = Math.ceil(lo - 1e-9); e <= Math.floor(hi + 1e-9); e++) t.push(e); return t; }
+  function frame(svg, W, H, M, xr, yr, opts) {
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.setAttribute("width", W);
+    svg.setAttribute("height", H);
+    const X = (lx) => M.l + (lx - xr[0]) / (xr[1] - xr[0]) * (W - M.l - M.r);
+    const Y = (ly) => M.t + (yr[1] - ly) / (yr[1] - yr[0]) * (H - M.t - M.b);
+    const g = el("g", {}, svg);
+    const cid = "clip-" + svg.id;
+    const cp = el("clipPath", { id: cid }, el("defs", {}, svg));
+    el("rect", { x: M.l, y: M.t, width: W - M.l - M.r, height: H - M.t - M.b }, cp);
+    for (const e of logAxis(xr[0], xr[1])) {
+      el("line", { x1: X(e), x2: X(e), y1: M.t, y2: H - M.b, class: "grid" }, g);
+      const anchor = Math.abs(e - xr[1]) < 1e-9 ? "end" : (Math.abs(e - xr[0]) < 1e-9 ? "start" : "middle");
+      if (opts.xlab(e) !== null) el("text", { x: X(e), y: H - M.b + 15, "text-anchor": anchor }, g, opts.xlab(e));
+    }
+    const ystep = opts.ystep || 1;
+    for (const e of logAxis(yr[0], yr[1])) {
+      if ((e - Math.ceil(yr[0])) % ystep) continue;
+      el("line", { x1: M.l, x2: W - M.r, y1: Y(e), y2: Y(e), class: "grid" }, g);
+      el("text", { x: M.l - 6, y: Y(e) + 4, "text-anchor": "end" }, g, "10" + sup(e));
+    }
+    el("rect", { x: M.l, y: M.t, width: W - M.l - M.r, height: H - M.t - M.b, class: "frame" }, g);
+    el("text", { x: (M.l + W - M.r) / 2, y: H - 6, "text-anchor": "middle", class: "axis-title" }, g, opts.xtitle);
+    const yt = el("text", { x: 13, y: (M.t + H - M.b) / 2, "text-anchor": "middle", class: "axis-title",
+      transform: `rotate(-90 13 ${(M.t + H - M.b) / 2})` }, g, opts.ytitle);
+    const data = el("g", { "clip-path": `url(#${cid})` }, svg);
+    return { X, Y, g, data };
+  }
+  function path(pts) { let d = ""; pts.forEach((p, i) => { d += (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1); }); return d; }
+
+  function drawTrace(state, res) {
+    const svg = document.getElementById("trace");
+    const W = Math.max(300, svg.parentElement.clientWidth - 34), H = Math.round(Math.min(420, Math.max(300, W * 0.62)));
+    const M = { l: 52, r: 14, t: 34, b: 38 };
+    const xr = [0, 3], yr = [-22, -1];
+    const ax = frame(svg, W, H, M, xr, yr, { xlab: (e) => (e === 0 ? "1" : "10" + sup(e)), ystep: 3,
+      xtitle: "x = m / T   (time →)", ytitle: "Y = n / s" });
+    const cy = (v) => ax.Y(Math.max(yr[0] - 1, Math.log10(v)));
+    // top axis: temperature for this mass
+    for (const e of logAxis(Math.log10(state.m) - 3, Math.log10(state.m))) {
+      const T = Math.pow(10, e), lx = Math.log10(state.m / T);
+      if (lx < xr[0] - 1e-9 || lx > xr[1] + 1e-9) continue;
+      const anchor = lx > xr[1] - 0.25 ? "end" : (lx < xr[0] + 0.25 ? "start" : "middle");
+      el("text", { x: ax.X(lx), y: M.t - 8, "text-anchor": anchor }, ax.g, fmtDecade(e));
+    }
+    // target Y for Omega h^2 = 0.120
+    const Yt = K.OMEGA_TARGET / (state.m * K.OMEGA_PER_MY);
+    const ty = cy(Yt);
+    el("line", { x1: M.l, x2: W - M.r, y1: ty, y2: ty, class: "l-target" }, ax.data);
+    el("text", { x: W - M.r - 4, y: ty - 6, "text-anchor": "end", class: "lab t-target" }, ax.g, "Ω h² = 0.120");
+    const eq = [], you = [];
+    let eqDone = false;
+    for (let i = 0; i < res.xs.length; i++) {
+      const lx = Math.log10(res.xs[i]);
+      if (lx > xr[1]) break;
+      if (!eqDone && res.eqs[i] > 0) {
+        eq.push([ax.X(lx), cy(res.eqs[i])]);
+        if (Math.log10(res.eqs[i]) < yr[0]) eqDone = true;   // gone below the chart: stop there
+      }
+      you.push([ax.X(lx), cy(res.ys[i])]);
+    }
+    el("path", { d: path(eq), class: "l-eq" }, ax.data);
+    el("path", { d: path(you), class: "l-you" }, ax.data);
+    if (isFinite(res.xf)) {
+      const i = res.xs.findIndex((x) => x >= res.xf);
+      const px = ax.X(Math.log10(res.xf)), py = cy(res.ys[Math.max(0, i)]);
+      el("circle", { cx: px, cy: py, r: 5, class: "dot-you" }, ax.g);
+      el("text", { x: px + 9, y: py - 8, class: "lab t-you" }, ax.g, "freeze-out");
+    }
+  }
+
+  function drawPlane(state) {
+    const svg = document.getElementById("plane");
+    const W = Math.max(300, svg.parentElement.clientWidth - 34), H = Math.round(Math.min(400, Math.max(280, W * 0.45)));
+    const M = { l: 52, r: 14, t: 16, b: 38 };
+    const xr = [-2, 5], yr = state.wave === "s" ? [-28, -23] : [-27, -22];
+    const narrow = W < 560;
+    const ax = frame(svg, W, H, M, xr, yr, { xlab: (e) => (narrow && (e - xr[0]) % 2 ? null : fmtDecade(e)),
+      xtitle: "WIMP mass", ytitle: state.wave === "s" ? "⟨σv⟩ (cm³/s)" : "b (cm³/s)" });
+    const thKey = `${state.g}${state.wave}`;
+    const th = DATA.thermal[thKey];
+    const tp = th.m.map((m, i) => [ax.X(Math.log10(m)), ax.Y(Math.log10(th.sv[i]))]);
+    if (state.wave === "s") {
+      for (const [key, cls] of [["bb", "l-limit"], ["tau", "l-limit2"]]) {
+        const L = DATA.fermi[key];
+        const pts = L.m.map((m, i) => [ax.X(Math.log10(m)), ax.Y(Math.log10(L.ul[i]))]).filter((p) => isFinite(p[1]));
+        if (key === "bb") {
+          const area = pts.concat([[pts[pts.length - 1][0], M.t], [pts[0][0], M.t]]);
+          el("path", { d: path(area) + "Z", class: "a-shade" }, ax.data);
+        }
+        el("path", { d: path(pts), class: cls }, ax.data);
+      }
+      el("text", { x: ax.X(Math.log10(7)), y: M.t + 16, class: "lab t-limit" }, ax.g, "excluded if all → b b̄");
+    }
+    el("path", { d: path(tp), class: "l-thermal" }, ax.data);
+    el("text", { x: ax.X(-1.6), y: ax.Y(Math.log10(interp(Math.log(0.025), th.m.map(Math.log), th.sv))) - 9, class: "lab t-target" }, ax.g, "thermal relic");
+    const px = ax.X(Math.log10(state.m)), py = ax.Y(Math.max(yr[0], Math.min(yr[1], Math.log10(state.sv))));
+    el("line", { x1: px, x2: px, y1: M.t, y2: H - M.b, class: "l-cross" }, ax.g);
+    el("circle", { cx: px, cy: py, r: 6, class: "dot-you" }, ax.g);
+    document.getElementById("plane-cap").textContent = state.wave === "s"
+      ? "Above a limit line, 42 Milky Way dwarf galaxies would glow in gamma rays that Fermi-LAT does not see (95% confidence, if every annihilation goes into that one channel). Limits are this project's own, from McDaniel et al.'s 2024 likelihoods."
+      : "A p-wave WIMP annihilates as ⟨σv⟩ = b⟨v²⟩. In a dwarf galaxy today v ≈ 10⁻⁴ c, a million times slower than at freeze-out, so gamma-ray searches cannot reach the thermal value.";
+    document.getElementById("plane-legend").querySelectorAll(".key")[1].hidden = state.wave !== "s";
+    document.getElementById("plane-legend").querySelectorAll(".key")[2].hidden = state.wave !== "s";
+  }
+
+  // ---- state and controls ---------------------------------------------------------
+  const $ = (id) => document.getElementById(id);
+  const state = { m: 100, sv: 2.2e-26, g: 2, wave: "s" };
+  function read() {
+    state.m = Math.pow(10, +$("mass").value);
+    state.sv = Math.pow(10, +$("sigv").value);
+    state.g = +$("ptype").value;
+    state.wave = $("wave-p").checked ? "p" : "s";
+  }
+  function setSigv(v) { $("sigv").value = Math.log10(v).toFixed(3); }
+  function chip(cls, text) { const c = $("verdict"); c.className = "chip " + cls; c.textContent = text; }
+  function update() {
+    read();
+    const res = relic(state.m, state.sv, state.g, state.wave, true);
+    $("mass-out").textContent = fmtMass(state.m);
+    $("sigv-label").textContent = state.wave === "s" ? "Annihilation ⟨σv⟩" : "Annihilation b  (⟨σv⟩ = 6b/x)";
+    $("sigv-out").textContent = sci(state.sv, 2) + " cm³/s";
+    const om = res.omega, ratio = om / K.OMEGA_TARGET;
+    $("omega").textContent = om >= 100 ? om.toExponential(1) : om >= 0.01 ? om.toPrecision(3) : om.toExponential(2);
+    $("ratio").textContent = ratio >= 1 ? `${ratio.toPrecision(3)} × the dark matter we observe` : `${(100 * ratio).toPrecision(3)}% of the dark matter we observe`;
+    if (ratio > 1.1) chip("bad", "too much: overcloses the universe's budget");
+    else if (ratio > 0.9) chip("good", "about right: all the dark matter");
+    else chip("warn", "too little: the rest must be something else");
+    $("f-x").textContent = isFinite(res.xf) ? "x = m/T = " + res.xf.toFixed(1) : "–";
+    $("f-T").textContent = isFinite(res.xf) ? fmtT(state.m / res.xf) : "–";
+    $("f-t").textContent = isFinite(res.xf) ? fmtTime(tOfT(state.m / res.xf)) + " after the Big Bang" : "–";
+    const th = DATA.thermal[`${state.g}${state.wave}`];
+    const thv = Math.exp(interp(Math.log(state.m), th.m.map(Math.log), th.sv.map(Math.log)));
+    $("f-th").textContent = sci(thv, 2) + " cm³/s" + (state.g === 4 ? " (χχ̄: ×2)" : "");
+    // Fermi-LAT check
+    const box = $("checks");
+    box.textContent = "";
+    const add = (cls, label, text) => {
+      const d = document.createElement("div"); d.className = "check";
+      const c = document.createElement("span"); c.className = "chip " + cls; c.textContent = label; d.appendChild(c);
+      const t = document.createElement("span"); t.textContent = text; d.appendChild(t); box.appendChild(d);
+    };
+    if (state.wave === "p") {
+      add("neutral", "dwarfs", "p-wave: annihilation today is too slow to see");
+    } else if (state.m < DATA.fermi.mmin || state.m > DATA.fermi.mmax) {
+      add("neutral", "dwarfs", "outside the gamma-ray analysis (5 GeV – 10 TeV)");
+    } else {
+      for (const [key, name] of [["bb", "b quarks"], ["tau", "τ leptons"]]) {
+        const L = DATA.fermi[key];
+        const ul = Math.exp(interp(Math.log(state.m), L.m.map(Math.log), L.ul.map(Math.log)));
+        if (state.sv > ul) add("bad", "→ " + name, `excluded: Fermi-LAT limit ${sci(ul, 1)} cm³/s`);
+        else add("good", "→ " + name, `allowed: limit ${sci(ul, 1)} cm³/s`);
+      }
+    }
+    drawTrace(state, res);
+    drawPlane(state);
+  }
+  for (const id of ["mass", "sigv", "ptype", "wave-s", "wave-p"]) $(id).addEventListener("input", update);
+  for (const id of ["wave-s", "wave-p"]) $(id).addEventListener("change", () => {
+    read();
+    setSigv(thermalValue(state.m, state.g, state.wave));
+    update();
+  });
+  $("btn-thermal").addEventListener("click", () => { read(); setSigv(thermalValue(state.m, state.g, state.wave)); update(); });
+  $("btn-canon").addEventListener("click", () => { $("wave-s").checked = true; setSigv(3e-26); update(); });
+  let rt = null;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(update, 120); });
+  read();
+  setSigv(thermalValue(state.m, state.g, state.wave));
+  update();
+})();
+</script>

@@ -1,0 +1,26 @@
+# Dyson, Eddington & Davidson 1920, printed page 309, untitled table (Sobral 4-inch lens), introduced by (quoted):
+#   "Subtracting the results of the comparison plates, so as to eliminate the errors arising from the intermediary scale
+#   plate we find for the displacements of the different stars, as compared with those as given by EINSTEIN's Theory, with
+#   value 1".75 at the sun's limb :-"
+# Source: Dyson, F. W., Eddington, A. S. & Davidson, C. 1920, Phil. Trans. R. Soc. A 220, 291-333, "A Determination of the Deflection of Light by the Sun's Gravitational Field, from Observations made at the Total Eclipse of May 29, 1919".
+# Scan: archive.org item philtrans06337895, leaf 18 (pages/leaf018.jpg); every digit read on the full-resolution 06337895_0018.jp2.
+# Printed heads: "No. of Star." | "Displacement in Right Ascension." {"Observed." "Calculated"} | "Displacement in
+#   Declination." {"Observed." "Calculated."}; unit '"' (arcsec) over each column. No totals are printed; the next text
+#   on the page is section 23 (astrographic plates).
+# Columns: star (Table I number, printed order 11 5 4 3 6 10 2), ra_observed, ra_calculated, dec_observed, dec_calculated
+#   (arcsec, as printed: explicit sign, 2 decimals). Axes as in Table I (x = R.A. east, y = Decl. north).
+# Definition, confirmed from the numbers: observed = Table VIII eclipse Mean minus Table VIII comparison Mean (13 of 14
+#   exact); calculated = K x (Ex, Ey) of p.304 with one K in 0.5501-0.5513 arcsec (1".75 at a solar radius of
+#   15'.72-15'.75; 15'.8 would give K = 0.553, which misses 2 of the 14), i.e. the Sobral columns of Table I (13 of 14
+#   identical; star 4 Decl. is +0.74 here and +0.73 in Table I, both within rounding of 0.735-0.739).
+# MISPRINT, kept as printed: star 6 R.A. observed is printed +0.10 (sign clear at full resolution). Table VIII gives
+#   -0.03 - (+0.07) = -0.10, the R.A. "observed" column then sums to -0.02 like Table VIII, and the p.331 radial observation
+#   0.56 needs -0.10 (with +0.10 it would be 0.58). A single sign change restores all three; notes R1.
+star,ra_observed,ra_calculated,dec_observed,dec_calculated
+11,-0.19,-0.32,+0.16,+0.02
+5,-0.29,-0.31,-0.46,-0.43
+4,-0.11,-0.10,+0.83,+0.74
+3,-0.20,-0.12,+1.00,+0.87
+6,+0.10,+0.04,+0.57,+0.40
+10,-0.08,+0.09,+0.35,+0.32
+2,+0.95,+0.85,-0.27,-0.09

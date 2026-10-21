@@ -1,0 +1,403 @@
+<title>Hide an Antimatter Domain</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one instrument column — controls, then the MeV sky, then a status readout and the numbers behind it. */
+:root {
+  --bg: #f4f6f9;
+  --panel: #fcfcfb;
+  --ink: #0e1420;
+  --ink-2: #4a5263;
+  --muted: #747c8c;
+  --grid: #e3e7ed;
+  --axis: #c2c8d2;
+  --pred: #2a78d6;
+  --pred-fill: rgba(42, 120, 214, 0.13);
+  --data: #0e1420;
+  --data-2: #868c97;
+  --band: #d5d9e0;
+  --hilite: rgba(208, 59, 59, 0.10);
+  --good: #0ca30c;
+  --critical: #d03b3b;
+  --focus: #2a78d6;
+  --f-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11151c; --panel: #181d25; --ink: #e7eaf0; --ink-2: #b3bac7; --muted: #8890a0;
+    --grid: #262d38; --axis: #47505f; --pred: #3987e5; --pred-fill: rgba(57, 135, 229, 0.18);
+    --data: #e7eaf0; --data-2: #98a0ad; --band: #3a424f; --hilite: rgba(208, 59, 59, 0.16);
+    --focus: #3987e5; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11151c; --panel: #181d25; --ink: #e7eaf0; --ink-2: #b3bac7; --muted: #8890a0;
+  --grid: #262d38; --axis: #47505f; --pred: #3987e5; --pred-fill: rgba(57, 135, 229, 0.18);
+  --data: #e7eaf0; --data-2: #98a0ad; --band: #3a424f; --hilite: rgba(208, 59, 59, 0.16);
+  --focus: #3987e5; color-scheme: dark;
+}
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1060px; margin: 0 auto; padding-block: 28px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 18px; }
+header { display: grid; gap: 6px; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+h1 { font-family: var(--f-display); font-weight: 600; font-size: clamp(28px, 4.2vw, 40px); line-height: 1.1; margin: 0; text-wrap: balance; }
+.lede { max-width: 68ch; color: var(--ink-2); margin: 0; }
+.controls { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr); gap: 16px 22px;
+  background: var(--panel); border: 1px solid var(--grid); border-radius: 8px; padding: 16px; }
+.ctl { display: grid; gap: 8px; min-width: 0; align-content: start; }
+.ctl label, .ctl .lab { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.d0row { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.d0val { font-family: var(--f-mono); font-size: 22px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.d0sub { font-size: 12.5px; color: var(--muted); }
+input[type=range] { width: 100%; accent-color: var(--pred); }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg button { font: inherit; font-size: 13px; padding: 5px 10px; border-radius: 6px; border: 1px solid var(--axis);
+  background: transparent; color: var(--ink); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+button:focus-visible, input:focus-visible, summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.small { font-size: 12px; color: var(--muted); }
+.linkbtn { font: inherit; font-size: 12.5px; background: none; border: none; color: var(--pred); padding: 0; cursor: pointer;
+  text-decoration: underline; text-underline-offset: 2px; justify-self: start; }
+.status { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px 16px; align-items: center;
+  background: var(--panel); border: 1px solid var(--grid); border-radius: 8px; padding: 14px 16px; }
+.pill { display: inline-flex; align-items: center; gap: 7px; font-family: var(--f-display); font-weight: 600; font-size: 15px;
+  letter-spacing: 0.02em; padding: 5px 12px; border-radius: 999px; color: #fff; }
+.pill.bad { background: var(--critical); }
+.pill.ok { background: var(--good); }
+.pill svg { width: 14px; height: 14px; }
+.verdict { margin: 0; color: var(--ink-2); min-width: 0; }
+.metrics { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px;
+  border-top: 1px solid var(--grid); padding-top: 12px; }
+.metric { display: grid; gap: 2px; min-width: 0; }
+.metric .k { font-size: 12px; color: var(--muted); }
+.metric .v { font-family: var(--f-mono); font-size: 18px; font-variant-numeric: tabular-nums; }
+.chartbox { background: var(--panel); border: 1px solid var(--grid); border-radius: 8px; padding: 12px 12px 8px; position: relative; }
+#chart { display: block; width: 100%; }
+#chart text { font-family: var(--f-body); }
+.tip { position: absolute; pointer-events: none; background: var(--panel); border: 1px solid var(--axis); border-radius: 6px;
+  padding: 7px 9px; font-size: 12px; line-height: 1.35; box-shadow: 0 4px 14px rgba(0,0,0,0.12); max-width: 240px; }
+.tip strong { font-family: var(--f-mono); font-weight: 500; font-size: 13px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 12.5px; color: var(--ink-2); padding: 6px 4px 2px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend svg { width: 22px; height: 12px; flex: none; }
+details { background: var(--panel); border: 1px solid var(--grid); border-radius: 8px; padding: 10px 14px; }
+summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+.tablewrap { overflow-x: auto; margin-top: 10px; }
+table { border-collapse: collapse; font-size: 13px; min-width: 560px; width: 100%; }
+th, td { padding: 5px 8px; text-align: right; border-bottom: 1px solid var(--grid); font-variant-numeric: tabular-nums; }
+th { font-weight: 600; color: var(--ink-2); }
+td:first-child, th:first-child { text-align: left; }
+td.over { color: var(--critical); font-weight: 600; }
+footer { font-size: 12.5px; color: var(--muted); display: grid; gap: 6px; max-width: 80ch; }
+@media (max-width: 760px) {
+  .controls { grid-template-columns: minmax(0, 1fr); }
+  .metrics { grid-template-columns: minmax(0, 1fr); }
+  .status { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Astrophysics atlas · P5 · where did the antimatter go?</div>
+    <h1>Hide an antimatter domain</h1>
+    <p class="lede">Suppose the universe were a patchwork of matter and antimatter regions. After recombination the regions
+      touch, gas flows into every boundary and annihilates, and the gamma rays from 1100 &gt; 1 + z &gt; 20 would glow
+      across today's sky at 1–45 MeV. Make the domains large enough and the glow fades below what COMPTEL measured.
+      How large is large enough?</p>
+  </header>
+
+  <section class="controls" aria-label="Assumptions">
+    <div class="ctl">
+      <label for="d0">Domain scale d₀ (boundary area per volume = 1/d₀)</label>
+      <div class="d0row"><span class="d0val" id="d0val">1.00 Gpc</span><span class="d0sub" id="d0sub"></span></div>
+      <input type="range" id="d0" min="-1" max="3.4" step="0.01" value="0">
+      <button class="linkbtn" id="tobound" type="button">Set to the smallest allowed size</button>
+    </div>
+    <div class="ctl">
+      <span class="lab" id="heatlab">Heating of the gas by annihilation electrons</span>
+      <div class="seg" role="group" aria-labelledby="heatlab" id="heat">
+        <button type="button" data-v="none" aria-pressed="false">None</button>
+        <button type="button" data-v="cdg" aria-pressed="true">Conservative</button>
+        <button type="button" data-v="full" aria-pressed="false">Full</button>
+      </div>
+      <span class="small">Conservative is Cohen, De Rújula &amp; Glashow's 1998 shortcut; full is their own deposition integral.</span>
+    </div>
+    <div class="ctl">
+      <span class="lab" id="endlab">Annihilation stops at</span>
+      <div class="seg" role="group" aria-labelledby="endlab" id="yend">
+        <button type="button" data-v="10" aria-pressed="false">z = 9</button>
+        <button type="button" data-v="20" aria-pressed="true">z = 19</button>
+        <button type="button" data-v="30" aria-pressed="false">z = 29</button>
+        <button type="button" data-v="50" aria-pressed="false">z = 49</button>
+      </div>
+      <span class="small">When the first structures form, boundaries may stop annihilating. z = 19 is the 1998 paper's choice.</span>
+    </div>
+  </section>
+
+  <section class="status" aria-live="polite">
+    <span class="pill bad" id="pill"></span>
+    <p class="verdict" id="verdict"></p>
+    <div class="metrics">
+      <div class="metric"><span class="k">Brightest band vs COMPTEL (+2σ)</span><span class="v" id="m1"></span></div>
+      <div class="metric"><span class="k">Matter annihilated by then</span><span class="v" id="m2"></span></div>
+      <div class="metric"><span class="k">Smallest allowed d₀, these assumptions</span><span class="v" id="m3"></span></div>
+    </div>
+  </section>
+
+  <section class="chartbox" aria-label="Gamma-ray spectrum">
+    <svg id="chart" role="img" aria-label="Predicted annihilation glow and measured gamma-ray background, energy squared times intensity against photon energy"></svg>
+    <div class="tip" id="tip" hidden></div>
+    <div class="legend" id="legend"></div>
+  </section>
+
+  <details id="tbl">
+    <summary>The COMPTEL bands, measured and predicted</summary>
+    <div class="tablewrap"><table id="table"></table></div>
+  </details>
+
+  <footer>
+    <span>Predictions: the boundary flow solved numerically from Cohen, De Rújula &amp; Glashow's (1998) fluid equations in the Planck 2018 universe; 3.93 photons per proton–antiproton annihilation (Crystal Barrel channels, Backenstoss et al. 1983); redshift and Compton/pair absorption to today.</span>
+    <span>Data: COMPTEL (Weidenspointner 1999; Kappadath 1998), EGRET (Strong et al. 2004), Fermi-LAT isotropic background (Ackermann et al. 2015, three Galactic foreground models), Swift-BAT (Ajello et al. 2008). The measured background is treated as an upper bound on the glow.</span>
+  </footer>
+</div>
+
+<script>
+const D = /*DATA*/null;
+const $ = (id) => document.getElementById(id);
+const state = { logd0: 0, heat: "cdg", yend: "20" };
+const SUP = { "-": "⁻", "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹" };
+function sci(v, digits = 1) {
+  if (!(v > 0)) return "0";
+  let e = Math.floor(Math.log10(v)), m = v / Math.pow(10, e);
+  if (+m.toFixed(digits) >= 10) { m /= 10; e += 1; }
+  return m.toFixed(digits) + " × 10" + String(e).split("").map((c) => SUP[c]).join("");
+}
+function fmtGpc(g) { return g >= 100 ? g.toFixed(0) : g >= 10 ? g.toFixed(1) : g.toFixed(2); }
+function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+const key = () => state.heat + "|" + state.yend;
+
+function render() {
+  const d0 = Math.pow(10, state.logd0);
+  const k = key();
+  const ratios = D.ratio1[k].w99.map((r) => r / d0);
+  let imax = 0;
+  ratios.forEach((r, i) => { if (r > ratios[imax]) imax = i; });
+  const rmax = ratios[imax];
+  const bound = D.bound[k];
+  $("d0val").textContent = fmtGpc(d0) + " Gpc";
+  $("d0sub").textContent = (d0 / D.dist_cmb).toFixed(d0 / D.dist_cmb >= 10 ? 0 : 2) + " × the distance to the CMB (" + D.dist_cmb.toFixed(1) + " Gpc)";
+  const c = D.comptel.w99;
+  const band = c.lo[imax] + "–" + c.hi[imax] + " MeV";
+  const pill = $("pill");
+  pill.textContent = "";
+  const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  icon.setAttribute("viewBox", "0 0 14 14");
+  const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  p.setAttribute("fill", "none"); p.setAttribute("stroke", "currentColor"); p.setAttribute("stroke-width", "2.2");
+  p.setAttribute("stroke-linecap", "round");
+  if (rmax >= 1) {
+    pill.className = "pill bad"; p.setAttribute("d", "M3 3 L11 11 M11 3 L3 11");
+    $("verdict").textContent = "Ruled out. Domains this small would glow " + rmax.toFixed(rmax < 10 ? 1 : 0) +
+      " times brighter than COMPTEL allows in the " + band + " band.";
+  } else {
+    pill.className = "pill ok"; p.setAttribute("d", "M2.5 7.5 L5.8 10.5 L11.5 3.5");
+    $("verdict").textContent = "Hidden. The glow stays below COMPTEL's MeV background everywhere (brightest band " +
+      band + " at " + (100 * rmax).toFixed(0) + "% of the limit)" + (d0 > D.dist_cmb ? ", but these domains are larger than everything we can see." : ".");
+  }
+  icon.appendChild(p);
+  pill.appendChild(icon);
+  pill.appendChild(document.createTextNode(rmax >= 1 ? "Excluded" : "Allowed"));
+  $("m1").textContent = "× " + (rmax >= 10 ? rmax.toFixed(0) : rmax.toFixed(2));
+  const frac = D.frac1[k] / d0;
+  $("m2").textContent = frac >= 1e-3 ? (100 * frac).toFixed(2) + " %" : sci(frac) + " of all";
+  $("m3").textContent = fmtGpc(bound) + " Gpc";
+  drawChart(d0, imax);
+  drawTable(d0);
+}
+
+function niceTicks(lo, hi) { const t = []; for (let e = Math.ceil(Math.log10(lo)); e <= Math.floor(Math.log10(hi)); e++) t.push(Math.pow(10, e)); return t; }
+const XL = [0.012, 2000], YL = [1e-5, 30];
+let geom = null, lastPoints = [];
+
+function drawChart(d0, imax) {
+  const svg = $("chart");
+  const W = Math.max(320, svg.parentElement.clientWidth - 24);
+  const H = Math.round(Math.max(300, Math.min(520, W * 0.56)));
+  const m = { l: 58, r: 14, t: 12, b: 46 };
+  svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+  svg.setAttribute("height", H);
+  const x = (e) => m.l + (Math.log10(e) - Math.log10(XL[0])) / (Math.log10(XL[1]) - Math.log10(XL[0])) * (W - m.l - m.r);
+  const y = (v) => m.t + (Math.log10(YL[1]) - Math.log10(Math.max(v, YL[0] * 1e-3))) / (Math.log10(YL[1]) - Math.log10(YL[0])) * (H - m.t - m.b);
+  geom = { x, y, W, H, m };
+  const ns = "http://www.w3.org/2000/svg";
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+  const el = (tag, attrs, parent = svg) => { const e = document.createElementNS(ns, tag); for (const a in attrs) e.setAttribute(a, attrs[a]); parent.appendChild(e); return e; };
+  const clip = el("clipPath", { id: "plotclip" }); el("rect", { x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b }, clip);
+  // grid and axes
+  for (const t of niceTicks(XL[0], XL[1])) {
+    el("line", { x1: x(t), x2: x(t), y1: m.t, y2: H - m.b, stroke: css("--grid"), "stroke-width": 1 });
+    const lab = t >= 1 ? String(t) : String(t);
+    const tx = el("text", { x: x(t), y: H - m.b + 16, "text-anchor": "middle", "font-size": 11, fill: css("--muted") });
+    tx.textContent = lab;
+  }
+  for (const t of niceTicks(YL[0], YL[1])) {
+    el("line", { x1: m.l, x2: W - m.r, y1: y(t), y2: y(t), stroke: css("--grid"), "stroke-width": 1 });
+    const tx = el("text", { x: m.l - 6, y: y(t) + 4, "text-anchor": "end", "font-size": 11, fill: css("--muted") });
+    tx.textContent = sci(t, 0).replace("1.0 × ", "").replace("1 × ", "");
+  }
+  el("line", { x1: m.l, x2: W - m.r, y1: H - m.b, y2: H - m.b, stroke: css("--axis") });
+  el("line", { x1: m.l, x2: m.l, y1: m.t, y2: H - m.b, stroke: css("--axis") });
+  const xl = el("text", { x: (m.l + W - m.r) / 2, y: H - 8, "text-anchor": "middle", "font-size": 12, fill: css("--ink-2") });
+  xl.textContent = "photon energy today (MeV)";
+  const yl = el("text", { x: 14, y: (m.t + H - m.b) / 2, "text-anchor": "middle", "font-size": 12, fill: css("--ink-2"),
+    transform: "rotate(-90 14 " + (m.t + H - m.b) / 2 + ")" });
+  yl.textContent = "E² × intensity (MeV cm⁻² s⁻¹ sr⁻¹)";
+  const g = el("g", { "clip-path": "url(#plotclip)" });
+  // highlight the brightest COMPTEL band
+  const c = D.comptel.w99;
+  el("rect", { x: x(c.lo[imax]), width: x(c.hi[imax]) - x(c.lo[imax]), y: m.t, height: H - m.t - m.b, fill: css("--hilite") }, g);
+  // Fermi band (step)
+  const f = D.fermi;
+  let dpath = "";
+  f.mid.forEach((e, i) => { dpath += (i ? "L" : "M") + x(f.elo[i]) + "," + y(f.hi[i]) + "L" + x(f.ehi[i]) + "," + y(f.hi[i]); });
+  for (let i = f.mid.length - 1; i >= 0; i--) dpath += "L" + x(f.ehi[i]) + "," + y(f.lo[i]) + "L" + x(f.elo[i]) + "," + y(f.lo[i]);
+  el("path", { d: dpath + "Z", fill: css("--band"), stroke: "none" }, g);
+  // prediction
+  const E = D.E, S = D.spectra[key()];
+  let pp = "", area = "";
+  E.forEach((e, i) => { const v = S[i] / d0; if (v > 0) { pp += (pp ? "L" : "M") + x(e).toFixed(1) + "," + y(v).toFixed(1); } });
+  area = pp + "L" + x(E[E.length - 1]) + "," + (H - m.b) + "L" + x(E[0]) + "," + (H - m.b) + "Z";
+  el("path", { d: area, fill: css("--pred-fill"), stroke: "none" }, g);
+  el("path", { d: pp, fill: "none", stroke: css("--pred"), "stroke-width": 2.2, "stroke-linejoin": "round" }, g);
+  // data
+  lastPoints = [];
+  const point = (cx, cy, shape, color, filled, info, errLo, errHi, xlo, xhi) => {
+    if (errLo !== undefined) el("line", { x1: cx, x2: cx, y1: y(errHi), y2: y(Math.max(errLo, YL[0] * 1e-3)), stroke: color, "stroke-width": 1 }, g);
+    if (xlo !== undefined) el("line", { x1: x(xlo), x2: x(xhi), y1: cy, y2: cy, stroke: color, "stroke-width": 1 }, g);
+    let s;
+    if (shape === "sq") s = el("rect", { x: cx - 4, y: cy - 4, width: 8, height: 8, fill: filled ? color : css("--panel"), stroke: color, "stroke-width": 1.4 }, g);
+    else if (shape === "di") s = el("path", { d: "M" + cx + "," + (cy - 5) + "L" + (cx + 5) + "," + cy + "L" + cx + "," + (cy + 5) + "L" + (cx - 5) + "," + cy + "Z", fill: css("--panel"), stroke: color, "stroke-width": 1.4 }, g);
+    else if (shape === "tr") s = el("path", { d: "M" + cx + "," + (cy - 5) + "L" + (cx + 5) + "," + (cy + 4) + "L" + (cx - 5) + "," + (cy + 4) + "Z", fill: color, stroke: "none" }, g);
+    else s = el("circle", { cx, cy, r: 3, fill: color }, g);
+    lastPoints.push({ cx, cy, info });
+  };
+  D.bat.mid.forEach((e, i) => { const v = D.bat.E2I[i]; point(x(e), y(v), "ci", css("--data-2"), true,
+    ["Swift-BAT", (e * 1000).toFixed(0) + " keV", v], v - D.bat.err[i], v + D.bat.err[i]); });
+  D.egret.mid.forEach((e, i) => { const v = e * e * D.egret.I[i], er = e * e * D.egret.err[i]; point(x(e), y(v), "tr", css("--data-2"), true,
+    ["EGRET (Strong et al. 2004)", e.toFixed(0) + " MeV", v], v - er, v + er); });
+  for (const [a, shape, lab] of [["k98", "di", "COMPTEL (Kappadath 1998)"], ["w99", "sq", "COMPTEL (Weidenspointner 1999)"]]) {
+    const cc = D.comptel[a];
+    cc.mid.forEach((e, i) => { const v = e * e * cc.I[i], er = e * e * cc.err[i];
+      point(x(e), y(v), shape, css("--data"), a === "w99", [lab, cc.lo[i] + "–" + cc.hi[i] + " MeV", v, (D.ratio1[key()][a][i] / d0)],
+        v - er, v + er, cc.lo[i], cc.hi[i]); });
+  }
+  drawLegend();
+}
+
+function drawLegend() {
+  const L = $("legend");
+  L.textContent = "";
+  const items = [["line", css("--pred"), "Predicted annihilation glow"], ["sq", css("--data"), "COMPTEL, Weidenspointner 1999"],
+    ["di", css("--data"), "COMPTEL, Kappadath 1998"], ["tr", css("--data-2"), "EGRET"], ["band", css("--band"), "Fermi-LAT isotropic background"],
+    ["ci", css("--data-2"), "Swift-BAT"], ["hl", css("--hilite"), "brightest band"]];
+  const ns = "http://www.w3.org/2000/svg";
+  for (const [t, col, lab] of items) {
+    const s = document.createElement("span");
+    const ic = document.createElementNS(ns, "svg"); ic.setAttribute("viewBox", "0 0 22 12");
+    const add = (tag, at) => { const e = document.createElementNS(ns, tag); for (const k in at) e.setAttribute(k, at[k]); ic.appendChild(e); };
+    if (t === "line") add("line", { x1: 1, x2: 21, y1: 6, y2: 6, stroke: col, "stroke-width": 2.4 });
+    else if (t === "sq") add("rect", { x: 7, y: 2, width: 8, height: 8, fill: col });
+    else if (t === "di") add("path", { d: "M11 1 L16 6 L11 11 L6 6 Z", fill: "none", stroke: col, "stroke-width": 1.4 });
+    else if (t === "tr") add("path", { d: "M11 1 L16 10 L6 10 Z", fill: col });
+    else if (t === "ci") add("circle", { cx: 11, cy: 6, r: 3, fill: col });
+    else add("rect", { x: 1, y: 2, width: 20, height: 8, fill: col });
+    s.appendChild(ic); s.appendChild(document.createTextNode(lab)); L.appendChild(s);
+  }
+}
+
+function drawTable(d0) {
+  const T = $("table");
+  T.textContent = "";
+  const head = T.insertRow();
+  ["Band (MeV)", "Measured E²I", "± (stat+syst)", "Predicted E²I", "Prediction / (measured + 2σ)"].forEach((h) => {
+    const th = document.createElement("th"); th.textContent = h; head.appendChild(th); });
+  const c = D.comptel.w99, r1 = D.ratio1[key()].w99;
+  c.mid.forEach((e, i) => {
+    const row = T.insertRow();
+    const ratio = r1[i] / d0, meas = e * e * c.I[i], err = e * e * c.err[i];
+    const pred = ratio * (c.I[i] + 2 * c.err[i]) * e * e;
+    [c.lo[i] + "–" + c.hi[i], sci(meas, 2), sci(err, 1), sci(pred, 2), ratio.toFixed(ratio >= 10 ? 0 : 2)].forEach((v, j) => {
+      const td = row.insertCell(); td.textContent = v; if (j === 4 && ratio >= 1) td.className = "over"; });
+  });
+}
+
+function showTip(ev) {
+  if (!geom) return;
+  const svg = $("chart"), r = svg.getBoundingClientRect();
+  const sx = (ev.clientX - r.left) * geom.W / r.width, sy = (ev.clientY - r.top) * geom.H / r.height;
+  const tip = $("tip");
+  let best = null, bd = 22 * geom.W / r.width;
+  for (const p of lastPoints) { const d = Math.hypot(p.cx - sx, p.cy - sy); if (d < bd) { bd = d; best = p; } }
+  tip.textContent = "";
+  const line = (strong, rest) => { const div = document.createElement("div"); const s = document.createElement("strong"); s.textContent = strong;
+    div.appendChild(s); if (rest) div.appendChild(document.createTextNode(" " + rest)); tip.appendChild(div); };
+  if (best) {
+    const [lab, where, v, ratio] = best.info;
+    line(sci(v, 2), "MeV cm⁻² s⁻¹ sr⁻¹");
+    const d = document.createElement("div"); d.textContent = lab + ", " + where; tip.appendChild(d);
+    if (ratio !== undefined) { const q = document.createElement("div"); q.textContent = "prediction / limit here: " + (ratio >= 10 ? ratio.toFixed(0) : ratio.toFixed(2)); tip.appendChild(q); }
+  } else if (sx > geom.m.l && sx < geom.W - geom.m.r) {
+    const lx = Math.log10(XL[0]) + (sx - geom.m.l) / (geom.W - geom.m.l - geom.m.r) * (Math.log10(XL[1]) - Math.log10(XL[0]));
+    const e = Math.pow(10, lx), E = D.E, S = D.spectra[key()];
+    if (e < E[0] || e > E[E.length - 1]) { tip.hidden = true; return; }
+    let j = 0; while (j < E.length - 2 && E[j + 1] < e) j++;
+    const t = (Math.log(e) - Math.log(E[j])) / (Math.log(E[j + 1]) - Math.log(E[j]));
+    const v = Math.exp((1 - t) * Math.log(Math.max(S[j], 1e-300)) + t * Math.log(Math.max(S[j + 1], 1e-300))) / Math.pow(10, state.logd0);
+    if (!(v > YL[0])) { tip.hidden = true; return; }
+    line(sci(v, 2), "MeV cm⁻² s⁻¹ sr⁻¹");
+    const d = document.createElement("div"); d.textContent = "predicted glow at " + (e >= 1 ? e.toFixed(1) : e.toFixed(2)) + " MeV"; tip.appendChild(d);
+  } else { tip.hidden = true; return; }
+  tip.hidden = false;
+  const box = svg.parentElement.getBoundingClientRect();
+  let left = ev.clientX - box.left + 14, top = ev.clientY - box.top + 14;
+  if (left + 250 > box.width) left = ev.clientX - box.left - 250;
+  tip.style.left = Math.max(4, left) + "px"; tip.style.top = top + "px";
+}
+
+function bindSeg(id, prop) {
+  const root = $(id);
+  root.addEventListener("click", (ev) => {
+    const b = ev.target.closest("button"); if (!b) return;
+    state[prop] = b.dataset.v;
+    for (const x of root.querySelectorAll("button")) x.setAttribute("aria-pressed", x === b ? "true" : "false");
+    render();
+  });
+}
+
+function start() {
+  if (!D) return;
+  $("d0").addEventListener("input", (ev) => { state.logd0 = +ev.target.value; render(); });
+  $("tobound").addEventListener("click", () => { state.logd0 = Math.log10(D.bound[key()] * 1.001); $("d0").value = state.logd0.toFixed(2); render(); });
+  bindSeg("heat", "heat"); bindSeg("yend", "yend");
+  const svg = $("chart");
+  svg.addEventListener("pointermove", showTip);
+  svg.addEventListener("pointerdown", showTip);
+  svg.addEventListener("pointerleave", () => { $("tip").hidden = true; });
+  window.addEventListener("scroll", () => { $("tip").hidden = true; }, { passive: true });
+  let raf = 0;
+  window.addEventListener("resize", () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(render); });
+  try { window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", render); } catch (e) {}
+  new MutationObserver(render).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  state.logd0 = 0;                                   // open at 1 Gpc, the scale Cohen et al. discussed
+  $("d0").value = "0";
+  render();
+}
+start();
+</script>

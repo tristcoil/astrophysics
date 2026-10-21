@@ -1,0 +1,23 @@
+# Source: Harvey, G. M. 1979, The Observatory 99, 195-198; ADS 1979Obs....99..195H. Read on the PDF's native 3456x5400 page
+#   images; every value checked at high zoom.
+# Table: Table III, printed page 198, "Gravitational displacement at the Sun's limb in seconds of arc". Printed columns
+#   "Determination" | "Displacement" (entries "value +- error").
+# Columns: determination (printed wording); displacement_arcsec; error_arcsec = the printed +- value (empty if none printed);
+#   note.
+# Units: arcsec at the Sun's limb.
+# Error type: the Zeiss rows are standard errors (Table II errors x 1.75; p.198 "weighted according to their standard errors").
+#   The +-0.18 of "4-inch plates reduced by Dyson et al." equals Dyson et al.'s "probable error of about +-0".12" (Phil. Trans.
+#   A 220, p.331) divided by 0.6745 (= 0.178), i.e. that probable error converted to a standard error; Harvey does not state
+#   this conversion. "Astrographic plates reduced by Dyson et al." is printed "0.93:" with no error; the trailing colon is the
+#   old convention for an uncertain value; text p.198: "a value of 0".93 with an unspecified, large error".
+# Text result not in the table (p.198, verbatim): "Combining the two fresh determinations, weighted according to their standard
+#   errors, gives 1".87+-0".13, a result which is just within one standard error of the predicted value."
+# Checks (harvey1979_summary.md): Table II means x 1.75 = 1.908 +- 0.104 and 1.540 +- 0.334, printed 1.90 +- 0.11 and
+#   1.55 +- 0.34 (each within the rounding of Table II, at its edge). The inverse-variance combination of 1.90 +- 0.11 and
+#   1.55 +- 0.34 is 1.867 +- 0.105: the mean 1.87 is reproduced, the printed error 0.13 is not.
+determination,displacement_arcsec,error_arcsec,note
+Predicted from Einstein's theory,1.75,,
+4-inch plates reduced by Dyson et al.,1.98,0.18,
+4-inch plates measured on the Zeiss,1.90,0.11,
+Astrographic plates reduced by Dyson et al.,0.93,,printed '0.93:' (colon after the value; no error printed)
+Astrographic plates measured on the Zeiss,1.55,0.34,

@@ -1,0 +1,42 @@
+# Dyson, Eddington & Davidson 1920, Table I (printed page 293).
+# Source: Dyson, F. W., Eddington, A. S. & Davidson, C. 1920, Phil. Trans. R. Soc. A 220, 291-333, "A Determination of the Deflection of Light by the Sun's Gravitational Field, from Observations made at the Total Eclipse of May 29, 1919".
+# Scan: archive.org item philtrans06337895, leaf 2 (pages/leaf002.jpg); every digit checked on the full-resolution 06337895_0002.jp2.
+# Content: photographic magnitudes and standard co-ordinates of the 13 stars, and the gravitational
+#   displacements in x and y "calculated on the assumption of a radial displacement 1".75 r0/r, where r is the
+#   distance from the sun's centre and r0 the radius of the sun", for Sobral and for Principe (p.293 text).
+# Columns:
+#   no          star number of Table I (the numbering used throughout the paper)
+#   name        plain-ASCII star name. Printed forms: "B.D., 21deg, 641", "Piazzi, IV, 82", "kappa^2 Tauri",
+#               "kappa^1 Tauri", "Piazzi, IV, 61", "upsilon Tauri", "B.D., 20deg, 741", "B.D., 20deg, 740",
+#               "Piazzi, IV, 53", "72 Tauri", "66 Tauri", "53 Tauri", "B.D., 22deg, 688"
+#   photog_mag  photographic magnitude (column "Photog. Mag.", unit m)
+#   x, y        standard co-ordinates, unit = 50 arcmin as printed ("Co-ordinates. Unit = 50'");
+#               x increases toward the east (R.A.), y toward the north (Decl.)
+#   sobral_dx, sobral_dy       predicted gravitational displacement at Sobral, arcsec
+#   principe_dx, principe_dy   predicted gravitational displacement at Principe, arcsec
+# Signs and precision exactly as printed (explicit + or -); old typesetting 0".85 written 0.85.
+# Displacement signs: + = toward +x (east) / +y (north), i.e. the same axes as x, y.
+# Checks (details in dyson1920_sobral4inch_notes.md): x, y of stars 11 5 4 3 6 10 2 equal those printed on p.304;
+#   all 26 x, y agree with Gaia DR3 places projected to 1919 within 0.0009 units (rms 1.7 arcsec); each site's
+#   displacements fit k (s - s_sun)/|s - s_sun|^2 with rms 0.003 arcsec (= rounding) except the two values below.
+# Printed values that do not fit the paper's own radial 1/r pattern (kept exactly as printed):
+#   star 13 sobral_dx printed -0.17; the pattern fitted to the other 25 Sobral values gives -0.110 (residual
+#     -0.060 arcsec, 20x the rounding scatter; Principe gives -0.14 for this star). A single digit (-0.11) would fit.
+#   star 8 principe_dx printed -0.29; the pattern fitted to the other 25 Principe values gives -0.310 (residual
+#     +0.020 arcsec). Neither star was used on the Sobral 4-inch plates.
+# Name note: printed "66 Tauri" is kept; the star at these co-ordinates is 56 Tau = HD 27309 (Gaia match in the
+#   project's config.py TABLE1_GAIA; 66 Tau is about 12 degrees away).
+no,name,photog_mag,x,y,sobral_dx,sobral_dy,principe_dx,principe_dy
+1,BD +21 641,7.0,+0.026,-0.200,-1.31,+0.20,-1.04,+0.09
+2,Piazzi IV 82,5.8,+1.079,-0.328,+0.85,-0.09,+1.02,-0.16
+3,kappa2 Tau,5.5,+0.348,+0.360,-0.12,+0.87,-0.28,+0.81
+4,kappa1 Tau,4.5,+0.334,+0.472,-0.10,+0.73,-0.21,+0.70
+5,Piazzi IV 61,6.0,-0.160,-1.107,-0.31,-0.43,-0.31,-0.38
+6,upsilon Tau,4.5,+0.587,+1.099,+0.04,+0.40,+0.01,+0.41
+7,BD +20 741,7.0,-0.707,-0.864,-0.38,-0.20,-0.35,-0.17
+8,BD +20 740,7.0,-0.727,-1.040,-0.33,-0.22,-0.29,-0.20
+9,Piazzi IV 53,7.0,-0.483,-1.303,-0.26,-0.30,-0.26,-0.27
+10,72 Tau,5.5,+0.860,+1.321,+0.09,+0.32,+0.07,+0.34
+11,66 Tau,5.5,-1.261,-0.160,-0.32,+0.02,-0.30,+0.01
+12,53 Tau,5.5,-1.311,-0.918,-0.28,-0.10,-0.26,-0.09
+13,BD +22 688,8.0,+0.089,+1.007,-0.17,+0.40,-0.14,+0.39

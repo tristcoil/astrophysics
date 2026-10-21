@@ -1,0 +1,42 @@
+# Dyson, Eddington & Davidson 1920, printed page 307, second table (untitled), introduced by: "When these are applied to
+#   the values of the constants found from the normal equations, we find the following values of the scale of the several
+#   photographs and their orientation relative to the scale plate :-"
+# Source: Dyson, F. W., Eddington, A. S. & Davidson, C. 1920, Phil. Trans. R. Soc. A 220, 291-333, "A Determination of the Deflection of Light by the Sun's Gravitational Field, from Observations made at the Total Eclipse of May 29, 1919".
+# Scan: archive.org item philtrans06337895, leaf 16 (pages/leaf016.jpg); every digit read on the full-resolution 06337895_0016.jp2.
+# Printed heads: "Scale Value." {"From x." "From y."}  "Orientation." {"From x." "From y."}  "Adopted Scale Orientation."
+#   (two columns: adopted scale, adopted orientation). Unit r (revolutions per unit of x, y, i.e. per 50'); the "r" is printed
+#   over the two Scale Value columns and over the adopted-orientation column only. Rows "Eclipse I." ",, II." ... ",, VIII."
+#   then "Comparison 14_2a" ",, 14_2b" ... ",, 18_2".
+# Columns: plate, kind (eclipse|comparison), scale_from_x_rev, scale_from_y_rev, orientation_from_x_rev,
+#   orientation_from_y_rev, adopted_scale_rev, adopted_orientation_rev (as printed; the eclipse adopted scale is printed
+#   "0.000" without sign).
+# Text after the table (p.307-308), quoted: "The agreement in the scale values obtained from x and y is satisfactory. There
+#   appears to be a small difference in the orientations as derived from the two directions in the comparison plates.
+#   This is, however, of small importance in the determination of alpha. There is a difference of scale value from July
+#   15-18 shown in both co-ordinates. For the purpose of exhibiting the gravitational displacements, residuals have been
+#   computed using adopted values for the scale and orientation given above, along with the calculated corrections for
+#   differential refraction and aberration. This has the advantage of reducing the number of constants employed in the
+#   reduction of the plates, and lessens the possibility of masking any discordances, though greater irregularities
+#   necessarily appear when four arbitrary constants instead of six are used in the reduction of each plate."
+# Derivation confirmed from the numbers (55 of 56 exact): scale from x = a + [a(row) - a(scale plate)]; scale from y =
+#   e + [e(row) - e(scale)]; orientation from x = b + [b(row) - b(scale)]; orientation from y = -(d + [d(row) - d(scale)]);
+#   a, b = solutions of Tables III/IV, e, d = solutions of Tables V/VI, brackets from the first p.307 table.
+#   Exception, kept as printed: 14_2b scale from x is printed +0.008; the arithmetic gives 0.032 + 0.409 - 0.423 = +0.018
+#   (notes R3). The adopted scale +0.013 of 14_2a/14_2b is the mean of their four printed scale values including +0.008.
+# Adopted orientation = mean of the two orientations (14 of 14). Adopted scale = +0.013 (July 14 plates), -0.084 (mean of
+#   the 10 values of 15_1-18_2), 0.000 for the eclipse plates (their 14 printed values average -0.003).
+plate,kind,scale_from_x_rev,scale_from_y_rev,orientation_from_x_rev,orientation_from_y_rev,adopted_scale_rev,adopted_orientation_rev
+I,eclipse,-0.025,-0.010,-0.237,-0.265,0.000,-0.251
+II,eclipse,-0.009,-0.024,-0.045,-0.107,0.000,-0.076
+III,eclipse,+0.006,+0.053,+0.014,+0.025,0.000,+0.020
+IV,eclipse,-0.056,+0.006,-0.027,-0.040,0.000,-0.034
+V,eclipse,-0.055,-0.006,+0.008,+0.031,0.000,+0.020
+VII,eclipse,+0.050,+0.017,+0.032,+0.050,0.000,+0.041
+VIII,eclipse,-0.014,+0.031,+0.008,+0.006,0.000,+0.007
+14_2a,comparison,+0.010,+0.004,+0.081,+0.033,+0.013,+0.057
+14_2b,comparison,+0.008,+0.030,-0.035,-0.049,+0.013,-0.042
+15_1,comparison,-0.063,-0.085,+0.155,+0.086,-0.084,+0.120
+15_2,comparison,-0.065,-0.075,+0.003,-0.035,-0.084,-0.016
+17_1,comparison,-0.118,-0.077,-0.116,-0.174,-0.084,-0.145
+17_2,comparison,-0.072,-0.109,+0.062,+0.029,-0.084,+0.046
+18_2,comparison,-0.093,-0.087,-0.014,-0.074,-0.084,-0.044

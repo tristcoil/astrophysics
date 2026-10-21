@@ -362,7 +362,7 @@ The file needed cleaning before any map or statistic meant anything. Every repai
 ## How to run
 
 ```bash
-cd ~/Desktop/astrophysics
+cd astrophysics
 source .venv/bin/activate       # numpy, scipy, pandas, matplotlib, plotly, requests
 cd 14-meteorite-landings
 python run.py                   # fetch (once, ~10 MB) -> analysis -> figures -> summary

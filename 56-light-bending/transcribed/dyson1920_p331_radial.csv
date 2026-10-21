@@ -1,0 +1,27 @@
+# Dyson, Eddington & Davidson 1920, printed page 331 (section 39, "V. General Conclusions"), table "RADIAL Displacement of
+#   Individual Stars." Introduced by (quoted, p.331): "It has been assumed that the displacement is inversely proportional
+#   to the distance from the sun's centre, since all theories agree on this, and indeed it seems clear from considerations
+#   of dimensions that a displacement, if due to gravitation, must follow this law. From the results with the 4-inch lens,
+#   some kind of test of the law is possible though it is necessarily only rough. The evidence is summarised in the
+#   following table and diagram, which show the radial displacement of the individual stars (mean from all the plates)
+#   plotted against the reciprocal of the distance from the centre. The displacement according to EINSTEIN's theory is
+#   indicated by the heavy line, according to the Newtonian law by the dotted line, and from these observations by the
+#   thin line." (The diagram is "Diagram 2", p.332.)
+# Source: Dyson, F. W., Eddington, A. S. & Davidson, C. 1920, Phil. Trans. R. Soc. A 220, 291-333, "A Determination of the Deflection of Light by the Sun's Gravitational Field, from Observations made at the Total Eclipse of May 29, 1919".
+# Scan: archive.org item philtrans06337895, leaf 40 (pages/leaf040.jpg); read on the full-resolution 06337895_0040.jp2.
+# Printed heads: "Star." "Calculation." "Observation."; unit '"' (arcsec). Values printed without sign (radial, outward).
+# The table has a single group; no station or instrument rows are printed. station_instrument = "Sobral 4-inch" is taken
+#   from the sentence above ("From the results with the 4-inch lens ...").
+# Columns: station_instrument, star (Table I number; printed order 11 10 6 5 4 2 3, i.e. decreasing distance from the sun),
+#   calculation_arcsec, observation_arcsec (as printed, 2 decimals).
+# Check (notes file): both columns equal the p.309 R.A./Decl. components projected on the unit vector from the sun to the
+#   star (Table I x, y; sun from the Table I Sobral displacements, about x = +0.436, y = -0.263): calculation 7 of 7 and
+#   observation 6 of 7 within rounding; star 6 observation 0.56 requires the p.309 R.A. value -0.10 (printed +0.10, R1).
+station_instrument,star,calculation_arcsec,observation_arcsec
+Sobral 4-inch,11,0.32,0.20
+Sobral 4-inch,10,0.33,0.32
+Sobral 4-inch,6,0.40,0.56
+Sobral 4-inch,5,0.53,0.54
+Sobral 4-inch,4,0.75,0.84
+Sobral 4-inch,2,0.85,0.97
+Sobral 4-inch,3,0.88,1.02

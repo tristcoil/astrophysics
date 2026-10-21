@@ -1,0 +1,101 @@
+# Published measurements of the CMB temperature at redshift z.
+# Transcribed by hand from the papers' own tables (see "source"); test_tcmb_table.py
+# re-reads those tables from the arXiv sources in data/papers/ and checks every value.
+#
+# kind: value (T with errors), upper (T is an upper limit), range (T = midpoint and
+#   err = half-width of a quoted 1-sigma range).
+# err_plus / err_minus: statistical 1-sigma errors; err_sys: separately quoted systematic.
+# sets: which data sets the row belongs to
+#   riechers22   - Extended Data Table 1 of Riechers et al. 2022 (Nature 602, 58), complete
+#   noterdaeme11 - the data behind Noterdaeme et al. 2011's beta fit (A&A 526, L7)
+#   baseline     - our independent compilation: one analysis per cluster sample or absorber,
+#                  collisionally corrected absorber values where available, plus 2025-26 results
+object,z,method,T,err_plus,err_minus,err_sys,kind,reference,source,sets
+COBE/FIRAS,0.0,CMB spectrum,2.72548,0.00057,0.00057,0,value,Fixsen 2009 ApJ 707 916,Riechers22 EDT1,riechers22;baseline
+COBE/FIRAS (1999),0.0,CMB spectrum,2.725,0.002,0.002,0,value,Mather et al. 1999 ApJ 512 511,Noterdaeme11 Fig. 1,noterdaeme11
+Planck clusters dz=0.05 stack,0.037,tSZ,2.888,0.039,0.039,0.011,value,Hurier et al. 2014 A&A 561 A143,Riechers22 EDT1,riechers22;baseline
+Planck clusters dz=0.05 stack,0.072,tSZ,2.931,0.017,0.017,0.011,value,Hurier et al. 2014 A&A 561 A143,Riechers22 EDT1,riechers22;baseline
+Planck clusters dz=0.05 stack,0.125,tSZ,3.059,0.032,0.032,0.012,value,Hurier et al. 2014 A&A 561 A143,Riechers22 EDT1,riechers22;baseline
+Planck clusters dz=0.05 stack,0.171,tSZ,3.197,0.030,0.030,0.012,value,Hurier et al. 2014 A&A 561 A143,Riechers22 EDT1,riechers22;baseline
+Planck clusters dz=0.05 stack,0.220,tSZ,3.288,0.032,0.032,0.013,value,Hurier et al. 2014 A&A 561 A143,Riechers22 EDT1,riechers22;baseline
+Planck clusters dz=0.05 stack,0.273,tSZ,3.416,0.038,0.038,0.013,value,Hurier et al. 2014 A&A 561 A143,Riechers22 EDT1,riechers22;baseline
+Planck clusters dz=0.05 stack,0.322,tSZ,3.562,0.050,0.050,0.014,value,Hurier et al. 2014 A&A 561 A143,Riechers22 EDT1,riechers22;baseline
+Planck clusters dz=0.05 stack,0.377,tSZ,3.717,0.063,0.063,0.014,value,Hurier et al. 2014 A&A 561 A143,Riechers22 EDT1,riechers22;baseline
+Planck clusters dz=0.05 stack,0.428,tSZ,3.971,0.071,0.071,0.015,value,Hurier et al. 2014 A&A 561 A143,Riechers22 EDT1,riechers22;baseline
+Planck clusters dz=0.05 stack,0.471,tSZ,3.943,0.112,0.112,0.015,value,Hurier et al. 2014 A&A 561 A143,Riechers22 EDT1,riechers22;baseline
+Planck clusters dz=0.05 stack,0.525,tSZ,4.380,0.119,0.119,0.016,value,Hurier et al. 2014 A&A 561 A143,Riechers22 EDT1,riechers22;baseline
+Planck clusters dz=0.05 stack,0.565,tSZ,4.075,0.156,0.156,0.016,value,Hurier et al. 2014 A&A 561 A143,Riechers22 EDT1,riechers22;baseline
+Planck clusters dz=0.05 stack,0.619,tSZ,4.404,0.194,0.194,0.016,value,Hurier et al. 2014 A&A 561 A143,Riechers22 EDT1,riechers22;baseline
+Planck clusters dz=0.05 stack,0.676,tSZ,4.779,0.278,0.278,0.017,value,Hurier et al. 2014 A&A 561 A143,Riechers22 EDT1,riechers22;baseline
+Planck clusters dz=0.05 stack,0.718,tSZ,4.933,0.371,0.371,0.017,value,Hurier et al. 2014 A&A 561 A143,Riechers22 EDT1,riechers22;baseline
+Planck clusters dz=0.05 stack,0.783,tSZ,4.515,0.621,0.621,0.018,value,Hurier et al. 2014 A&A 561 A143,Riechers22 EDT1,riechers22;baseline
+Planck clusters dz=0.05 stack,0.870,tSZ,5.356,0.617,0.617,0.019,value,Hurier et al. 2014 A&A 561 A143,Riechers22 EDT1,riechers22;baseline
+Planck clusters dz=0.05 stack,0.972,tSZ,5.813,1.025,1.025,0.020,value,Hurier et al. 2014 A&A 561 A143,Riechers22 EDT1,riechers22;baseline
+Planck X-ray clusters stack,0.042,tSZ,2.856,0.018,0.018,0,value,de Martino et al. 2015 ApJ 808 128,Riechers22 EDT1,riechers22
+Planck X-ray clusters stack,0.077,tSZ,2.953,0.021,0.021,0,value,de Martino et al. 2015 ApJ 808 128,Riechers22 EDT1,riechers22
+Planck X-ray clusters stack,0.123,tSZ,3.072,0.026,0.026,0,value,de Martino et al. 2015 ApJ 808 128,Riechers22 EDT1,riechers22
+Planck X-ray clusters stack,0.169,tSZ,3.162,0.020,0.020,0,value,de Martino et al. 2015 ApJ 808 128,Riechers22 EDT1,riechers22
+Planck X-ray clusters stack,0.222,tSZ,3.326,0.015,0.015,0,value,de Martino et al. 2015 ApJ 808 128,Riechers22 EDT1,riechers22
+Planck X-ray clusters stack,0.274,tSZ,3.495,0.016,0.016,0,value,de Martino et al. 2015 ApJ 808 128,Riechers22 EDT1,riechers22
+SPT clusters,0.129,tSZ,3.01,0.14,0.11,0,value,Saro et al. 2014 MNRAS 440 2610,Riechers22 EDT1,riechers22;baseline
+SPT clusters,0.265,tSZ,3.44,0.16,0.13,0,value,Saro et al. 2014 MNRAS 440 2610,Riechers22 EDT1,riechers22;baseline
+SPT clusters,0.371,tSZ,3.53,0.18,0.14,0,value,Saro et al. 2014 MNRAS 440 2610,Riechers22 EDT1,riechers22;baseline
+SPT clusters,0.416,tSZ,3.82,0.19,0.15,0,value,Saro et al. 2014 MNRAS 440 2610,Riechers22 EDT1,riechers22;baseline
+SPT clusters,0.447,tSZ,4.09,0.25,0.19,0,value,Saro et al. 2014 MNRAS 440 2610,Riechers22 EDT1,riechers22;baseline
+SPT clusters,0.499,tSZ,4.16,0.27,0.20,0,value,Saro et al. 2014 MNRAS 440 2610,Riechers22 EDT1,riechers22;baseline
+SPT clusters,0.590,tSZ,4.62,0.36,0.26,0,value,Saro et al. 2014 MNRAS 440 2610,Riechers22 EDT1,riechers22;baseline
+SPT clusters,0.628,tSZ,4.45,0.31,0.23,0,value,Saro et al. 2014 MNRAS 440 2610,Riechers22 EDT1,riechers22;baseline
+SPT clusters,0.681,tSZ,4.72,0.39,0.27,0,value,Saro et al. 2014 MNRAS 440 2610,Riechers22 EDT1,riechers22;baseline
+SPT clusters,0.742,tSZ,5.01,0.49,0.33,0,value,Saro et al. 2014 MNRAS 440 2610,Riechers22 EDT1,riechers22;baseline
+SPT clusters,0.887,tSZ,4.97,0.24,0.19,0,value,Saro et al. 2014 MNRAS 440 2610,Riechers22 EDT1,riechers22;baseline
+SPT clusters,1.022,tSZ,5.37,0.22,0.18,0,value,Saro et al. 2014 MNRAS 440 2610,Riechers22 EDT1,riechers22;baseline
+A1656 (Coma),0.023,tSZ,2.72,0.10,0.10,0,value,Luzzi et al. 2009 ApJ 705 1122,Luzzi09 Tables 1 and 3,noterdaeme11
+A2204,0.152,tSZ,2.90,0.17,0.17,0,value,Luzzi et al. 2009 ApJ 705 1122,Luzzi09 Tables 1 and 3,noterdaeme11
+A1689,0.183,tSZ,2.95,0.27,0.27,0,value,Luzzi et al. 2009 ApJ 705 1122,Luzzi09 Tables 1 and 3,noterdaeme11
+A520,0.200,tSZ,2.74,0.28,0.28,0,value,Luzzi et al. 2009 ApJ 705 1122,Luzzi09 Tables 1 and 3,noterdaeme11
+A2163,0.202,tSZ,3.36,0.20,0.20,0,value,Luzzi et al. 2009 ApJ 705 1122,Luzzi09 Tables 1 and 3,noterdaeme11
+A773,0.216,tSZ,3.85,0.64,0.64,0,value,Luzzi et al. 2009 ApJ 705 1122,Luzzi09 Tables 1 and 3,noterdaeme11
+A2390,0.232,tSZ,3.51,0.25,0.25,0,value,Luzzi et al. 2009 ApJ 705 1122,Luzzi09 Tables 1 and 3,noterdaeme11
+A1835,0.252,tSZ,3.39,0.26,0.26,0,value,Luzzi et al. 2009 ApJ 705 1122,Luzzi09 Tables 1 and 3,noterdaeme11
+A697,0.282,tSZ,3.22,0.26,0.26,0,value,Luzzi et al. 2009 ApJ 705 1122,Luzzi09 Tables 1 and 3,noterdaeme11
+ZW3146,0.291,tSZ,4.05,0.66,0.66,0,value,Luzzi et al. 2009 ApJ 705 1122,Luzzi09 Tables 1 and 3,noterdaeme11
+RXJ1347,0.451,tSZ,3.97,0.19,0.19,0,value,Luzzi et al. 2009 ApJ 705 1122,Luzzi09 Tables 1 and 3,noterdaeme11
+CL0016+16,0.546,tSZ,3.69,0.37,0.37,0,value,Luzzi et al. 2009 ApJ 705 1122,Luzzi09 Tables 1 and 3,noterdaeme11
+MS0451-0305,0.550,tSZ,4.59,0.36,0.36,0,value,Luzzi et al. 2009 ApJ 705 1122,Luzzi09 Tables 1 and 3,noterdaeme11
+B0218+357 (HCN+HNC),0.68466,radio molecular absorption,4.50,0.17,0.17,0,value,Kotani Oka & Enokiya 2026 arXiv:2602.22399,Kotani26 abstract,baseline
+PKS1830-211 SW (10 molecules),0.88582,radio molecular absorption,5.08,0.10,0.10,0,value,Muller et al. 2013 A&A 551 A109,Muller13 Table 4,muller
+PKS1830-211 SW (HCN),0.88582,radio molecular absorption,5.13,0.06,0.06,0,value,Kotani et al. 2025 arXiv:2509.20760,Kotani25 abstract,baseline
+J085726+185524,1.7293,CO Tex,7.5,1.6,1.2,0,value,Noterdaeme et al. 2011 A&A 526 L7,Noterdaeme11 Table 1,riechers22;noterdaeme11
+J085726+185524,1.7293,CO Tex corrected (Maeder),6.5,1.6,1.2,0,value,Maeder 2017 ApJ 847 65,Riechers22 EDT1,riechers22
+J085726+185524,1.7293,CO Tex corrected (Klimenko),7.9,1.7,1.4,0,value,Klimenko et al. 2020 Astron. Lett. 46 715,Klimenko20 Table 2,riechers22;baseline
+J104705+205734,1.7738,CO Tex,7.8,0.7,0.6,0,value,Noterdaeme et al. 2011 A&A 526 L7,Noterdaeme11 Table 1,riechers22;noterdaeme11
+J104705+205734,1.7738,CO Tex corrected (Maeder),6.8,0.8,0.7,0,value,Maeder 2017 ApJ 847 65,Riechers22 EDT1,riechers22
+J104705+205734,1.7738,CO Tex corrected (Klimenko),6.6,1.2,1.1,0,value,Klimenko et al. 2020 Astron. Lett. 46 715,Klimenko20 Table 2,riechers22;baseline
+Q1331+170,1.7765,CI Tex,7.2,0.8,0.8,0,value,Cui et al. 2005 ApJ 633 649,Riechers22 EDT1,riechers22;noterdaeme11;baseline
+Q0013-004,1.9731,CI Tex,7.9,1.0,1.0,0,value,Ge Bechtold & Black 1997 ApJ 474 67,Riechers22 EDT1,riechers22;noterdaeme11;baseline
+J170542+354340,2.0377,CO Tex,8.6,1.1,1.0,0,value,Noterdaeme et al. 2011 A&A 526 L7,Noterdaeme11 Table 1,riechers22;noterdaeme11
+J170542+354340,2.0377,CO Tex corrected (Maeder),7.6,1.2,1.1,0,value,Maeder 2017 ApJ 847 65,Riechers22 EDT1,riechers22
+J170542+354340,2.0377,CO Tex corrected (Klimenko),8.6,1.9,1.4,0,value,Klimenko et al. 2020 Astron. Lett. 46 715,Klimenko20 Table 2,riechers22;baseline
+B1444+0126,2.0870,CI Tex corrected (Klimenko),10.5,0,0,0,upper,Klimenko et al. 2020 Astron. Lett. 46 715,Klimenko20 Table 1,riechers22;baseline
+PKS1232+0815,2.3371,CI Tex corrected,10,4,4,0,range,Srianand Petitjean & Ledoux 2000 Nature 408 931,Riechers22 EDT1 (6-14 K),riechers22;noterdaeme11
+PKS1232+0815,2.3377,CI Tex corrected (Klimenko),9.4,0,0,0,upper,Klimenko et al. 2020 Astron. Lett. 46 715,Klimenko20 Table 1,riechers22;baseline
+J143912+111740,2.4184,CO Tex,9.15,0.7,0.7,0,value,Srianand et al. 2008 A&A 482 L39,Noterdaeme11 Table 1 (Riechers22 lists 9.2),noterdaeme11
+J143912+111740,2.4184,CO Tex,9.2,0.7,0.7,0,value,Srianand et al. 2008 A&A 482 L39,Riechers22 EDT1,riechers22
+J143912+111740,2.4184,CO Tex corrected (Maeder),7.9,0.8,0.8,0,value,Maeder 2017 ApJ 847 65,Riechers22 EDT1,riechers22
+J143912+111740,2.4184,CO Tex corrected (Klimenko),9.04,0.8,0.7,0,value,Klimenko et al. 2020 Astron. Lett. 46 715,Klimenko20 Table 2,riechers22;baseline
+J143912+111740,2.4184,CI Tex corrected (Klimenko),13.7,0,0,0,upper,Klimenko et al. 2020 Astron. Lett. 46 715,Klimenko20 Table 1,riechers22
+J1513+0352,2.4636,CI Tex corrected (Klimenko),12,0,0,0,upper,Klimenko et al. 2020 Astron. Lett. 46 715,Klimenko20 Table 1,riechers22;baseline
+J000015+004833,2.5255,CO Tex,9.6,0.7,0.6,0,value,Noterdaeme et al. 2017 A&A 597 A82,Riechers22 EDT1,riechers22
+J000015+004833,2.5255,CO Tex corrected (Maeder),7.3,0.8,0.7,0,value,Maeder 2017 ApJ 847 65,Riechers22 EDT1,riechers22
+J000015+004833,2.5255,CO Tex corrected (Klimenko),9.8,0.7,0.6,0,value,Klimenko et al. 2020 Astron. Lett. 46 715,Klimenko20 Table 2,riechers22;baseline
+J000015+004833,2.5255,CI Tex corrected (Klimenko),11.1,1.5,6.6,0,value,Klimenko et al. 2020 Astron. Lett. 46 715,Klimenko20 Table 1,riechers22
+J0812+3208,2.6263,CI Tex corrected (Klimenko),10.8,1.4,3.3,0,value,Klimenko et al. 2020 Astron. Lett. 46 715,Klimenko20 Table 1,riechers22;baseline
+J123714+064759,2.6896,CO Tex,10.5,0.8,0.6,0,value,Noterdaeme et al. 2010 A&A 523 A80,Noterdaeme11 Table 1,riechers22;noterdaeme11
+J123714+064759,2.6896,CO Tex corrected (Maeder),9.2,0.9,0.7,0,value,Maeder 2017 ApJ 847 65,Riechers22 EDT1,riechers22
+J123714+064759,2.6896,CO Tex corrected (Klimenko),10.4,0.8,0.7,0,value,Klimenko et al. 2020 Astron. Lett. 46 715,Klimenko20 Table 2,riechers22;baseline
+J123714+064759,2.6896,CI Tex corrected (Klimenko),13.8,0,0,0,upper,Klimenko et al. 2020 Astron. Lett. 46 715,Klimenko20 Table 1,riechers22
+J0843+0221,2.7866,CI Tex corrected (Klimenko),16,0,0,0,upper,Klimenko et al. 2020 Astron. Lett. 46 715,Klimenko20 Table 1,riechers22;baseline
+Q0347-3819,3.025,CII Tex,12.1,1.7,3.2,0,value,Molaro et al. 2002 A&A 381 L64,Riechers22 EDT1,riechers22;noterdaeme11;baseline
+J2100-0641,3.0915,CI Tex corrected (Klimenko),12.9,3.3,4.5,0,value,Klimenko et al. 2020 Astron. Lett. 46 715,Klimenko20 Table 1,riechers22;baseline
+J0816+1446,3.2874,CI Tex corrected (Klimenko),15.2,1.0,4.2,0,value,Klimenko et al. 2020 Astron. Lett. 46 715,Klimenko20 Table 1,riechers22;baseline
+HFLS3,6.3369,H2O absorption against the CMB,23.3,6.9,6.9,0,range,Riechers et al. 2022 Nature 602 58,Riechers22 (16.4-30.2 K),riechers22;baseline

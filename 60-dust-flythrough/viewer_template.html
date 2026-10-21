@@ -1,0 +1,826 @@
+<title>Dust Around the Sun</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Barlow:wght@400;500&family=IBM+Plex+Mono:wght@400&display=swap">
+<style>
+/* Layout: the 3D canvas fills the window; a thin instrument strip on top, a control
+   panel on the right (bottom sheet on phones), captions over the lower third. */
+:root {
+  --ground: #f4f3ef;          /* light theme: the "starlight" view, dust as shadows on bright sky */
+  --ink: #1d1c1a;
+  --ink-2: #5d5b55;
+  --panel: rgba(250, 249, 246, 0.86);
+  --rule: rgba(29, 28, 26, 0.14);
+  --accent: #2a78d6;          /* young clusters, focus rings */
+  --wave: #c4511f;            /* the Radcliffe Wave */
+  --shell: #13866a;           /* the Local Bubble's wall */
+  --sky: #f4f3ef;              /* canvas background in the starlight view */
+  --sky-ink: #1d1c1a;
+  --sky-ink-2: #55534d;
+  --label: #3b3a36;
+  --label-halo: rgba(244, 243, 239, 0.85);
+  --sky-accent: #2a78d6;
+  --sky-wave: #c4511f;
+  --sky-shell: #13866a;
+  --display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", system-ui, sans-serif;
+  --body: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #04050a; --ink: #ecebe6; --ink-2: #a9a79f; --panel: rgba(10, 11, 16, 0.78);
+    --rule: rgba(236, 235, 230, 0.16); --accent: #5a9ef0; --wave: #f08a4b; --shell: #3cc79b; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #04050a; --ink: #ecebe6; --ink-2: #a9a79f; --panel: rgba(10, 11, 16, 0.78);
+  --rule: rgba(236, 235, 230, 0.16); --accent: #5a9ef0; --wave: #f08a4b; --shell: #3cc79b; color-scheme: dark;
+}
+#app.sky-dark {                /* glow and solid views: dust on a dark sky, whatever the page theme */
+  --sky: #04050a; --sky-ink: #ecebe6; --sky-ink-2: #a9a79f; --label: #e6e1d6;
+  --label-halo: rgba(4, 5, 10, 0.78); --sky-accent: #5a9ef0; --sky-wave: #f08a4b; --sky-shell: #3cc79b;
+}
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--ground); color: var(--ink); font: 400 14px/1.45 var(--body); overflow: hidden; }
+#app { position: fixed; inset: 0; background: var(--sky); }
+#gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+#gl.dragging { cursor: grabbing; }
+#labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.lbl { position: absolute; transform: translate(6px, -50%); white-space: nowrap; font: 500 12px/1 var(--display);
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--label);
+  text-shadow: 0 0 3px var(--label-halo), 0 0 6px var(--label-halo); }
+.lbl::before { content: ""; position: absolute; left: -6px; top: 50%; width: 3px; height: 3px; margin-top: -1.5px;
+  border-radius: 50%; background: var(--label); }
+.lbl.big { font-size: 14px; font-weight: 600; }
+.lbl.wave { color: var(--sky-wave); } .lbl.wave::before { background: var(--sky-wave); }
+.lbl.shell { color: var(--sky-shell); } .lbl.shell::before { background: var(--sky-shell); }
+header.strip { position: absolute; top: 0; left: 0; right: 0; display: flex; gap: 18px; align-items: baseline;
+  flex-wrap: wrap; padding-block: calc(10px + env(safe-area-inset-top, 0px)) 8px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  pointer-events: none; }
+header.strip h1 { margin: 0; font: 600 22px/1.1 var(--display); letter-spacing: 0.04em; text-transform: uppercase; text-wrap: balance;
+  color: var(--sky-ink); text-shadow: 0 0 6px var(--label-halo); }
+header.strip .sub { color: var(--sky-ink-2); font-size: 13px; max-width: 62ch; text-shadow: 0 0 6px var(--label-halo); }
+#readout { position: absolute; left: max(16px, env(safe-area-inset-left, 0px)); bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  font: 400 12px/1.5 var(--mono); color: var(--ink-2); font-variant-numeric: tabular-nums; pointer-events: none;
+  background: var(--panel); padding: 6px 9px; border-radius: 4px; border: 1px solid var(--rule); max-width: calc(100% - 32px); }
+#readout b { color: var(--ink); font-weight: 400; }
+#caption { position: absolute; left: 50%; bottom: calc(76px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
+  max-width: min(640px, calc(100% - 32px)); text-align: center; font: 500 16px/1.4 var(--body); color: var(--sky-ink);
+  text-shadow: 0 0 4px var(--label-halo), 0 0 10px var(--label-halo); pointer-events: none; transition: opacity 0.6s; }
+#caption small { display: block; font: 400 13px/1.4 var(--body); color: var(--sky-ink-2); margin-top: 2px; }
+#caption:not(:empty) { background: color-mix(in srgb, var(--sky) 62%, transparent); padding: 6px 12px; border-radius: 4px; }
+#app.movie aside.panel, #app.movie #readout, #app.movie header.strip .sub { display: none; }
+aside.panel { position: absolute; top: calc(64px + env(safe-area-inset-top, 0px)); right: max(16px, env(safe-area-inset-right, 0px));
+  width: 236px; display: grid; gap: 12px; padding: 12px; background: var(--panel); border: 1px solid var(--rule);
+  border-radius: 6px; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); font-size: 13px; }
+aside.panel h2 { margin: 0 0 4px; font: 600 12px/1 var(--display); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-2); }
+.seg { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+.seg button { font: 500 12px/1 var(--display); letter-spacing: 0.05em; text-transform: uppercase; padding: 7px 0; border: 0;
+  background: transparent; color: var(--ink-2); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--ground); }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.btn { font: 500 12px/1 var(--display); letter-spacing: 0.06em; text-transform: uppercase; padding: 7px 10px;
+  border: 1px solid var(--rule); border-radius: 4px; background: transparent; color: var(--ink); cursor: pointer; }
+.btn:hover, .seg button:hover { border-color: var(--ink-2); }
+.btn.primary { background: var(--ink); color: var(--ground); border-color: var(--ink); }
+button:focus-visible, input:focus-visible, label:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+label.tog { display: flex; align-items: center; gap: 7px; cursor: pointer; }
+label.tog input { accent-color: var(--ink); margin: 0; }
+.sw { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+input[type=range] { width: 100%; accent-color: var(--ink); }
+.note { color: var(--ink-2); font-size: 12px; line-height: 1.4; }
+.note a { color: inherit; }
+#tourbar { display: grid; grid-template-columns: auto 1fr; gap: 8px; align-items: center; }
+#panelToggle { display: none; }
+#fallback { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; }
+@media (max-width: 720px) {
+  header.strip h1 { font-size: 18px; }
+  header.strip .sub { display: none; }
+  aside.panel { top: auto; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); left: max(16px, env(safe-area-inset-left, 0px));
+    right: max(16px, env(safe-area-inset-right, 0px)); width: auto; max-height: 46vh; overflow: auto; }
+  aside.panel.closed > :not(.always) { display: none; }
+  #panelToggle { display: inline-block; }
+  #readout { bottom: auto; top: calc(48px + env(safe-area-inset-top, 0px)); font-size: 11px; }
+  #caption { bottom: auto; top: calc(108px + env(safe-area-inset-top, 0px)); font-size: 14px; }
+}
+@media (prefers-reduced-motion: reduce) { #caption { transition: none; } }
+</style>
+
+<div id="app">
+  <canvas id="gl" aria-label="Interactive 3D view of the dust around the Sun"></canvas>
+  <div id="labels" aria-hidden="true"></div>
+  <header class="strip">
+    <h1>Dust around the Sun</h1>
+    <span class="sub">The 3D dust map of Edenhofer et al. (2024), built from 54 million Gaia stars. Drag to turn, scroll to move, or play the tour.</span>
+  </header>
+  <div id="caption" aria-live="polite"></div>
+  <div id="readout"></div>
+  <aside class="panel" id="panel">
+    <div class="row always">
+      <button class="btn primary" id="tourBtn" type="button">Play tour</button>
+      <button class="btn" id="sunBtn" type="button">From the Sun</button>
+      <button class="btn" id="panelToggle" type="button" aria-expanded="true">Controls</button>
+    </div>
+    <div id="tourbar"><span class="note" id="tourTime">0:00</span><input type="range" id="tourPos" min="0" max="1000" value="0" aria-label="Tour position"></div>
+    <div>
+      <h2>What brightness means</h2>
+      <div class="seg" role="group" aria-label="Render mode">
+        <button type="button" data-mode="0" id="modeGlow">Glow</button>
+        <button type="button" data-mode="1" id="modeStar">Starlight</button>
+        <button type="button" data-mode="2" id="modeSolid">Solid</button>
+      </div>
+      <p class="note" id="modeNote"></p>
+      <label class="note" for="exposure">Stretch</label>
+      <input type="range" id="exposure" min="-2" max="2" step="0.05" value="0">
+    </div>
+    <div>
+      <h2>Layers</h2>
+      <div style="display:grid; gap:6px">
+        <label class="tog"><input type="checkbox" id="lyrClusters" checked><span class="sw" style="background:var(--accent)"></span>Young clusters (&lt;30 Myr)</label>
+        <label class="tog"><input type="checkbox" id="lyrWave" checked><span class="sw" style="background:var(--wave)"></span>Radcliffe Wave model</label>
+        <label class="tog"><input type="checkbox" id="lyrShell"><span class="sw" style="background:var(--shell)"></span>Local Bubble wall</label>
+        <label class="tog"><input type="checkbox" id="lyrLabels" checked>Cloud names</label>
+        <label class="tog"><input type="checkbox" id="lyrGrid" checked>Distance rings</label>
+      </div>
+    </div>
+    <div>
+      <h2>Go to</h2>
+      <div class="row">
+        <button class="btn" type="button" data-goto="taurus">Taurus</button>
+        <button class="btn" type="button" data-goto="orion">Orion</button>
+        <button class="btn" type="button" data-goto="above">Above</button>
+        <button class="btn" type="button" data-goto="wave">The Wave</button>
+      </div>
+    </div>
+    <p class="note">Map: posterior mean, 69 pc to 1.25 kpc (coarser 2 kpc map beyond). No data within 69 pc of the Sun. Keys: W A S D fly, Q E down/up, shift faster.</p>
+  </aside>
+  <div id="fallback" hidden><p>This view needs WebGL 2, which this browser or device does not provide.</p></div>
+</div>
+
+<!--__DATA__-->
+<script>
+"use strict";
+const META = /*__META__*/;
+
+// ---------------------------------------------------------------- small math
+const V = {
+  add: (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]],
+  sub: (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]],
+  mul: (a, s) => [a[0] * s, a[1] * s, a[2] * s],
+  dot: (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2],
+  cross: (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]],
+  len: a => Math.hypot(a[0], a[1], a[2]),
+  norm: a => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / l, a[1] / l, a[2] / l]; },
+  lerp: (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t],
+};
+function perspective(fovy, aspect, near, far) {
+  const f = 1 / Math.tan(fovy / 2), nf = 1 / (near - far);
+  return [f / aspect, 0, 0, 0, 0, f, 0, 0, 0, 0, (far + near) * nf, -1, 0, 0, 2 * far * near * nf, 0];
+}
+function lookAt(eye, target, up) {
+  const z = V.norm(V.sub(eye, target)), x = V.norm(V.cross(up, z)), y = V.cross(z, x);
+  return [x[0], y[0], z[0], 0, x[1], y[1], z[1], 0, x[2], y[2], z[2], 0,
+          -V.dot(x, eye), -V.dot(y, eye), -V.dot(z, eye), 1];
+}
+function mat4mul(a, b) {
+  const o = new Array(16);
+  for (let c = 0; c < 4; c++) for (let r = 0; r < 4; r++) {
+    let s = 0; for (let k = 0; k < 4; k++) s += a[k * 4 + r] * b[c * 4 + k]; o[c * 4 + r] = s;
+  }
+  return o;
+}
+function mat4inv(m) {
+  const inv = new Array(16);
+  inv[0] = m[5]*m[10]*m[15]-m[5]*m[11]*m[14]-m[9]*m[6]*m[15]+m[9]*m[7]*m[14]+m[13]*m[6]*m[11]-m[13]*m[7]*m[10];
+  inv[4] = -m[4]*m[10]*m[15]+m[4]*m[11]*m[14]+m[8]*m[6]*m[15]-m[8]*m[7]*m[14]-m[12]*m[6]*m[11]+m[12]*m[7]*m[10];
+  inv[8] = m[4]*m[9]*m[15]-m[4]*m[11]*m[13]-m[8]*m[5]*m[15]+m[8]*m[7]*m[13]+m[12]*m[5]*m[11]-m[12]*m[7]*m[9];
+  inv[12] = -m[4]*m[9]*m[14]+m[4]*m[10]*m[13]+m[8]*m[5]*m[14]-m[8]*m[6]*m[13]-m[12]*m[5]*m[10]+m[12]*m[6]*m[9];
+  inv[1] = -m[1]*m[10]*m[15]+m[1]*m[11]*m[14]+m[9]*m[2]*m[15]-m[9]*m[3]*m[14]-m[13]*m[2]*m[11]+m[13]*m[3]*m[10];
+  inv[5] = m[0]*m[10]*m[15]-m[0]*m[11]*m[14]-m[8]*m[2]*m[15]+m[8]*m[3]*m[14]+m[12]*m[2]*m[11]-m[12]*m[3]*m[10];
+  inv[9] = -m[0]*m[9]*m[15]+m[0]*m[11]*m[13]+m[8]*m[1]*m[15]-m[8]*m[3]*m[13]-m[12]*m[1]*m[11]+m[12]*m[3]*m[9];
+  inv[13] = m[0]*m[9]*m[14]-m[0]*m[10]*m[13]-m[8]*m[1]*m[14]+m[8]*m[2]*m[13]+m[12]*m[1]*m[10]-m[12]*m[2]*m[9];
+  inv[2] = m[1]*m[6]*m[15]-m[1]*m[7]*m[14]-m[5]*m[2]*m[15]+m[5]*m[3]*m[14]+m[13]*m[2]*m[7]-m[13]*m[3]*m[6];
+  inv[6] = -m[0]*m[6]*m[15]+m[0]*m[7]*m[14]+m[4]*m[2]*m[15]-m[4]*m[3]*m[14]-m[12]*m[2]*m[7]+m[12]*m[3]*m[6];
+  inv[10] = m[0]*m[5]*m[15]-m[0]*m[7]*m[13]-m[4]*m[1]*m[15]+m[4]*m[3]*m[13]+m[12]*m[1]*m[7]-m[12]*m[3]*m[5];
+  inv[14] = -m[0]*m[5]*m[14]+m[0]*m[6]*m[13]+m[4]*m[1]*m[14]-m[4]*m[2]*m[13]-m[12]*m[1]*m[6]+m[12]*m[2]*m[5];
+  inv[3] = -m[1]*m[6]*m[11]+m[1]*m[7]*m[10]+m[5]*m[2]*m[11]-m[5]*m[3]*m[10]-m[9]*m[2]*m[7]+m[9]*m[3]*m[6];
+  inv[7] = m[0]*m[6]*m[11]-m[0]*m[7]*m[10]-m[4]*m[2]*m[11]+m[4]*m[3]*m[10]+m[8]*m[2]*m[7]-m[8]*m[3]*m[6];
+  inv[11] = -m[0]*m[5]*m[11]+m[0]*m[7]*m[9]+m[4]*m[1]*m[11]-m[4]*m[3]*m[9]-m[8]*m[1]*m[7]+m[8]*m[3]*m[5];
+  inv[15] = m[0]*m[5]*m[10]-m[0]*m[6]*m[9]-m[4]*m[1]*m[10]+m[4]*m[2]*m[9]+m[8]*m[1]*m[6]-m[8]*m[2]*m[5];
+  let det = m[0] * inv[0] + m[1] * inv[4] + m[2] * inv[8] + m[3] * inv[12];
+  det = 1 / det;
+  return inv.map(v => v * det);
+}
+
+// ---------------------------------------------------------------- data
+function b64bytes(s) {
+  const bin = atob(s.replace(/\s+/g, ""));
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+async function inflate(bytes) {
+  const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate"));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+async function loadBlob(name) {
+  const el = document.getElementById("data-" + name);
+  if (el) return b64bytes(el.textContent);
+  const parts = [];                       // online: base64 text in one or more parts, joined before decoding
+  for (const url of META.files[name]) {
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error("could not load " + url);
+    parts.push(await resp.text());
+  }
+  return b64bytes(parts.join(""));
+}
+
+// ---------------------------------------------------------------- GL setup
+const canvas = document.getElementById("gl");
+const gl = canvas.getContext("webgl2", { antialias: false, alpha: false, preserveDrawingBuffer: true, premultipliedAlpha: false });
+
+const VS_QUAD = `#version 300 es
+in vec2 aPos; out vec2 vNdc;
+void main() { vNdc = aPos; gl_Position = vec4(aPos, 0.0, 1.0); }`;
+
+const FS_VOL = `#version 300 es
+precision highp float; precision highp sampler3D;
+uniform sampler3D uTex[3];
+uniform vec3 uMin[3]; uniform vec3 uMax[3]; uniform float uStepMin[3];
+uniform float uRmax[3];          // use a level only within this distance of the Sun
+uniform float uRmin;             // no data inside this radius
+uniform mat4 uInvVP; uniform vec3 uCam;
+uniform float uLo; uniform float uHi;
+uniform int uMode; uniform float uExposure; uniform vec3 uKappa; uniform float uOpacity;
+uniform float uStepScale; uniform float uFrame;
+uniform vec3 uGround;
+uniform int uClipOn; uniform vec3 uClipN; uniform vec2 uClipRange;   // optional cutaway box:
+uniform vec3 uClipD; uniform vec2 uClipRange2;                       //   across and along an axis
+uniform vec2 uGlow;                                                   // glow stretch: N0, Nsat
+uniform vec2 uFade;                                                   // solid view: fade out dust below this density range
+in vec2 vNdc; out vec4 frag;
+
+float decode(float c) {
+  float code = c * 255.0;
+  if (code < 0.5) return 0.0;
+  return exp2(3.321928 * (uLo + (code - 1.0) / 254.0 * (uHi - uLo)));
+}
+float levelDensity(int i, vec3 p) {
+  vec3 t = (p - uMin[i]) / (uMax[i] - uMin[i]);
+  if (i == 0) return decode(texture(uTex[0], t).r);
+  if (i == 1) return decode(texture(uTex[1], t).r);
+  return decode(texture(uTex[2], t).r);
+}
+bool inside(int i, vec3 p, float r) {
+  return all(greaterThan(p, uMin[i])) && all(lessThan(p, uMax[i])) && r < uRmax[i];
+}
+float density(vec3 p, out int level) {
+  float r = length(p);
+  level = 3;
+  if (r < uRmin) return 0.0;
+  if (uClipOn == 1) {
+    float s = dot(p, uClipN), a = dot(p, uClipD);
+    if (s < uClipRange.x || s > uClipRange.y || a < uClipRange2.x || a > uClipRange2.y) return 0.0;
+  }
+  for (int i = 0; i < 3; i++) { if (inside(i, p, r)) { level = i; return levelDensity(i, p); } }
+  return 0.0;
+}
+vec2 boxHit(vec3 o, vec3 d, vec3 bmin, vec3 bmax) {
+  vec3 inv = 1.0 / d;
+  vec3 t0 = (bmin - o) * inv, t1 = (bmax - o) * inv;
+  vec3 tmin = min(t0, t1), tmax = max(t0, t1);
+  return vec2(max(max(tmin.x, tmin.y), tmin.z), min(min(tmax.x, tmax.y), tmax.z));
+}
+float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233)) + uFrame * 0.618) * 43758.5453); }
+vec3 glowRamp(float x) {          // one warm hue, dark to pale: brightness = dust column
+  x = clamp(x, 0.0, 1.0);
+  vec3 c0 = uGround, c1 = vec3(0.35, 0.12, 0.05), c2 = vec3(0.86, 0.43, 0.16), c3 = vec3(1.0, 0.86, 0.62), c4 = vec3(1.0, 0.98, 0.93);
+  if (x < 0.25) return mix(c0, c1, x / 0.25);
+  if (x < 0.55) return mix(c1, c2, (x - 0.25) / 0.30);
+  if (x < 0.85) return mix(c2, c3, (x - 0.55) / 0.30);
+  return mix(c3, c4, (x - 0.85) / 0.15);
+}
+void main() {
+  vec4 far = uInvVP * vec4(vNdc, 1.0, 1.0);
+  vec3 dir = normalize(far.xyz / far.w - uCam);
+  vec2 hit = boxHit(uCam, dir, uMin[2], uMax[2]);
+  float t = max(hit.x, 0.0), tEnd = hit.y;
+  float N = 0.0;                         // column (ZGR23 mag)
+  vec3 C = vec3(0.0); float T = 1.0;     // solid mode
+  float kx = exp2(uExposure * 1.5);
+  if (tEnd > t) {
+    t += hash(gl_FragCoord.xy) * uStepMin[0];
+    for (int k = 0; k < 1400; k++) {
+      if (t >= tEnd) break;
+      vec3 p = uCam + dir * t;
+      int level;
+      float rho = density(p, level);
+      float smin = uStepMin[min(level, 2)];
+      float ds = max(smin, t * 0.004) * uStepScale;
+      if (rho > 0.0) {
+        N += rho * ds;
+        if (uMode == 2) {
+          float w = smoothstep(uFade.x, uFade.y, rho);
+          float a = 1.0 - exp(-uOpacity * kx * rho * w * ds);
+          float lum = clamp(log(rho / uFade.x) / log(2000.0), 0.0, 1.0);
+          C += T * a * glowRamp(0.30 + 0.70 * lum);
+          T *= 1.0 - a;
+          if (T < 0.01) break;
+        }
+      }
+      t += ds;
+    }
+  }
+  vec3 col;
+  if (uMode == 0) {
+    float x = log(1.0 + N * kx / uGlow.x) / log(1.0 + uGlow.y / uGlow.x);
+    col = glowRamp(x);
+  } else if (uMode == 1) {
+    col = uGround * exp(-uKappa * N * kx / 1.0857);
+  } else {
+    col = C + T * uGround;
+  }
+  frag = vec4(col, 1.0);
+}`;
+
+const VS_PTS = `#version 300 es
+in vec3 aPos; in vec4 aCol; in float aSize;
+uniform mat4 uVP; uniform float uScale; uniform float uDpr; uniform float uMinSize;
+uniform int uClipOn; uniform vec3 uClipN; uniform vec2 uClipRange; uniform vec3 uClipD; uniform vec2 uClipRange2;
+out vec4 vCol;
+void main() {
+  vec4 c = uVP * vec4(aPos, 1.0);
+  if (uClipOn == 1) {
+    float s = dot(aPos, uClipN), a = dot(aPos, uClipD);
+    if (s < uClipRange.x || s > uClipRange.y || a < uClipRange2.x || a > uClipRange2.y) c = vec4(2.0, 2.0, 2.0, 1.0);
+  }
+  gl_Position = c;
+  float d = max(c.w, 1.0);
+  gl_PointSize = clamp(aSize * uScale / pow(d, 0.35), uMinSize, 18.0) * uDpr;
+  vCol = aCol;
+}`;
+const FS_PTS = `#version 300 es
+precision mediump float; in vec4 vCol; uniform vec3 uHalo; out vec4 frag;
+void main() {
+  vec2 q = gl_PointCoord * 2.0 - 1.0; float r2 = dot(q, q);
+  if (r2 > 1.0) discard;
+  float core = 1.0 - smoothstep(0.38, 0.52, r2);          // a halo ring in the sky colour separates marks from dust
+  frag = vec4(mix(uHalo, vCol.rgb, core), mix(0.55 * vCol.a, vCol.a, core) * (1.0 - smoothstep(0.85, 1.0, r2)));
+}`;
+const VS_LINES = `#version 300 es
+in vec3 aPos; in vec4 aCol; uniform mat4 uVP; out vec4 vCol;
+void main() { gl_Position = uVP * vec4(aPos, 1.0); vCol = aCol; }`;
+const FS_LINES = `#version 300 es
+precision mediump float; in vec4 vCol; out vec4 frag; void main() { frag = vCol; }`;
+
+function compile(vs, fs) {
+  const p = gl.createProgram();
+  for (const [type, src] of [[gl.VERTEX_SHADER, vs], [gl.FRAGMENT_SHADER, fs]]) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src); gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+    gl.attachShader(p, s);
+  }
+  gl.linkProgram(p);
+  if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
+  return p;
+}
+function uni(p, names) { const u = {}; for (const n of names) u[n] = gl.getUniformLocation(p, n); return u; }
+
+// ---------------------------------------------------------------- state
+const state = {
+  mode: 0, exposure: 0, stepScale: 1.0, quality: 1.0,
+  layers: { clusters: true, wave: true, shell: false, labels: true, grid: true }, clip: null,
+  cam: { pos: [-60, -40, 25], target: [-141, 19, -36] },
+  tour: { playing: false, t: 0, last: 0 },
+  dragging: null, keys: new Set(), dirty: true, moving: 0,
+};
+const appEl = document.getElementById("app");
+const css = n => getComputedStyle(appEl).getPropertyValue(n).trim();
+function hex2rgb(h) { const m = h.replace("#", ""); return [0, 2, 4].map(i => parseInt(m.slice(i, i + 2), 16) / 255); }
+
+// ---------------------------------------------------------------- tour
+const TOUR = META.tour;
+function catmull(p0, p1, p2, p3, t) {
+  const t2 = t * t, t3 = t2 * t;
+  return [0, 1, 2].map(i => 0.5 * ((2 * p1[i]) + (-p0[i] + p2[i]) * t + (2 * p0[i] - 5 * p1[i] + 4 * p2[i] - p3[i]) * t2 + (-p0[i] + 3 * p1[i] - 3 * p2[i] + p3[i]) * t3));
+}
+function tourAt(time) {
+  const ks = TOUR.keys, n = ks.length;
+  if (time <= ks[0].t) return { pos: ks[0].pos, target: ks[0].target, caption: ks[0] };
+  for (let i = 0; i < n - 1; i++) {
+    const a = ks[i], b = ks[i + 1];
+    if (time <= b.t) {
+      let u = (time - a.t) / (b.t - a.t);
+      u = u * u * (3 - 2 * u);                         // ease in and out of each key
+      const k0 = ks[Math.max(i - 1, 0)], k3 = ks[Math.min(i + 2, n - 1)];
+      return { pos: catmull(k0.pos, a.pos, b.pos, k3.pos, u), target: catmull(k0.target, a.target, b.target, k3.target, u),
+               caption: u < 0.5 ? a : b, u };
+    }
+  }
+  const last = ks[n - 1];
+  return { pos: last.pos, target: last.target, caption: last };
+}
+function captionFor(time) {
+  let cap = null;
+  for (const c of TOUR.captions) if (time >= c.t0 && time <= c.t1) cap = c;
+  return cap;
+}
+
+// ---------------------------------------------------------------- overlays
+let progVol, progPts, progLines, uVol, uPts, uLines, quadVao;
+const layerBuffers = {};
+function makePointLayer(name, items, colorVar, alpha, size) {
+  const n = items.length, pos = new Float32Array(n * 3), col = new Float32Array(n * 4), siz = new Float32Array(n);
+  const rgb = hex2rgb(css(colorVar));
+  items.forEach((p, i) => {
+    pos.set([p[0], p[1], p[2]], i * 3); col.set([...rgb, alpha], i * 4); siz[i] = p[3] ?? size;
+  });
+  layerBuffers[name] = { kind: "points", n, pos, col, siz, colorVar, alpha };
+}
+function makeLineLayer(name, segs, colorVar, alpha) {
+  const n = segs.length / 3, col = new Float32Array(n * 4), rgb = hex2rgb(css(colorVar));
+  for (let i = 0; i < n; i++) col.set([...rgb, alpha], i * 4);
+  layerBuffers[name] = { kind: "lines", n, pos: new Float32Array(segs), col, colorVar, alpha };
+}
+function recolorLayers() {
+  for (const L of Object.values(layerBuffers)) {
+    const rgb = hex2rgb(css(L.colorVar));
+    for (let i = 0; i < L.n; i++) { L.col[i * 4] = rgb[0]; L.col[i * 4 + 1] = rgb[1]; L.col[i * 4 + 2] = rgb[2]; }
+    uploadLayer(L);
+  }
+}
+function uploadLayer(L) {
+  if (!L.vao) { L.vao = gl.createVertexArray(); L.bp = gl.createBuffer(); L.bc = gl.createBuffer(); L.bs = gl.createBuffer(); }
+  const prog = L.kind === "points" ? progPts : progLines;
+  gl.bindVertexArray(L.vao);
+  const bind = (buf, data, attr, size) => {
+    const loc = gl.getAttribLocation(prog, attr);
+    if (loc < 0) return;
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf); gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, size, gl.FLOAT, false, 0, 0);
+  };
+  bind(L.bp, L.pos, "aPos", 3); bind(L.bc, L.col, "aCol", 4);
+  if (L.kind === "points") bind(L.bs, L.siz, "aSize", 1);
+  gl.bindVertexArray(null);
+}
+function buildOverlays() {
+  const O = META.overlays;
+  makePointLayer("clusters", O.clusters.map(c => [c[0], c[1], c[2], 3.2 + 0.9 * Math.log10(Math.max(c[4], 10))]), "--sky-accent", 0.95, 4);
+  makePointLayer("wave", O.wave.map(p => [p[0], p[1], p[2], 5.5]), "--sky-wave", 1.0, 5.5);
+  makePointLayer("shell", O.shell.map(p => [p[0], p[1], p[2], 1.6]), "--sky-shell", 0.45, 1.6);
+  const rings = [];
+  for (const R of O.rings) {
+    const n = 180;
+    for (let i = 0; i < n; i++) {
+      const a0 = 2 * Math.PI * i / n, a1 = 2 * Math.PI * (i + 1) / n;
+      rings.push(R * Math.cos(a0), R * Math.sin(a0), 0, R * Math.cos(a1), R * Math.sin(a1), 0);
+    }
+  }
+  rings.push(0, 0, 0, 2000, 0, 0);                    // toward the Galactic Centre
+  makeLineLayer("grid", rings, "--sky-ink-2", 0.35);
+  makePointLayer("sun", [[0, 0, 0, 9]], "--sky-ink", 1.0, 9);
+  for (const L of Object.values(layerBuffers)) uploadLayer(L);
+}
+
+// ---------------------------------------------------------------- labels
+const labelBox = document.getElementById("labels");
+const labelEls = META.overlays.labels.map(l => {
+  const d = document.createElement("div");
+  d.className = "lbl" + (l.cls ? " " + l.cls : "");
+  d.textContent = l.name;
+  labelBox.appendChild(d);
+  return { el: d, ...l };
+});
+
+// ---------------------------------------------------------------- render
+let texs = [], vp = null, W = 1, H = 1, dpr = 1;
+function resize() {
+  dpr = Math.min(window.devicePixelRatio || 1, 2) * state.quality;
+  W = Math.max(1, Math.round(canvas.clientWidth * dpr)); H = Math.max(1, Math.round(canvas.clientHeight * dpr));
+  if (canvas.width !== W || canvas.height !== H) { canvas.width = W; canvas.height = H; }
+  state.dirty = true;
+}
+function camMatrices() {
+  const aspect = W / H, fov = 55 * Math.PI / 180;
+  const view = lookAt(state.cam.pos, state.cam.target, [0, 0, 1]);
+  const proj = perspective(fov, aspect, 0.5, 20000);
+  return { view, proj, vp: mat4mul(proj, view) };
+}
+function render(frameSeed = 0) {
+  const m = camMatrices(); vp = m.vp;
+  gl.viewport(0, 0, W, H);
+  gl.disable(gl.DEPTH_TEST); gl.disable(gl.BLEND);
+  gl.useProgram(progVol);
+  for (let i = 0; i < 3; i++) { gl.activeTexture(gl.TEXTURE0 + i); gl.bindTexture(gl.TEXTURE_3D, texs[i]); }
+  gl.uniform1iv(uVol.uTex, [0, 1, 2]);
+  const L = META.levels;
+  gl.uniform3fv(uVol.uMin, L.flatMap(l => l.min)); gl.uniform3fv(uVol.uMax, L.flatMap(l => l.max));
+  gl.uniform1fv(uVol.uStepMin, L.map(l => l.step)); gl.uniform1fv(uVol.uRmax, L.map(l => l.rmax));
+  gl.uniform1f(uVol.uRmin, META.rmin);
+  gl.uniformMatrix4fv(uVol.uInvVP, false, mat4inv(vp));
+  gl.uniform3fv(uVol.uCam, state.cam.pos);
+  gl.uniform1f(uVol.uLo, META.lo); gl.uniform1f(uVol.uHi, META.hi);
+  gl.uniform1i(uVol.uMode, state.mode); gl.uniform1f(uVol.uExposure, state.exposure);
+  gl.uniform3fv(uVol.uKappa, META.kappa_rgb); gl.uniform1f(uVol.uOpacity, META.solid_opacity);
+  gl.uniform1f(uVol.uStepScale, state.stepScale); gl.uniform1f(uVol.uFrame, frameSeed);
+  gl.uniform3fv(uVol.uGround, hex2rgb(css("--sky")));
+  setClipUniforms(uVol);
+  gl.uniform2fv(uVol.uGlow, META.glow);
+  gl.uniform2fv(uVol.uFade, META.solid_fade);
+  gl.bindVertexArray(quadVao); gl.drawArrays(gl.TRIANGLES, 0, 3);
+  // overlays, blended on top (the dust is optically thin in the default view)
+  gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  const show = state.layers;
+  gl.useProgram(progLines); gl.uniformMatrix4fv(uLines.uVP, false, vp);
+  if (show.grid && !state.clip) { const g = layerBuffers.grid; gl.bindVertexArray(g.vao); gl.drawArrays(gl.LINES, 0, g.n); }
+  gl.useProgram(progPts); gl.uniformMatrix4fv(uPts.uVP, false, vp);
+  gl.uniform1f(uPts.uScale, 6.0); gl.uniform1f(uPts.uDpr, dpr); gl.uniform3fv(uPts.uHalo, hex2rgb(css("--sky")));
+  setClipUniforms(uPts);
+  const MIN_SIZE = { shell: 1.3, wave: 3.6, clusters: 2.0, sun: 4.0 };
+  for (const name of ["shell", "wave", "clusters", "sun"]) {
+    if (name !== "sun" && !show[name]) continue;
+    gl.uniform1f(uPts.uMinSize, MIN_SIZE[name]);
+    const Lb = layerBuffers[name]; gl.bindVertexArray(Lb.vao); gl.drawArrays(gl.POINTS, 0, Lb.n);
+  }
+  gl.bindVertexArray(null);
+  placeLabels();
+  updateReadout();
+}
+function setClipUniforms(u) {
+  const c = state.clip;
+  gl.uniform1i(u.uClipOn, c ? 1 : 0);
+  gl.uniform3fv(u.uClipN, c ? c.n : [1, 0, 0]); gl.uniform2fv(u.uClipRange, c ? [c.lo, c.hi] : [-1e9, 1e9]);
+  gl.uniform3fv(u.uClipD, c ? c.d : [0, 1, 0]); gl.uniform2fv(u.uClipRange2, c ? [c.lo2, c.hi2] : [-1e9, 1e9]);
+}
+function insideClip(p) {
+  const c = state.clip;
+  if (!c) return true;
+  const s = V.dot(p, c.n), a = V.dot(p, c.d);
+  return s >= c.lo && s <= c.hi && a >= c.lo2 && a <= c.hi2;
+}
+function project(p) {
+  const x = vp[0] * p[0] + vp[4] * p[1] + vp[8] * p[2] + vp[12];
+  const y = vp[1] * p[0] + vp[5] * p[1] + vp[9] * p[2] + vp[13];
+  const w = vp[3] * p[0] + vp[7] * p[1] + vp[11] * p[2] + vp[15];
+  if (w <= 1) return null;
+  return [(x / w * 0.5 + 0.5) * canvas.clientWidth, (1 - (y / w * 0.5 + 0.5)) * canvas.clientHeight, w];
+}
+function placeLabels() {
+  const on = state.layers.labels;
+  for (const l of labelEls) {
+    const layerOk = l.cls === "wave" ? state.layers.wave : l.cls === "shell" ? state.layers.shell : on;
+    const s = layerOk && insideClip(l.pos) ? project(l.pos) : null;
+    if (!s || s[0] < -50 || s[0] > canvas.clientWidth + 50 || s[1] < 0 || s[1] > canvas.clientHeight) { l.el.hidden = true; continue; }
+    const fade = Math.max(0, Math.min(1, 1.6 - s[2] / (l.range || 2500)));
+    if (fade <= 0.02) { l.el.hidden = true; continue; }
+    l.el.hidden = false;
+    l.el.style.left = s[0].toFixed(1) + "px"; l.el.style.top = s[1].toFixed(1) + "px";
+    l.el.style.opacity = fade.toFixed(2);
+  }
+}
+
+// A_V from the Sun to the camera, integrated through the same voxels the view shows
+let cpuLevels = null;
+function cpuDensity(p) {
+  const r = Math.hypot(p[0], p[1], p[2]);
+  if (r < META.rmin) return 0;
+  for (let i = 0; i < 3; i++) {
+    const Lv = META.levels[i], c = cpuLevels[i];
+    if (r >= Lv.rmax) continue;
+    const ix = Math.floor((p[0] - Lv.min[0]) / Lv.cell), iy = Math.floor((p[1] - Lv.min[1]) / Lv.cell), iz = Math.floor((p[2] - Lv.min[2]) / Lv.cell);
+    if (ix < 0 || iy < 0 || iz < 0 || ix >= Lv.shape[0] || iy >= Lv.shape[1] || iz >= Lv.shape[2]) continue;
+    const code = c[(iz * Lv.shape[1] + iy) * Lv.shape[0] + ix];
+    return code === 0 ? 0 : Math.pow(10, META.lo + (code - 1) / 254 * (META.hi - META.lo));
+  }
+  return 0;
+}
+function columnToSun() {
+  if (!cpuLevels) return NaN;
+  const p = state.cam.pos, d = V.len(p);
+  const n = Math.max(2, Math.ceil(d / 1.0));
+  let s = 0;
+  for (let i = 0; i < n; i++) s += cpuDensity(V.mul(p, (i + 0.5) / n));
+  return s * d / n;
+}
+const readout = document.getElementById("readout");
+function updateReadout() {
+  const p = state.cam.pos, d = V.len(p);
+  const l = (Math.atan2(p[1], p[0]) * 180 / Math.PI + 360) % 360, b = Math.asin(p[2] / Math.max(d, 1e-9)) * 180 / Math.PI;
+  const av = META.zgr23_to_av * columnToSun();
+  const where = d < 1 ? "you are <b>at the Sun</b>"
+    : `you are <b>${d.toFixed(0)} pc</b> from the Sun, toward l <b>${l.toFixed(1)}°</b> b <b>${b.toFixed(1)}°</b>`;
+  readout.innerHTML = where + "<br>" +
+    `x y z <b>${p.map(v => v.toFixed(0)).join(" ")}</b> pc &nbsp; A<sub>V</sub> to the Sun <b>${isNaN(av) ? "…" : av.toFixed(2)}</b> mag`;
+}
+
+// ---------------------------------------------------------------- interaction
+function orbit(dAz, dEl) {
+  const c = state.cam, off = V.sub(c.pos, c.target), r = V.len(off);
+  let az = Math.atan2(off[1], off[0]), el = Math.asin(off[2] / r);
+  az -= dAz; el = Math.max(-1.45, Math.min(1.45, el + dEl));
+  c.pos = V.add(c.target, [r * Math.cos(el) * Math.cos(az), r * Math.cos(el) * Math.sin(az), r * Math.sin(el)]);
+}
+function dolly(f) {
+  const c = state.cam, off = V.sub(c.pos, c.target), r = V.len(off);
+  const nr = Math.max(8, Math.min(9000, r * f));
+  c.pos = V.add(c.target, V.mul(off, nr / r));
+}
+function pan(dx, dy) {
+  const c = state.cam, fwd = V.norm(V.sub(c.target, c.pos)), right = V.norm(V.cross(fwd, [0, 0, 1])), up = V.cross(right, fwd);
+  const r = V.len(V.sub(c.pos, c.target)), s = r * 0.0015;
+  const move = V.add(V.mul(right, -dx * s), V.mul(up, dy * s));
+  c.pos = V.add(c.pos, move); c.target = V.add(c.target, move);
+}
+function stopTour() { if (state.tour.playing) { state.tour.playing = false; tourBtn.textContent = "Play tour"; } }
+function clearClip() { if (state.clip) { state.clip = null; state.dirty = true; } }
+const pointers = new Map();
+canvas.addEventListener("pointerdown", e => {
+  canvas.setPointerCapture(e.pointerId); pointers.set(e.pointerId, [e.clientX, e.clientY]);
+  state.dragging = { button: e.button, shift: e.shiftKey }; canvas.classList.add("dragging"); stopTour(); clearClip();
+});
+canvas.addEventListener("pointermove", e => {
+  if (!pointers.has(e.pointerId)) return;
+  const prev = pointers.get(e.pointerId), dx = e.clientX - prev[0], dy = e.clientY - prev[1];
+  if (pointers.size === 2) {
+    const [a, b] = [...pointers.values()], before = Math.hypot(a[0] - b[0], a[1] - b[1]);
+    pointers.set(e.pointerId, [e.clientX, e.clientY]);
+    const [a2, b2] = [...pointers.values()], after = Math.hypot(a2[0] - b2[0], a2[1] - b2[1]);
+    if (before > 0 && after > 0) dolly(before / after);
+    pan(dx / 2, dy / 2);
+  } else {
+    pointers.set(e.pointerId, [e.clientX, e.clientY]);
+    if (state.dragging && (state.dragging.button === 2 || state.dragging.shift)) pan(dx, dy);
+    else orbit(dx * 0.005, dy * 0.005);
+  }
+  state.dirty = true; state.moving = 8;
+});
+const endDrag = e => { pointers.delete(e.pointerId); if (!pointers.size) { state.dragging = null; canvas.classList.remove("dragging"); } };
+canvas.addEventListener("pointerup", endDrag); canvas.addEventListener("pointercancel", endDrag);
+canvas.addEventListener("contextmenu", e => e.preventDefault());
+canvas.addEventListener("wheel", e => { e.preventDefault(); stopTour(); dolly(Math.exp(e.deltaY * 0.0012)); state.dirty = true; state.moving = 8; }, { passive: false });
+window.addEventListener("keydown", e => { if (e.target.tagName === "INPUT") return; state.keys.add(e.key.toLowerCase()); if ("wasdqe".includes(e.key.toLowerCase())) stopTour(); });
+window.addEventListener("keyup", e => state.keys.delete(e.key.toLowerCase()));
+function flyStep(dt) {
+  const k = state.keys; if (!k.size) return;
+  const c = state.cam, fwd = V.norm(V.sub(c.target, c.pos)), right = V.norm(V.cross(fwd, [0, 0, 1]));
+  const speed = (k.has("shift") ? 400 : 80) * dt;
+  let mv = [0, 0, 0];
+  if (k.has("w")) mv = V.add(mv, fwd); if (k.has("s")) mv = V.sub(mv, fwd);
+  if (k.has("d")) mv = V.add(mv, right); if (k.has("a")) mv = V.sub(mv, right);
+  if (k.has("e")) mv = V.add(mv, [0, 0, 1]); if (k.has("q")) mv = V.sub(mv, [0, 0, 1]);
+  if (V.len(mv) > 0) { mv = V.mul(V.norm(mv), speed); c.pos = V.add(c.pos, mv); c.target = V.add(c.target, mv); state.dirty = true; state.moving = 8; }
+}
+
+// ---------------------------------------------------------------- UI wiring
+const tourBtn = document.getElementById("tourBtn"), tourPos = document.getElementById("tourPos"), tourTime = document.getElementById("tourTime");
+const captionEl = document.getElementById("caption");
+const MODE_NOTES = [
+  "Glow: brightness grows with the dust column along each sightline, like a far-infrared camera sees dust. Log stretch.",
+  "Starlight: a bright background dimmed and reddened by the dust, 10^(-0.4 A) per colour, using the ZGR23 extinction curve.",
+  "Solid: dust also blocks what lies behind it, so near clouds hide far ones. Opacity, and fading out dust thinner than n_H ~ 0.3 cm^-3, are display choices.",
+];
+function setMode(m) {
+  state.mode = m;
+  appEl.classList.toggle("sky-dark", m !== 1);
+  if (progPts) recolorLayers();
+  for (const b of document.querySelectorAll(".seg button")) b.setAttribute("aria-pressed", String(+b.dataset.mode === m));
+  document.getElementById("modeNote").textContent = MODE_NOTES[m];
+  state.dirty = true;
+}
+for (const b of document.querySelectorAll(".seg button")) b.addEventListener("click", () => setMode(+b.dataset.mode));
+document.getElementById("exposure").addEventListener("input", e => { state.exposure = +e.target.value; state.dirty = true; });
+for (const [id, key] of [["lyrClusters", "clusters"], ["lyrWave", "wave"], ["lyrShell", "shell"], ["lyrLabels", "labels"], ["lyrGrid", "grid"]]) {
+  const el = document.getElementById(id); el.checked = state.layers[key];
+  el.addEventListener("change", () => { state.layers[key] = el.checked; state.dirty = true; });
+}
+tourBtn.addEventListener("click", () => {
+  state.tour.playing = !state.tour.playing;
+  if (state.tour.playing && state.tour.t >= TOUR.duration) state.tour.t = 0;
+  tourBtn.textContent = state.tour.playing ? "Pause" : "Play tour";
+  state.tour.last = performance.now();
+});
+tourPos.addEventListener("input", () => { stopTour(); state.tour.t = tourPos.value / 1000 * TOUR.duration; applyTour(state.tour.t); });
+document.getElementById("sunBtn").addEventListener("click", () => { stopTour(); goTo(META.views.sun); });
+for (const b of document.querySelectorAll("[data-goto]")) b.addEventListener("click", () => { stopTour(); goTo(META.views[b.dataset.goto]); });
+const panel = document.getElementById("panel"), panelToggle = document.getElementById("panelToggle");
+panelToggle.addEventListener("click", () => { const closed = panel.classList.toggle("closed"); panelToggle.setAttribute("aria-expanded", String(!closed)); });
+if (window.matchMedia("(max-width: 720px)").matches) { panel.classList.add("closed"); panelToggle.setAttribute("aria-expanded", "false"); }
+let anim = null;
+function goTo(view) {
+  const from = { pos: state.cam.pos.slice(), target: state.cam.target.slice() }, t0 = performance.now();
+  const dur = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 1 : 1600;
+  anim = now => {
+    let u = Math.min(1, (now - t0) / dur); u = u * u * (3 - 2 * u);
+    state.cam.pos = V.lerp(from.pos, view.pos, u); state.cam.target = V.lerp(from.target, view.target, u);
+    state.dirty = true; state.moving = 8;
+    if (u >= 1) anim = null;
+  };
+}
+const LAYER_IDS = { clusters: "lyrClusters", wave: "lyrWave", shell: "lyrShell", labels: "lyrLabels", grid: "lyrGrid" };
+function applyTour(time) {
+  const s = tourAt(time);
+  state.cam.pos = s.pos; state.cam.target = s.target;
+  let lay = null, clip = null;
+  for (const k of TOUR.keys) {
+    if (time < k.t) break;
+    if (k.layers) lay = k.layers;
+    if ("clip" in k) clip = k.clip;
+  }
+  state.clip = clip;
+  if (lay) {
+    Object.assign(state.layers, lay);
+    for (const [key, id] of Object.entries(LAYER_IDS)) document.getElementById(id).checked = state.layers[key];
+  }
+  const cap = captionFor(time);
+  if (cap) { captionEl.innerHTML = cap.text + (cap.note ? `<small>${cap.note}</small>` : ""); captionEl.style.opacity = 1; }
+  else captionEl.style.opacity = 0;
+  const mm = Math.floor(time / 60), ss = Math.floor(time % 60);
+  tourTime.textContent = `${mm}:${String(ss).padStart(2, "0")}`;
+  tourPos.value = Math.round(time / TOUR.duration * 1000);
+  state.dirty = true;
+}
+
+// theme: follow the viewer's theme until the user picks a mode
+const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
+function themeIsDark() {
+  const t = document.documentElement.getAttribute("data-theme");
+  return t ? t === "dark" : darkQuery.matches;
+}
+let userPickedMode = false;
+document.querySelector(".seg").addEventListener("click", () => { userPickedMode = true; });
+function onTheme() { if (!userPickedMode) setMode(themeIsDark() ? 2 : 1); state.dirty = true; }
+darkQuery.addEventListener("change", onTheme);
+new MutationObserver(onTheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+// ---------------------------------------------------------------- boot
+async function boot() {
+  if (!gl) { document.getElementById("fallback").hidden = false; return; }
+  progVol = compile(VS_QUAD, FS_VOL); progPts = compile(VS_PTS, FS_PTS); progLines = compile(VS_LINES, FS_LINES);
+  uVol = uni(progVol, ["uTex", "uMin", "uMax", "uStepMin", "uRmax", "uRmin", "uInvVP", "uCam", "uLo", "uHi", "uMode",
+                       "uExposure", "uKappa", "uOpacity", "uStepScale", "uFrame", "uGround", "uClipOn", "uClipN",
+                       "uClipRange", "uClipD", "uClipRange2", "uGlow", "uFade"]);
+  uPts = uni(progPts, ["uVP", "uScale", "uDpr", "uMinSize", "uHalo", "uClipOn", "uClipN", "uClipRange", "uClipD", "uClipRange2"]);
+  uLines = uni(progLines, ["uVP"]);
+  quadVao = gl.createVertexArray(); gl.bindVertexArray(quadVao);
+  const qb = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, qb);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  const loc = gl.getAttribLocation(progVol, "aPos"); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  gl.bindVertexArray(null);
+  buildOverlays();
+  setMode(themeIsDark() ? 2 : 1);
+  captionEl.textContent = "Loading the dust map…";
+  cpuLevels = [];
+  for (let i = 0; i < 3; i++) {
+    const Lv = META.levels[i];
+    const raw = await inflate(await loadBlob(Lv.name));
+    cpuLevels.push(raw);
+    const tex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_3D, tex);
+    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+    gl.texImage3D(gl.TEXTURE_3D, 0, gl.R8, Lv.shape[0], Lv.shape[1], Lv.shape[2], 0, gl.RED, gl.UNSIGNED_BYTE, raw);
+    for (const [k, v] of [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE],
+                          [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_R, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_3D, k, v);
+    texs.push(tex);
+  }
+  captionEl.textContent = "";
+  captionEl.style.opacity = 0;
+  applyTour(0);
+  window.__ready = true;
+  requestAnimationFrame(loop);
+}
+let lastT = performance.now();
+function loop(now) {
+  if (state.offline) return;
+  const dt = Math.min(0.1, (now - lastT) / 1000); lastT = now;
+  if (state.tour.playing) {
+    state.tour.t += dt;
+    if (state.tour.t >= TOUR.duration) { state.tour.t = TOUR.duration; stopTour(); }
+    applyTour(state.tour.t); state.moving = 8;
+  }
+  if (anim) anim(now);
+  flyStep(dt);
+  const wantQ = state.moving > 0 ? 0.55 : 1.0;
+  if (Math.abs(wantQ - state.quality) > 0.01) { state.quality = wantQ; resize(); }
+  if (state.moving > 0) state.moving--; else if (state.quality < 1) { state.quality = 1; resize(); }
+  if (state.dirty) { resize(); render(); state.dirty = false; }
+  requestAnimationFrame(loop);
+}
+window.addEventListener("resize", resize);
+// Offline rendering hook (used to record the movie): render the tour at time t at a fixed size.
+window.__renderTourFrame = (time, w, h, stepScale) => {
+  state.offline = true; appEl.classList.add("movie");
+  state.quality = 1; state.stepScale = stepScale || 1;
+  canvas.style.width = w + "px"; canvas.style.height = h + "px";
+  dpr = 1; W = w; H = h; canvas.width = w; canvas.height = h;
+  applyTour(time); render(0); return true;
+};
+window.__setMode = setMode;
+window.__setExposure = e => { state.exposure = e; document.getElementById("exposure").value = e; state.dirty = true; };
+window.__setLayers = obj => { Object.assign(state.layers, obj); state.dirty = true; };
+boot().catch(err => { captionEl.textContent = "Could not start the viewer: " + err.message; console.error(err); });
+</script>

@@ -1,0 +1,37 @@
+# Source: Harvey, G. M. 1979, The Observatory 99, 195-198; ADS 1979Obs....99..195H. Read on the PDF's native 3456x5400 page
+#   images; every value checked at high zoom (old-style figures: 1 looks like small-capital I, 0 like o).
+# Table: Table II, printed page 197, "Displacement factor lambda for the individual plates". Printed as two side-by-side blocks
+#   headed "4-inch plates" and "13-inch plates", each with columns "Plate no." and "lambda"; entries printed as "value +- error".
+# Columns: instrument (4-inch or 13-inch = the Astrographic); plate = printed plate number, or "Mean"; lambda; lambda_se.
+# Meaning (p.197, verbatim): "lambda is the linear coefficient of the predicted displacements", where the predicted
+#   displacements dx, dy are those "predicted by Dyson et al. on the assumption of a radial displacement outwards of 1".75 at
+#   the Sun's limb". lambda is dimensionless; lambda = 1 is Einstein's value. Displacement at the limb = lambda x 1.75 arcsec
+#   (p.197: "The mean values of lambda must therefore be multiplied by 1".75 to produce results in seconds of arc for
+#   displacements at the Sun's limb.").
+# Error type: standard error (p.197: "Table II shows the values of lambda thus obtained and their standard errors.").
+# Mean rows (p.197): "Each value was assigned a weight equal to the reciprocal of the square of its standard error; the
+#   weighted mean values of lambda and their standard errors for each of the instruments are also given in Table II."
+# Fit (p.197): lambda.dx + ax + by + c = DX and lambda.dy + dx + ey + f = DY, "solved simultaneously by least squares"; both
+#   coordinates, six linear plate constants a-f per plate. On Astrographic plates 2, 6 and 11 the image nearest the Sun was
+#   excluded (p.197).
+# Plate numbers are as printed; Harvey does not give their correspondence with the plate numbers of Dyson et al. 1920.
+# Signs as printed (positive values unsigned; plate 12 of the 13-inch printed with a minus sign).
+# Checks: inverse-variance weighted means recomputed from the rows: 4-inch 1.0903 +- 0.0594 (printed 1.09 +- 0.06),
+#   13-inch 0.8798 +- 0.1908 (printed 0.88 +- 0.19). Pass. See harvey1979_summary.md.
+instrument,plate,lambda,lambda_se
+4-inch,1,1.08,0.16
+4-inch,4,1.15,0.25
+4-inch,5,1.11,0.09
+4-inch,7,0.85,0.21
+4-inch,8,1.12,0.11
+4-inch,Mean,1.09,0.06
+13-inch,2,0.77,0.76
+13-inch,3,1.40,0.40
+13-inch,4,0.59,0.57
+13-inch,6,1.22,0.63
+13-inch,7,1.06,0.64
+13-inch,8,1.33,0.81
+13-inch,10,0.82,0.53
+13-inch,11,1.51,0.91
+13-inch,12,-0.03,0.44
+13-inch,Mean,0.88,0.19

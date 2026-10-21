@@ -1,0 +1,546 @@
+<!-- Template for explorer.py: everything after the FRAGMENT marker is the page.
+     explorer.py inserts the data and the generated beta functions, then writes
+     the full offline document and an artifact fragment. -->
+<!--FRAGMENT-->
+<title>Is Our Vacuum Stable?</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a short reading column over a two-part instrument -- the lambda(mu) chart beside a
+   verdict card and the phase map -- with the controls between them; one column on phones. */
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --fg: #15171c; --fg2: #4a4f5d; --muted: #80869a;
+  --grid: #e4e7ee; --axis: #c3c8d3; --lam: #4a3aa7; --lam-band: rgba(74, 58, 167, 0.14);
+  --stable: #2a78d6; --stable-wash: #dce8f8; --unstable: #c9541f; --unstable-wash: #fbe2d6;
+  --meta-wash: #eceef3; --ring: #15171c;
+  --display: "Spectral", Georgia, "Times New Roman", serif;
+  --body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111318; --panel: #191c23; --fg: #e9ebf1; --fg2: #b5bac7; --muted: #868c9c;
+    --grid: #262a34; --axis: #3b404d; --lam: #a89ef2; --lam-band: rgba(168, 158, 242, 0.16);
+    --stable: #5a9ff0; --stable-wash: #182a42; --unstable: #e0703e; --unstable-wash: #3a2219;
+    --meta-wash: #20232b; --ring: #e9ebf1; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111318; --panel: #191c23; --fg: #e9ebf1; --fg2: #b5bac7; --muted: #868c9c;
+  --grid: #262a34; --axis: #3b404d; --lam: #a89ef2; --lam-band: rgba(168, 158, 242, 0.16);
+  --stable: #5a9ff0; --stable-wash: #182a42; --unstable: #e0703e; --unstable-wash: #3a2219;
+  --meta-wash: #20232b; --ring: #e9ebf1; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px;
+  line-height: 1.5; margin: 0; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 28px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 22px; }
+.eyebrow { font: 500 12px/1.4 var(--mono); letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--muted); margin: 0; }
+h1 { font: 600 clamp(30px, 5vw, 44px)/1.08 var(--display); margin: 6px 0 10px;
+  text-wrap: balance; letter-spacing: -0.01em; }
+.lede { max-width: 68ch; margin: 0; color: var(--fg2); font-size: 17px; }
+.lede b { color: var(--fg); font-weight: 600; }
+.controls { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px;
+  background: var(--panel); border: 1px solid var(--grid); border-radius: 10px; padding: 16px 18px; }
+.ctl { display: grid; gap: 4px; min-width: 0; }
+.ctl label { font-weight: 600; font-size: 14px; display: flex; justify-content: space-between;
+  gap: 8px; align-items: baseline; }
+.ctl output { font: 500 15px var(--mono); font-variant-numeric: tabular-nums; }
+.ctl .meas { font: 400 12px var(--mono); color: var(--muted); }
+.track { position: relative; height: 26px; display: flex; align-items: center; }
+.band { position: absolute; top: 9px; height: 8px; border-radius: 4px; background: var(--lam-band);
+  pointer-events: none; }
+input[type=range] { width: 100%; accent-color: var(--lam); position: relative; margin: 0;
+  background: transparent; }
+input[type=range]:focus-visible { outline: 2px solid var(--lam); outline-offset: 3px; }
+.ctl-foot { display: flex; justify-content: flex-end; grid-column: 1 / -1; }
+button { font: 600 13px var(--body); color: var(--fg); background: transparent;
+  border: 1px solid var(--axis); border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+button:hover { border-color: var(--lam); }
+button:focus-visible { outline: 2px solid var(--lam); outline-offset: 2px; }
+.instrument { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 18px;
+  align-items: start; }
+.panel { background: var(--panel); border: 1px solid var(--grid); border-radius: 10px;
+  padding: 14px 14px 10px; margin: 0; min-width: 0; }
+.panel h2 { font: 600 15px/1.3 var(--body); margin: 0 0 2px; }
+.panel .sub { font-size: 13px; color: var(--muted); margin: 0 0 6px; }
+.side { display: grid; gap: 18px; min-width: 0; }
+.verdict { display: grid; gap: 10px; }
+.pill { justify-self: start; font: 600 13px var(--mono); letter-spacing: 0.05em; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 999px; border: 1.5px solid currentColor; }
+.pill.stable { color: var(--stable); background: var(--stable-wash); }
+.pill.metastable { color: var(--fg2); background: var(--meta-wash); }
+.pill.unstable { color: var(--unstable); background: var(--unstable-wash); }
+.facts { display: grid; grid-template-columns: minmax(0, 1fr) max-content; gap: 8px 14px; margin: 0;
+  font-size: 14px; align-items: baseline; }
+.facts dt { color: var(--muted); min-width: 0; }
+.facts dd { margin: 0; font-family: var(--mono); font-variant-numeric: tabular-nums;
+  text-align: right; white-space: nowrap; }
+svg { display: block; width: 100%; height: auto; overflow: visible; }
+svg text { font-family: var(--body); fill: var(--fg2); font-size: 12px; }
+svg .tick text, svg text.tick { font-family: var(--mono); font-size: 11px; fill: var(--muted); }
+.tip { font: 500 12px var(--mono); }
+.notes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.notes section { min-width: 0; }
+.notes h3 { font: 600 14px var(--body); margin: 0 0 4px; }
+.notes p { margin: 0; color: var(--fg2); font-size: 14px; max-width: 60ch; }
+.notes a { color: var(--lam); }
+details { font-size: 14px; }
+details summary { cursor: pointer; color: var(--fg2); }
+.tbl { overflow-x: auto; }
+table { border-collapse: collapse; font-family: var(--mono); font-size: 12.5px;
+  font-variant-numeric: tabular-nums; margin-top: 8px; }
+th, td { padding: 3px 10px; border-bottom: 1px solid var(--grid); text-align: right; }
+th { color: var(--muted); font-weight: 500; }
+@media (max-width: 860px) {
+  .instrument { grid-template-columns: minmax(0, 1fr); }
+  .notes { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 620px) {
+  .controls { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+<!--BODY-->
+<main class="wrap">
+  <header>
+    <p class="eyebrow">Atlas project P7 · Standard Model, three-loop running</p>
+    <h1>Is our vacuum stable?</h1>
+    <p class="lede">The Higgs field's self-coupling <b>λ</b> depends on the energy at which you
+      probe it. The measured Higgs and top-quark masses fix λ near 173 GeV; the
+      renormalization-group equations carry it upward. The heavy top quark drags it down.
+      If λ turns negative below the Planck mass, a lower-energy state of the Higgs field exists
+      and the empty space we live in is only <b>metastable</b>. Move the masses and watch.</p>
+  </header>
+
+  <section class="controls" aria-label="Measured inputs">
+    <div class="ctl">
+      <label for="mt"><span>Top quark mass M<sub>t</sub></span> <output id="mt-out"></output></label>
+      <div class="track"><span class="band" id="mt-band"></span>
+        <input type="range" id="mt"></div>
+      <span class="meas" id="mt-meas"></span>
+    </div>
+    <div class="ctl">
+      <label for="mh"><span>Higgs boson mass M<sub>h</sub></span> <output id="mh-out"></output></label>
+      <div class="track"><span class="band" id="mh-band"></span>
+        <input type="range" id="mh"></div>
+      <span class="meas" id="mh-meas"></span>
+    </div>
+    <div class="ctl">
+      <label for="as"><span>Strong coupling α<sub>s</sub>(M<sub>Z</sub>)</span> <output id="as-out"></output></label>
+      <div class="track"><span class="band" id="as-band"></span>
+        <input type="range" id="as"></div>
+      <span class="meas" id="as-meas"></span>
+    </div>
+    <div class="ctl-foot"><button id="reset" type="button">Reset to the measured values</button></div>
+  </section>
+
+  <section class="instrument">
+    <figure class="panel" id="lam-panel">
+      <h2>The Higgs self-coupling λ against energy</h2>
+      <p class="sub">MS-bar coupling at the renormalization scale μ; the shaded band is the
+        measured top mass ± 1σ, the dashed line the measured values.</p>
+      <svg id="lam" role="img" aria-label="Higgs self-coupling against energy scale"></svg>
+      <details>
+        <summary>Values at each decade of energy</summary>
+        <div class="tbl"><table id="tbl"></table></div>
+      </details>
+    </figure>
+    <aside class="side">
+      <div class="panel verdict" aria-live="polite">
+        <span class="pill" id="pill">metastable</span>
+        <dl class="facts" id="facts"></dl>
+      </div>
+      <figure class="panel">
+        <h2>Where these masses put the vacuum</h2>
+        <p class="sub">Ellipses: PDG 2026 at 1σ and 2σ. Ring: your settings.</p>
+        <svg id="phase" role="img" aria-label="Phase diagram of the vacuum in the top mass, Higgs mass plane"></svg>
+      </figure>
+    </aside>
+  </section>
+
+  <section class="notes">
+    <section>
+      <h3>How it is computed</h3>
+      <p>Couplings at μ = M<sub>t</sub> come from the measured masses (a fit to this project's
+        matching, calibrated to SMDR by Martin &amp; Robertson). They then run with the
+        Standard Model's three-loop β functions (Buttazzo et al. 2013, appendix B) up to
+        10<sup>20</sup> GeV, recomputed in your browser at every move.</p>
+    </section>
+    <section>
+      <h3>What the verdicts mean</h3>
+      <p><b>Stable</b>: λ stays positive up to the Planck mass, 1.22 × 10<sup>19</sup> GeV.
+        The stricter test with the two-loop effective potential (dashed blue line) moves that
+        border by about 0.07 GeV. <b>Unstable</b>: a bubble of the true vacuum would probably
+        have formed in our past light cone (leading-order tunnelling rate, Planck 2018 cosmology).
+        <b>Metastable</b>: in between.</p>
+    </section>
+    <section>
+      <h3>What it assumes</h3>
+      <p>No new particles or forces up to the Planck scale, which is a big assumption, and the
+        top mass measured at colliders taken as the pole mass (an ambiguity of a few hundred MeV).
+        Tunnelling rates are leading-order estimates; Andreassen, Frost &amp; Schwartz (2018)
+        give the full next-to-leading-order calculation.</p>
+    </section>
+  </section>
+</main>
+<script>
+/*__DATA__*/
+/*__BETAS__*/
+(() => {
+  "use strict";
+  const C = DATA.constants;
+  const MPL_LOG = Math.log10(C.MPl);
+  const LN10 = Math.log(10);
+  const sliders = {
+    mt: { key: "Mt", step: 0.01, unit: "GeV", digits: 2 },
+    mh: { key: "Mh", step: 0.01, unit: "GeV", digits: 2 },
+    as: { key: "as", step: 0.0001, unit: "", digits: 4 },
+  };
+  const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  const SUP = { "-": "⁻", "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶",
+    "7": "⁷", "8": "⁸", "9": "⁹" };
+  const sup = (n) => String(n).split("").map((c) => SUP[c] ?? c).join("");
+  const sci = (x, d = 1) => {
+    if (!isFinite(x)) return "—";
+    const e = Math.floor(Math.log10(x));
+    const m = x / 10 ** e;
+    return `${m.toFixed(d)} × 10${sup(e)}`;
+  };
+  const pow10 = (lg) => `10${sup(Math.round(lg))}`;
+
+  // ---- matching at mu = M_t (quadratic fit to the project's matching) ----
+  function couplings(Mt, Mh, as) {
+    const x = Mt - DATA.center.Mt, y = Mh - DATA.center.Mh, z = (as - DATA.center.as) / 0.001;
+    const basis = [1, x, y, z, x * x, y * y, z * z, x * y, x * z, y * z];
+    const out = {};
+    for (const [k, c] of Object.entries(DATA.match.coef)) {
+      out[k] = c.reduce((s, ci, i) => s + ci * basis[i], 0);
+    }
+    return out;
+  }
+
+  // ---- RK4 in s = ln mu^2, as in rge.run ----
+  function run(Mt, Mh, as, muMax = 1e20, step = 0.05) {
+    const c = couplings(Mt, Mh, as);
+    let X = [5 / 3 * c.gY ** 2, c.g2 ** 2, c.g3 ** 2, c.yt ** 2, c.yb ** 2, c.ytau ** 2, c.lam, 0];
+    const s0 = 2 * Math.log(Mt), s1 = 2 * Math.log(muMax);
+    const n = Math.ceil((s1 - s0) / step), h = (s1 - s0) / n;
+    const lgmu = new Float64Array(n + 1), lam = new Float64Array(n + 1);
+    lgmu[0] = s0 / 2 / LN10; lam[0] = X[6];
+    const t = new Array(8);
+    for (let i = 0; i < n; i++) {
+      const k1 = betas(X, 3);
+      for (let j = 0; j < 8; j++) t[j] = X[j] + 0.5 * h * k1[j];
+      const k2 = betas(t, 3);
+      for (let j = 0; j < 8; j++) t[j] = X[j] + 0.5 * h * k2[j];
+      const k3 = betas(t, 3);
+      for (let j = 0; j < 8; j++) t[j] = X[j] + h * k3[j];
+      const k4 = betas(t, 3);
+      const Y = new Array(8);
+      for (let j = 0; j < 8; j++) Y[j] = X[j] + h / 6 * (k1[j] + 2 * k2[j] + 2 * k3[j] + k4[j]);
+      X = Y;
+      lgmu[i + 1] = (s0 + h * (i + 1)) / 2 / LN10;
+      lam[i + 1] = X[6];
+    }
+    return { lgmu, lam };
+  }
+
+  function analyse(r) {
+    let minL = Infinity, minAt = NaN, cross = NaN, rate = -Infinity;
+    for (let i = 0; i < r.lam.length; i++) {
+      const lg = r.lgmu[i], l = r.lam[i];
+      if (lg > MPL_LOG) break;
+      if (l < minL) { minL = l; minAt = lg; }
+      if (i > 0 && isNaN(cross) && r.lam[i - 1] > 0 && l <= 0) {
+        const f = r.lam[i - 1] / (r.lam[i - 1] - l);
+        cross = r.lgmu[i - 1] + f * (lg - r.lgmu[i - 1]);
+      }
+      if (l < 0) {
+        const S = 8 * Math.PI ** 2 / (3 * Math.abs(l));
+        rate = Math.max(rate, 4 * lg - S / LN10);          // log10 Gamma/V in GeV^4
+      }
+    }
+    const p0 = rate + C.log10_lc - 4 * C.log10_H0;          // log10 P(decayed in past light cone)
+    const tau = -rate / 4 + C.log10_hbar_per_year;          // log10 lifetime, (Gamma/V)^(-1/4)
+    let phase = "stable";
+    if (minL < 0) phase = p0 >= 0 ? "unstable" : "metastable";
+    return { minL, minAt, cross, rate, p0, tau, phase };
+  }
+
+  function stabilityBound(Mh, as) {
+    // M_t at which min lambda (mu <= M_Pl) is exactly zero, by bisection
+    let lo = 150, hi = 190;
+    const f = (mt) => analyse(run(mt, Mh, as, C.MPl * 1.01, 0.1)).minL;
+    if (f(lo) < 0 || f(hi) > 0) return NaN;
+    for (let i = 0; i < 26; i++) {
+      const mid = 0.5 * (lo + hi);
+      if (f(mid) > 0) lo = mid; else hi = mid;
+    }
+    return 0.5 * (lo + hi);
+  }
+
+  // ---- drawing helpers ----
+  const NS = "http://www.w3.org/2000/svg";
+  function el(tag, attrs, parent) {
+    const e = document.createElementNS(NS, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  const lamSvg = document.getElementById("lam");
+  const phaseSvg = document.getElementById("phase");
+  let state = { Mt: DATA.center.Mt, Mh: DATA.center.Mh, as: DATA.center.as };
+  let current = null, bound = NaN;
+
+  function drawLambda() {
+    const W = Math.max(lamSvg.clientWidth || 600, 280);
+    const H = Math.round(Math.min(Math.max(W * 0.62, 260), 430));
+    lamSvg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    lamSvg.replaceChildren();
+    const m = { l: 52, r: 14, t: 12, b: 40 };
+    const x0 = 2, x1 = 20, y0 = -0.06, y1 = 0.14;
+    const X = (v) => m.l + (v - x0) / (x1 - x0) * (W - m.l - m.r);
+    const Y = (v) => m.t + (y1 - v) / (y1 - y0) * (H - m.t - m.b);
+    // grid + ticks
+    const g = el("g", {}, lamSvg);
+    for (let v = -0.06; v <= 0.1401; v += 0.02) {
+      el("line", { x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v), stroke: css("--grid"), "stroke-width": 1 }, g);
+      const t = el("text", { x: m.l - 6, y: Y(v) + 4, "text-anchor": "end", class: "tick" }, g);
+      t.textContent = v.toFixed(2).replace("-", "−");
+    }
+    const xstep = W < 520 ? 4 : 2;
+    for (let v = 2; v <= 20; v += xstep) {
+      el("line", { x1: X(v), x2: X(v), y1: m.t, y2: H - m.b, stroke: css("--grid"), "stroke-width": 1 }, g);
+      const t = el("text", { x: X(v), y: H - m.b + 16, "text-anchor": "middle", class: "tick" }, g);
+      t.textContent = `10${sup(v)}`;
+    }
+    const xl = el("text", { x: (m.l + W - m.r) / 2, y: H - 6, "text-anchor": "middle" }, g);
+    xl.textContent = "energy scale μ (GeV)";
+    // Planck region
+    el("rect", { x: X(MPL_LOG), y: m.t, width: X(20) - X(MPL_LOG), height: H - m.t - m.b,
+      fill: css("--meta-wash") }, g);
+    const pl = el("text", { x: X(MPL_LOG) - 4, y: m.t + 14, "text-anchor": "end" }, g);
+    pl.textContent = "Planck mass";
+    // zero line
+    el("line", { x1: m.l, x2: W - m.r, y1: Y(0), y2: Y(0), stroke: css("--fg"), "stroke-width": 1 }, g);
+    // reference band (measured M_t +- 1 sigma) and central curve
+    const ref = DATA.reference;
+    let d = "";
+    ref.x.forEach((v, i) => { d += `${i ? "L" : "M"}${X(v).toFixed(1)},${Y(ref.lo[i]).toFixed(1)}`; });
+    for (let i = ref.x.length - 1; i >= 0; i--) d += `L${X(ref.x[i]).toFixed(1)},${Y(ref.hi[i]).toFixed(1)}`;
+    el("path", { d: d + "Z", fill: css("--lam-band"), stroke: "none" }, g);
+    let dc = "";
+    ref.x.forEach((v, i) => { dc += `${i ? "L" : "M"}${X(v).toFixed(1)},${Y(ref.central[i]).toFixed(1)}`; });
+    el("path", { d: dc, fill: "none", stroke: css("--muted"), "stroke-width": 1.2, "stroke-dasharray": "4 4" }, g);
+    // live curve
+    let dl = "";
+    const r = current.run;
+    const stride = Math.max(1, Math.floor(r.lam.length / 500));
+    for (let i = 0; i < r.lam.length; i += stride) {
+      const yv = Math.min(Math.max(r.lam[i], y0 - 0.02), y1 + 0.02);
+      dl += `${i ? "L" : "M"}${X(r.lgmu[i]).toFixed(1)},${Y(yv).toFixed(1)}`;
+    }
+    el("path", { d: dl, fill: "none", stroke: css("--lam"), "stroke-width": 2.2,
+      "stroke-linejoin": "round" }, g);
+    const a = current.a;
+    if (!isNaN(a.cross)) {
+      el("circle", { cx: X(a.cross), cy: Y(0), r: 4.5, fill: css("--panel"), stroke: css("--lam"),
+        "stroke-width": 2 }, g);
+      const lab = el("text", { x: X(a.cross) + 8, y: Y(0) - 8 }, g);
+      lab.textContent = `λ < 0 above ${sci(10 ** a.cross)} GeV`;
+    }
+    // hover layer
+    const hover = el("g", { opacity: 0 }, lamSvg);
+    const vline = el("line", { y1: m.t, y2: H - m.b, stroke: css("--axis"), "stroke-width": 1 }, hover);
+    const dot = el("circle", { r: 4, fill: css("--lam") }, hover);
+    const tipBg = el("rect", { rx: 4, fill: css("--panel"), stroke: css("--axis") }, hover);
+    const tip = el("text", { class: "tip" }, hover);
+    const hit = el("rect", { x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b,
+      fill: "transparent" }, lamSvg);
+    const move = (ev) => {
+      const pt = lamSvg.getBoundingClientRect();
+      const px = (ev.clientX - pt.left) * (W / pt.width);
+      const lg = x0 + (px - m.l) / (W - m.l - m.r) * (x1 - x0);
+      if (lg < r.lgmu[0] || lg > 20) { hover.setAttribute("opacity", 0); return; }
+      let i = 0;
+      while (i < r.lgmu.length - 1 && r.lgmu[i] < lg) i++;
+      const lv = r.lam[i];
+      vline.setAttribute("x1", X(lg)); vline.setAttribute("x2", X(lg));
+      dot.setAttribute("cx", X(lg)); dot.setAttribute("cy", Y(Math.min(Math.max(lv, y0), y1)));
+      tip.textContent = `μ = ${sci(10 ** lg)} GeV   λ = ${lv.toFixed(4).replace("-", "−")}`;
+      const bb = tip.getComputedTextLength() + 14;
+      let tx = X(lg) + 10;
+      if (tx + bb > W - m.r) tx = X(lg) - 10 - bb;
+      tip.setAttribute("x", tx + 7); tip.setAttribute("y", m.t + 20);
+      tipBg.setAttribute("x", tx); tipBg.setAttribute("y", m.t + 6);
+      tipBg.setAttribute("width", bb); tipBg.setAttribute("height", 20);
+      hover.setAttribute("opacity", 1);
+    };
+    hit.addEventListener("pointermove", move);
+    hit.addEventListener("pointerdown", move);
+    hit.addEventListener("pointerleave", () => hover.setAttribute("opacity", 0));
+  }
+
+  function drawPhase() {
+    const W = Math.max(phaseSvg.clientWidth || 360, 240);
+    const H = Math.round(W * 0.86);
+    phaseSvg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    phaseSvg.replaceChildren();
+    const m = { l: 44, r: 10, t: 8, b: 38 };
+    const tx0 = 166, tx1 = 180, hy0 = 118, hy1 = 132;
+    const X = (v) => m.l + (v - tx0) / (tx1 - tx0) * (W - m.l - m.r);
+    const Y = (v) => m.t + (hy1 - v) / (hy1 - hy0) * (H - m.t - m.b);
+    const g = el("g", {}, phaseSvg);
+    el("rect", { x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b,
+      fill: css("--meta-wash") }, g);
+    const B = DATA.bounds;
+    const poly = (pts, edgeY) => {
+      if (!pts.length) return "";
+      let d = `M${X(pts[0][0])},${Y(edgeY)}`;
+      pts.forEach(([t, h]) => { d += `L${X(t).toFixed(1)},${Y(Math.min(Math.max(h, hy0), hy1)).toFixed(1)}`; });
+      return d + `L${X(pts[pts.length - 1][0])},${Y(edgeY)}Z`;
+    };
+    // stable: above the lambda boundary (fill to the top edge, and the strip left of its start)
+    const sb = B.stable_lambda;
+    if (sb.length) {
+      // stable: everything above the border, including the strip left of where it enters
+      let d = `M${X(tx0)},${Y(hy0)}`;
+      sb.forEach(([t, h]) => { d += `L${X(t).toFixed(1)},${Y(Math.min(Math.max(h, hy0), hy1)).toFixed(1)}`; });
+      d += `L${X(sb[sb.length - 1][0])},${Y(hy1)}L${X(tx0)},${Y(hy1)}Z`;
+      el("path", { d, fill: css("--stable-wash") }, g);
+    }
+    const ub = B.unstable;
+    if (ub.length) el("path", { d: poly(ub, hy0), fill: css("--unstable-wash") }, g);
+    const line = (pts, color, dash, w) => {
+      if (!pts.length) return;
+      let d = "";
+      pts.forEach(([t, h], i) => { d += `${i ? "L" : "M"}${X(t).toFixed(1)},${Y(h).toFixed(1)}`; });
+      el("path", { d, fill: "none", stroke: color, "stroke-width": w, "stroke-dasharray": dash || "none" }, g);
+    };
+    line(sb, css("--stable"), "", 1.6);
+    line(B.stable_lambda_eff, css("--stable"), "4 3", 1);
+    line(ub, css("--unstable"), "", 1.6);
+    // axes
+    for (let t = 166; t <= 180; t += 2) {
+      const tt = el("text", { x: X(t), y: H - m.b + 15, "text-anchor": "middle", class: "tick" }, g);
+      tt.textContent = t;
+    }
+    for (let h = 118; h <= 132; h += 2) {
+      const tt = el("text", { x: m.l - 6, y: Y(h) + 4, "text-anchor": "end", class: "tick" }, g);
+      tt.textContent = h;
+    }
+    const xl = el("text", { x: (m.l + W - m.r) / 2, y: H - 4, "text-anchor": "middle" }, g);
+    xl.textContent = "top mass M_t (GeV)";
+    const yl = el("text", { x: 11, y: (m.t + H - m.b) / 2, transform: `rotate(-90 11 ${(m.t + H - m.b) / 2})`,
+      "text-anchor": "middle" }, g);
+    yl.textContent = "Higgs mass M_h (GeV)";
+    const lab = (txt, t, h) => { const e = el("text", { x: X(t), y: Y(h), "text-anchor": "middle" }, g); e.textContent = txt; };
+    lab("stable", 167.6, 130.6);
+    lab("metastable", 173.4, 120.2);
+    if (ub.length) lab("unstable", 179.0, 118.6);
+    // measured ellipses
+    const sx = (W - m.l - m.r) / (tx1 - tx0), sy = (H - m.t - m.b) / (hy1 - hy0);
+    for (const k of [1, 2]) {
+      el("ellipse", { cx: X(DATA.center.Mt), cy: Y(DATA.center.Mh), rx: k * DATA.sigma.Mt * sx,
+        ry: k * DATA.sigma.Mh * sy, fill: "none", stroke: css("--fg"), "stroke-width": k === 1 ? 1.2 : 0.7 }, g);
+    }
+    el("circle", { cx: X(DATA.center.Mt), cy: Y(DATA.center.Mh), r: 2.2, fill: css("--fg") }, g);
+    const p24 = C.pdg2024;
+    el("rect", { x: X(p24.Mt) - 3, y: Y(p24.Mh) - 3, width: 6, height: 6, fill: css("--panel"),
+      stroke: css("--fg"), "stroke-width": 1 }, g);
+    // your point
+    const inside = state.Mt >= tx0 && state.Mt <= tx1 && state.Mh >= hy0 && state.Mh <= hy1;
+    if (inside) {
+      el("circle", { cx: X(state.Mt), cy: Y(state.Mh), r: 7, fill: "none", stroke: css("--lam"),
+        "stroke-width": 2.4 }, g);
+    }
+  }
+
+  function drawFacts() {
+    const a = current.a;
+    const pill = document.getElementById("pill");
+    pill.className = `pill ${a.phase}`;
+    pill.textContent = a.phase;
+    const rows = [];
+    if (a.phase === "stable") {
+      rows.push(["λ stays positive", "up to the Planck mass"]);
+      rows.push(["lowest λ", `${a.minL.toFixed(4)} at ${sci(10 ** a.minAt)} GeV`]);
+    } else {
+      rows.push(["λ turns negative at", `${sci(10 ** a.cross)} GeV`]);
+      rows.push(["lowest λ", `${a.minL.toFixed(4).replace("-", "−")} at ${sci(10 ** a.minAt)} GeV`]);
+      rows.push(["chance it has already decayed in our past light cone",
+        a.p0 >= 0 ? "about 1 or more" : pow10(a.p0)]);
+      rows.push(["typical lifetime (Γ/V)^−¼", `${pow10(a.tau)} years`]);
+    }
+    rows.push(["stable only if M_t below", isNaN(bound) ? "computing…" : `${bound.toFixed(2)} GeV`]);
+    const dl = document.getElementById("facts");
+    dl.replaceChildren();
+    for (const [k, v] of rows) {
+      const dt = document.createElement("dt"); dt.textContent = k;
+      const dd = document.createElement("dd"); dd.textContent = v;
+      dl.append(dt, dd);
+    }
+    // values table
+    const tbl = document.getElementById("tbl");
+    tbl.replaceChildren();
+    const head = tbl.insertRow();
+    for (const h of ["μ (GeV)", "λ"]) { const th = document.createElement("th"); th.textContent = h; head.appendChild(th); }
+    const r = current.run;
+    for (let lg = 3; lg <= 19; lg += 1) {
+      let i = 0;
+      while (i < r.lgmu.length - 1 && r.lgmu[i] < lg) i++;
+      const row = tbl.insertRow();
+      row.insertCell().textContent = `10${sup(lg)}`;
+      row.insertCell().textContent = r.lam[i].toFixed(5).replace("-", "−");
+    }
+  }
+
+  let boundTimer = null;
+  function update() {
+    const r = run(state.Mt, state.Mh, state.as);
+    current = { run: r, a: analyse(r) };
+    drawLambda(); drawPhase(); drawFacts();
+    clearTimeout(boundTimer);
+    bound = NaN;
+    boundTimer = setTimeout(() => { bound = stabilityBound(state.Mh, state.as); drawFacts(); }, 150);
+  }
+
+  // ---- controls ----
+  for (const [id, s] of Object.entries(sliders)) {
+    const input = document.getElementById(id);
+    const [lo, hi] = DATA.ranges[s.key];
+    input.min = lo; input.max = hi; input.step = s.step; input.value = DATA.center[s.key];
+    const sig = DATA.sigma[s.key], c = DATA.center[s.key];
+    document.getElementById(`${id}-meas`).textContent =
+      `measured ${c.toFixed(s.digits)} ± ${sig.toFixed(s.digits)}${s.unit ? " " + s.unit : ""} (PDG 2026)`;
+    const band = document.getElementById(`${id}-band`);
+    band.style.left = `${(c - sig - lo) / (hi - lo) * 100}%`;
+    band.style.width = `${2 * sig / (hi - lo) * 100}%`;
+    const out = document.getElementById(`${id}-out`);
+    const show = () => { out.textContent = `${Number(input.value).toFixed(s.digits)}${s.unit ? " " + s.unit : ""}`; };
+    show();
+    input.addEventListener("input", () => { state[s.key] = Number(input.value); show(); update(); });
+  }
+  document.getElementById("reset").addEventListener("click", () => {
+    for (const [id, s] of Object.entries(sliders)) {
+      const input = document.getElementById(id);
+      input.value = DATA.center[s.key];
+      state[s.key] = DATA.center[s.key];
+      input.dispatchEvent(new Event("input"));
+    }
+  });
+  let rz = null;
+  window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { drawLambda(); drawPhase(); }, 80); });
+  const mq = window.matchMedia("(prefers-color-scheme: dark)");
+  mq.addEventListener?.("change", () => { drawLambda(); drawPhase(); });
+  new MutationObserver(() => { drawLambda(); drawPhase(); })
+    .observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  update();
+})();
+</script>

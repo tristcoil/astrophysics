@@ -935,7 +935,8 @@ def figure_sky_tonight(res, art):
     ax.set_xlabel(f"local time ({site['tz_label']}), evening of {SNAPSHOT_DATE} to the next morning")
     ax.set_ylabel("altitude above the horizon (°)")
     ax.set_title(f"What's up tonight from {site['name']} "
-                 f"({site['lat']:.2f}° N, {site['lon']:.2f}° E)")
+                 f"({abs(site['lat']):.2f}° {'N' if site['lat'] >= 0 else 'S'}, "
+                 f"{abs(site['lon']):.2f}° {'E' if site['lon'] >= 0 else 'W'})")
     tw = sky["twilight_local"]
     ax.text(0.01, 0.985, f"sunset {tw['sunset']['evening']} · fully dark (Sun 18° down) "
             f"{tw['astronomical']['evening']}–{tw['astronomical']['morning']} · sunrise "

@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Black Hole Explorer</title>
+<style>
+:root { color-scheme: light; --bg:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --muted:#898781; --grid:#e1e0d9;
+  --axis:#c3c2b7; --gap:#efeee9; --ours:#eb6834; --pub:#4a3aa7; --curve:#2a78d6; --band:#cde2fb; --card:#ffffff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { color-scheme: dark; --bg:#1a1a19;
+  --ink:#ffffff; --ink2:#c3c2b7; --muted:#9a998f; --grid:#33332f; --axis:#55544e; --gap:#262624; --ours:#d95926;
+  --pub:#9085e9; --curve:#3987e5; --band:#1c3a5e; --card:#222220; } }
+:root[data-theme="dark"] { color-scheme: dark; --bg:#1a1a19; --ink:#ffffff; --ink2:#c3c2b7; --muted:#9a998f;
+  --grid:#33332f; --axis:#55544e; --gap:#262624; --ours:#d95926; --pub:#9085e9; --curve:#3987e5; --band:#1c3a5e;
+  --card:#222220; }
+body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width:1060px; margin:0 auto; padding:24px 16px 48px; }
+h1 { font-size:26px; margin:0 0 4px; } h2 { font-size:18px; margin:32px 0 6px; }
+p.lede { color:var(--ink2); margin:0 0 16px; max-width:760px; }
+.card { background:var(--card); border:1px solid var(--grid); border-radius:10px; padding:16px; }
+.row { display:flex; gap:16px; flex-wrap:wrap; align-items:center; }
+.controls label { color:var(--ink2); font-size:14px; }
+select, button { font:inherit; color:var(--ink); background:var(--bg); border:1px solid var(--axis); border-radius:6px; padding:4px 8px; }
+input[type=range] { width:260px; accent-color:var(--ours); }
+.readout { display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:10px; margin:12px 0; }
+.stat { border-left:3px solid var(--grid); padding:2px 10px; }
+.stat .k { font-size:12.5px; color:var(--muted); } .stat .v { font-size:20px; font-weight:600; }
+svg { width:100%; height:auto; display:block; }
+svg text { fill:var(--ink2); font-size:12px; } .axis line, .axis path { stroke:var(--axis); }
+.gridl { stroke:var(--grid); stroke-width:1; } .note { color:var(--ink2); font-size:13.5px; }
+.two { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+@media (max-width:760px) { .two { grid-template-columns:1fr; } input[type=range] { width:100%; } }
+footer { color:var(--muted); font-size:12.5px; margin-top:32px; }
+</style></head>
+<body><main>
+<h1>Black Hole Explorer</h1>
+<p class="lede">The companion star's orbit gives the <b>mass function</b> f(M) = P K³ / 2πG, a strict lower limit on the
+unseen mass. Turning it into a mass needs the orbit's tilt. Drag the inclination and watch the mass change. The real
+measurements of 20 black-hole transients come from BlackCAT.</p>
+
+<div class="card">
+  <div class="row controls">
+    <label>Black hole <select id="sys"></select></label>
+    <label>Inclination <input id="inc" type="range" min="10" max="90" step="0.5" value="60"> <span id="incv"></span></label>
+  </div>
+  <div class="readout">
+    <div class="stat"><div class="k">orbital period</div><div class="v" id="r-p"></div></div>
+    <div class="stat"><div class="k">companion's speed K₂</div><div class="v" id="r-k"></div></div>
+    <div class="stat"><div class="k">mass function f(M)</div><div class="v" id="r-f"></div></div>
+    <div class="stat"><div class="k">mass at this inclination</div><div class="v" id="r-m"></div></div>
+  </div>
+  <svg id="plot" viewBox="0 0 900 380" role="img" aria-label="Black hole mass against inclination"></svg>
+  <p class="note" id="verdict"></p>
+</div>
+
+<h2>Replay an outburst: MAXI J1820+070, 2018</h2>
+<p class="lede">Daily X-ray fluxes from MAXI, in units of the Crab Nebula. The hardness is the ratio of the 4–10 keV
+to the 2–4 keV flux. A Crab-like spectrum has hardness 1.</p>
+<div class="card">
+  <div class="row controls">
+    <button id="play">▶ Play</button>
+    <input id="day" type="range" min="0" value="0" step="1" style="width:420px">
+    <span id="dayv" class="note"></span>
+  </div>
+  <div class="two">
+    <svg id="lc" viewBox="0 0 480 300" role="img" aria-label="Light curve"></svg>
+    <svg id="hid" viewBox="0 0 480 300" role="img" aria-label="Hardness-intensity diagram"></svg>
+  </div>
+  <p class="note" id="state"></p>
+</div>
+<footer>Data: BlackCAT online (Corral-Santana et al. 2016 and updates), MAXI/GSC (RIKEN, JAXA, MAXI team).
+Masses here use each system's median mass ratio q; the project's figures propagate every uncertainty.
+Made by project I4 of the Astrophysics Project Atlas (AI-generated).</footer>
+</main>
+<script>
+const SYS = [{"name": "XTE J1550-564", "common": "", "sptype": "K2 \u2013 4IV", "porb_h": 37.0088, "k2": 363.0, "k2_err": 6.0, "fm": 7.6437, "q": 0.03, "q_txt": "0.015\u20130.045", "i_txt": "75 \u00b1 4\u00b0", "m1_pub": "7.8 \u2013 15.6", "refs": "Orosz2011a; Orosz2002", "i_lo": 71.0, "i_hi": 79.08, "m_med": 9.02, "m_lo": 8.39, "m_hi": 9.78}, {"name": "GRS 1915+105", "common": "", "sptype": "K1 \u2013 5III", "porb_h": 812.0, "k2": 126.0, "k2_err": 1.0, "fm": 7.0125, "q": 0.0429, "q_txt": "0.042 \u00b1 0.024", "i_txt": "60 \u00b1 5\u00b0", "m1_pub": "12", "refs": "Reid2023; Steeghs2013", "i_lo": 55.12, "i_hi": 64.94, "m_med": 11.78, "m_lo": 10.2, "m_hi": 13.94}, {"name": "MAXI J1305-704", "common": "", "sptype": "K3 \u2013 5", "porb_h": 9.5, "k2": 554.0, "k2_err": 8.0, "fm": 6.9754, "q": 0.0501, "q_txt": "0.05 \u00b1 0.02", "i_txt": "60\u201382\u00b0", "m1_pub": "8.9 +1.6 -1.0", "refs": "MataSanchez2021", "i_lo": 63.8, "i_hi": 78.69, "m_med": 9.08, "m_lo": 8.09, "m_hi": 10.68}, {"name": "XTE J1118+480", "common": "", "sptype": "K7 \u2013 M1V", "porb_h": 4.0784088, "k2": 708.8, "k2_err": 1.4, "fm": 6.2695, "q": 0.0239, "q_txt": "0.024 \u00b1 0.009", "i_txt": "68\u201379\u00b0", "m1_pub": "6.9 \u2013 8.2", "refs": "Calvelo2009; GonzalezHernandez2008; Khargharia2013", "i_lo": 69.82, "i_hi": 77.28, "m_med": 7.46, "m_lo": 7.07, "m_hi": 7.96}, {"name": "GS 2023+338", "common": "V404 Cyg", "sptype": "K3III", "porb_h": 155.30803, "k2": 208.4, "k2_err": 0.5, "fm": 6.0684, "q": 0.0671, "q_txt": "0.067 \u00b1 0.005", "i_txt": "67 +3/\u22121\u00b0", "m1_pub": "9 +0.2 -0.6", "refs": "Casares1994; Casares1996; Casares2019; Khargharia2010", "i_lo": 66.01, "i_hi": 69.96, "m_med": 8.81, "m_lo": 8.32, "m_hi": 9.09}, {"name": "GS 1354-64", "common": "", "sptype": "G0 \u2013 5III", "porb_h": 61.068, "k2": 279.0, "k2_err": 5.0, "fm": 5.7241, "q": 0.1202, "q_txt": "0.12 +0.03/\u22120.04", "i_txt": "27.2\u201379\u00b0", "m1_pub": "\u22657.6\u00b10.7", "refs": "Casares2004; Casares2009; Casares2009", "i_lo": 39.13, "i_hi": 72.27, "m_med": 12.12, "m_lo": 8.31, "m_hi": 28.42}, {"name": "MAXI J1820+070", "common": "", "sptype": "K3 \u2013 5", "porb_h": 16.4518, "k2": 418.0, "k2_err": 4.0, "fm": 5.1897, "q": 0.0701, "q_txt": "0.07 \u00b1 0.01", "i_txt": "67\u201381\u00b0", "m1_pub": "5.71 \u2013 8.10 (8.40 +0.77 -0.70 if adopted i=63\u00ba)", "refs": "Torres2019; Torres2020; Torres2020; Atri2020", "i_lo": 69.28, "i_hi": 78.88, "m_med": 6.69, "m_lo": 6.26, "m_hi": 7.29}, {"name": "XTE J1859+226", "common": "", "sptype": "~K5V / K5-K7V", "porb_h": 6.624, "k2": 562.0, "k2_err": 40.0, "fm": 5.0662, "q": 0.0698, "q_txt": "0.07 \u00b1 0.01", "i_txt": "67 \u00b1 4\u00b0", "m1_pub": "8\u00b12", "refs": "YanesRizo2022", "i_lo": 62.91, "i_hi": 70.92, "m_med": 7.53, "m_lo": 5.93, "m_hi": 9.4}, {"name": "GS 2000+251", "common": "QZ Vul", "sptype": "K3 \u2013 7V", "porb_h": 8.258095, "k2": 520.0, "k2_err": 5.0, "fm": 5.0133, "q": 0.0401, "q_txt": "0.04 \u00b1 0.01", "i_txt": "54\u201360\u00b0", "m1_pub": "5.5 \u2013 8.8", "refs": "Casares1995a; Harlaftis1996; Harlaftis1996; Ioannou2004", "i_lo": 54.97, "i_hi": 59.06, "m_med": 9.18, "m_lo": 8.55, "m_hi": 9.91}, {"name": "H 1705-250", "common": "Nova Oph 1977", "sptype": "K3 \u2013 M0V", "porb_h": 12.51, "k2": 448.0, "k2_err": 4.0, "fm": 4.8567, "q": 0.0262, "q_txt": "0\u20130.053", "i_txt": "48\u201380\u00b0", "m1_pub": "4.9 \u2013 7.9", "refs": "Filippenko1997; Harlaftis1997; Remillard1996; Martin1995", "i_lo": 53.72, "i_hi": 75.22, "m_med": 6.87, "m_lo": 5.67, "m_hi": 9.79}, {"name": "GRS 1009-45", "common": "", "sptype": "K7 \u2013 M0V", "porb_h": 6.8449, "k2": 475.0, "k2_err": 6.0, "fm": 3.168, "q": 0.0548, "q_txt": "0.055 \u00b1 0.01", "i_txt": "37\u201380\u00b0", "m1_pub": "\u22654.4", "refs": "Filippenko1999; Shahbaz1996", "i_lo": 45.35, "i_hi": 74.09, "m_med": 5.32, "m_lo": 3.98, "m_hi": 9.77}, {"name": "GRO J1655-40", "common": "", "sptype": "F6IV", "porb_h": 62.926272, "k2": 226.1, "k2_err": 0.8, "fm": 3.1403, "q": 0.4197, "q_txt": "0.42 \u00b1 0.03", "i_txt": "69 \u00b1 2\u00b0", "m1_pub": "6\u00b10.4", "refs": "Beer2002; GonzalezHernandez2008a; Shahbaz2003a", "i_lo": 67.0, "i_hi": 70.98, "m_med": 7.79, "m_lo": 7.35, "m_hi": 8.25}, {"name": "GRS 1124-684", "common": "GU Mus (Nova Mus 1991)", "sptype": "K3 \u2013 5V", "porb_h": 10.38252, "k2": 407.0, "k2_err": 3.0, "fm": 3.0219, "q": 0.079, "q_txt": "0.079 \u00b1 0.007", "i_txt": "43.2 +2.1/\u22122.7\u00b0", "m1_pub": "11.0 +2.1 -1.4", "refs": "Orosz1996; Wu2015; Wu2015; Wu2016", "i_lo": 40.56, "i_hi": 45.31, "m_med": 10.98, "m_lo": 9.76, "m_hi": 12.84}, {"name": "3A 0620-003", "common": "A0620-00", "sptype": "K2 \u2013 7V", "porb_h": 7.75234, "k2": 437.0, "k2_err": 2.0, "fm": 2.7927, "q": 0.074, "q_txt": "0.074 \u00b1 0.006", "i_txt": "51 \u00b1 0.9\u00b0", "m1_pub": "6.6\u00b10.3", "refs": "Cantrell2010; GonzalezHernandez2010; Orosz1994", "i_lo": 50.11, "i_hi": 51.9, "m_med": 6.86, "m_lo": 6.59, "m_hi": 7.16}, {"name": "Swift J1727.8-1613", "common": "", "sptype": "K4V", "porb_h": 10.804, "k2": 390.0, "k2_err": 4.0, "fm": 2.7675, "q": 0.2505, "q_txt": "0\u20130.5", "i_txt": "below 74\u00b0", "m1_pub": ">3.1\u00b10.1", "refs": "MataSanchez2024a"}, {"name": "SAX J1819.3-2525", "common": "V4641 Sgr", "sptype": "B9III", "porb_h": 67.6152, "k2": 211.0, "k2_err": 3.0, "fm": 2.745, "q": 0.4548, "q_txt": "0.455 \u00b1 0.041", "i_txt": "72 \u00b1 4\u00b0", "m1_pub": "6.4\u00b10.6", "refs": "MacDonald2014; Orosz2001", "i_lo": 67.98, "i_hi": 75.97, "m_med": 6.78, "m_lo": 6.18, "m_hi": 7.51}, {"name": "XTE J1650-500", "common": "", "sptype": "~K4V", "porb_h": 7.69, "k2": 435.0, "k2_err": 30.0, "fm": 2.7401, "q": 0.2499, "q_txt": "0\u20130.5", "i_txt": "above 47\u00b0 (no eclipses)", "m1_pub": "\u22647.3", "refs": "Orosz2004", "i_lo": 51.87, "i_hi": 70.8, "m_med": 6.42, "m_lo": 4.13, "m_hi": 9.82}, {"name": "1H 1659-487", "common": "GX 339-4", "sptype": "K1 \u2013 2 probably IV", "porb_h": 42.21, "k2": 219.0, "k2_err": 3.0, "fm": 1.9144, "q": 0.18, "q_txt": "0.18 \u00b1 0.05", "i_txt": "37\u201378\u00b0", "m1_pub": "2.3 \u2013 9.5", "refs": "Heida2017", "i_lo": 45.37, "i_hi": 72.5, "m_med": 4.15, "m_lo": 3.07, "m_hi": 7.42}, {"name": "GRO J0422+32", "common": "", "sptype": "M4 \u2013 5V", "porb_h": 5.09185, "k2": 378.0, "k2_err": 16.0, "fm": 1.1871, "q": 0.1101, "q_txt": "0.11 +0.05/\u22120.02", "i_txt": "10\u201350\u00b0", "m1_pub": "2 \u2013 15", "refs": "Casares1995c; Beekman1997; Webb2000; Webb2000", "i_lo": 21.54, "i_hi": 45.72, "m_med": 7.71, "m_lo": 4.08, "m_hi": 30.4}, {"name": "4U 1543-475", "common": "", "sptype": "A2V", "porb_h": 26.79377, "k2": 124.0, "k2_err": 4.0, "fm": 0.2205, "q": 0.2803, "q_txt": "0.25\u20130.31", "i_txt": "20.7 \u00b1 1.5\u00b0", "m1_pub": "8.4 \u2013 10.4", "refs": "Orosz1998; Orosz1998; Orosz2003", "i_lo": 19.22, "i_hi": 22.21, "m_med": 8.17, "m_lo": 6.54, "m_hi": 10.38}];
+const OB = {"mjd": [58188.5, 58189.5, 58190.5, 58191.5, 58192.5, 58193.5, 58194.5, 58195.5, 58196.5, 58197.5, 58198.5, 58199.5, 58200.5, 58201.5, 58202.5, 58205.5, 58206.5, 58226.5, 58227.5, 58228.5, 58229.5, 58230.5, 58231.5, 58232.5, 58233.5, 58234.5, 58235.5, 58236.5, 58237.5, 58238.5, 58239.5, 58240.5, 58241.5, 58242.5, 58243.5, 58244.5, 58245.5, 58246.5, 58247.5, 58248.5, 58249.5, 58250.5, 58251.5, 58252.5, 58253.5, 58254.5, 58255.5, 58256.5, 58257.5, 58258.5, 58259.5, 58260.5, 58261.5, 58262.5, 58263.5, 58264.5, 58265.5, 58266.5, 58267.5, 58268.5, 58269.5, 58270.5, 58271.5, 58272.5, 58273.5, 58274.5, 58275.5, 58276.5, 58277.5, 58278.5, 58298.5, 58299.5, 58300.5, 58301.5, 58302.5, 58303.5, 58304.5, 58305.5, 58306.5, 58307.5, 58308.5, 58309.5, 58310.5, 58311.5, 58312.5, 58313.5, 58314.5, 58315.5, 58316.5, 58317.5, 58318.5, 58319.5, 58320.5, 58321.5, 58322.5, 58323.5, 58324.5, 58325.5, 58326.5, 58327.5, 58328.5, 58329.5, 58330.5, 58331.5, 58332.5, 58333.5, 58334.5, 58335.5, 58336.5, 58337.5, 58338.5, 58339.5, 58340.5, 58341.5, 58342.5, 58343.5, 58344.5, 58345.5, 58346.5, 58347.5, 58348.5, 58349.5, 58350.5, 58351.5, 58371.5, 58372.5, 58373.5, 58374.5, 58375.5, 58376.5, 58377.5, 58378.5, 58379.5, 58380.5, 58381.5, 58382.5, 58383.5, 58384.5, 58385.5, 58386.5, 58387.5, 58388.5, 58389.5, 58390.5, 58391.5, 58392.5, 58393.5, 58394.5, 58395.5, 58396.5, 58397.5, 58398.5, 58399.5, 58400.5, 58401.5, 58402.5, 58403.5, 58404.5, 58405.5, 58406.5, 58407.5, 58408.5, 58409.5, 58410.5], "flux": [0.0549, 0.0958, 0.1207, 0.2524, 0.3751, 0.4852, 0.7468, 1.0253, 1.2936, 1.5729, 1.6036, 1.5778, 1.6548, 1.6272, 1.5522, 1.4321, 1.5586, 1.3495, 1.4003, 1.3121, 1.3497, 1.3753, 1.3806, 1.3621, 1.3557, 1.3465, 1.2964, 1.3347, 1.3497, 1.2241, 1.2156, 1.1879, 1.1849, 1.1593, 1.1364, 1.1393, 1.1674, 1.1638, 1.2014, 1.0958, 1.0611, 1.0688, 1.0849, 1.0667, 1.041, 1.0155, 0.999, 1.0063, 0.9891, 0.9783, 0.9648, 0.9453, 0.9168, 0.89, 0.8545, 0.8322, 0.8115, 0.8027, 0.8188, 0.8045, 0.7576, 0.7825, 0.7594, 0.7262, 0.7047, 0.674, 0.6131, 0.6248, 0.5678, 0.5505, 0.7118, 0.7248, 0.8036, 0.8821, 0.9299, 1.0587, 1.2967, 1.9885, 2.3286, 2.1705, 2.2054, 1.9816, 1.9737, 1.8781, 1.8839, 1.8823, 1.8846, 1.8085, 1.8269, 1.7922, 1.75, 1.7515, 1.4313, 1.4511, 1.4916, 1.4699, 1.4819, 1.4175, 1.3014, 1.2505, 1.1961, 1.1641, 1.1428, 1.3062, 1.2556, 1.3, 1.3215, 1.3057, 1.2633, 1.2241, 1.2179, 1.1944, 1.1717, 1.1828, 1.1797, 1.1476, 1.132, 1.0628, 1.0557, 1.0264, 0.9706, 0.9281, 0.9069, 0.9129, 0.5467, 0.5774, 0.5506, 0.5045, 0.5133, 0.4899, 0.4771, 0.4698, 0.4863, 0.4037, 0.4169, 0.4012, 0.4407, 0.4686, 0.4362, 0.4132, 0.3879, 0.3254, 0.2723, 0.2345, 0.2119, 0.1984, 0.1711, 0.1438, 0.1363, 0.1172, 0.0956, 0.0769, 0.0619, 0.058, 0.0469, 0.0301, 0.0533, 0.0441, 0.0354, 0.0281, 0.0202, 0.0149, 0.0176, 0.0171], "hr": [1.7943, 1.6855, 1.6046, 1.4136, 1.5569, 1.5276, 1.4998, 1.5256, 1.5146, 1.443, 1.4434, 1.4477, 1.4036, 1.417, 1.5257, 1.576, 1.4594, 1.4127, 1.3891, 1.4103, 1.3708, 1.3746, 1.3547, 1.4236, 1.4125, 1.334, 1.3904, 1.3564, 1.2861, 1.3449, 1.3459, 1.3278, 1.3318, 1.2997, 1.2401, 1.2678, 1.3312, 1.2348, 1.3355, 1.5449, 1.4888, 1.538, 1.4997, 1.4906, 1.5261, 1.5149, 1.4144, 1.4991, 1.4901, 1.6677, 1.3739, 1.3411, 1.3116, 1.3508, 1.3101, 1.332, 1.3383, 1.3437, 1.348, 1.3166, 1.4815, 1.2559, 1.3004, 1.3255, 1.2881, 1.3583, 1.3638, 1.3134, 1.2978, 1.4169, 1.2942, 1.2731, 1.2758, 1.2123, 1.209, 1.1277, 0.9414, 0.5904, 0.4628, 0.3694, 0.3431, 0.3254, 0.2887, 0.2626, 0.2633, 0.2728, 0.2743, 0.2651, 0.2593, 0.2717, 0.2656, 0.2565, 0.3095, 0.3197, 0.3053, 0.2848, 0.3089, 0.2882, 0.2805, 0.2628, 0.264, 0.2648, 0.2622, 0.2448, 0.2409, 0.2308, 0.2312, 0.2184, 0.2078, 0.2177, 0.2316, 0.2212, 0.202, 0.2383, 0.2273, 0.2128, 0.2066, 0.218, 0.2042, 0.1961, 0.1985, 0.1978, 0.1842, 0.19, 0.1592, 0.1768, 0.1515, 0.1674, 0.1438, 0.1471, 0.1346, 0.1527, 0.1552, 0.1631, 0.1777, 0.1801, 0.2965, 0.4021, 0.444, 0.4764, 0.6006, 0.7378, 1.0398, 0.9871, 1.1676, 1.1876, 1.4948, 1.4342, 1.2631, 1.6405, 1.9386, 1.6274, 1.3671, 1.6084, 1.3647, 1.1119, 1.301, 1.6356, 1.2394, 1.7192, 1.342, 1.8492, 1.3231, 2.1693], "bat": [null, null, 0.5586, 0.8058, 1.125, 1.5077, 2.0592, 2.7742, 3.1873, 3.6183, 3.6905, 3.8591, 4.0106, 3.8512, 3.8349, 3.7492, 3.5659, 3.0978, 3.01, 3.0258, 2.8655, 2.9301, 3.0266, 2.8983, 2.8781, 2.8068, 2.8488, 2.8587, 2.7116, 2.5943, 2.5397, 2.4744, 2.4315, 2.507, 2.4036, 2.366, 2.4008, 2.3574, 2.3276, 2.2026, 2.334, 2.3091, 2.2091, 1.9741, 2.2021, 2.1788, 2.0583, 2.1148, 2.1319, 2.0881, 1.9611, 2.0135, 1.9953, 1.9469, 1.9165, 1.856, 1.7962, 1.7663, 1.7251, 1.7235, 1.5966, 1.6445, 1.5782, 1.5115, null, null, null, null, null, null, 1.4153, 1.5312, 1.6042, 1.6262, 1.7073, 1.5986, 1.1785, 0.7887, 0.5476, 0.3465, 0.3212, 0.2337, 0.2038, 0.1565, 0.1601, 0.1825, 0.1908, 0.1613, 0.1689, 0.1207, 0.1117, 0.1124, 0.12, 0.1722, 0.1625, 0.1617, 0.1919, 0.133, 0.099, 0.0857, 0.0326, 0.0387, 0.0285, 0.0209, 0.04, 0.0207, 0.0235, 0.0083, 0.0176, -0.0205, 0.0193, 0.0237, 0.0233, 0.0003, -0.0002, 0.004, 0.0236, 0.0098, 0.0242, 0.0038, 0.0321, 0.0107, 0.0304, -0.0062, null, null, null, null, null, null, null, null, null, null, 0.057, 0.0642, 0.122, 0.1864, 0.1883, 0.2304, 0.2699, 0.3119, 0.3654, 0.3704, 0.3708, 0.3666, 0.3234, 0.2716, 0.2903, 0.2619, 0.219, 0.1732, 0.1436, 0.1015, 0.0922, 0.0834, 0.0729, 0.0448, 0.0475, 0.063, 0.041, 0.0326, 0.0206, 0.0035], "h2s": 58306.5, "s2h": 58387.5};
+const NS = "http://www.w3.org/2000/svg";
+const $ = id => document.getElementById(id);
+function el(tag, attrs, parent, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (text !== undefined) e.textContent = text;
+  if (parent) parent.appendChild(e);
+  return e;
+}
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const mass = (f, q, i) => f * (1 + q) ** 2 / Math.sin(i * Math.PI / 180) ** 3;
+
+// ---------------------------------------------------------------- weighing
+const sel = $("sys");
+SYS.forEach((s, k) => { const o = document.createElement("option"); o.value = k;
+  o.textContent = s.common ? `${s.name} (${s.common.split(" (")[0]})` : s.name; sel.appendChild(o); });
+function drawWeigh() {
+  const s = SYS[+sel.value], inc = +$("inc").value, svg = $("plot");
+  svg.innerHTML = "";
+  const W = 900, H = 380, L = 64, R = 20, T = 16, B = 44;
+  const x = i => L + (i - 10) / 80 * (W - L - R);
+  const y = m => T + (Math.log10(100) - Math.log10(Math.min(Math.max(m, 1), 100))) / 2 * (H - T - B);
+  el("rect", {x: L, y: y(3.2), width: W - L - R, height: y(2.08) - y(3.2), fill: css("--gap")}, svg);
+  el("text", {x: L + 6, y: y(2.6) + 4}, svg, "neutron stars stop here (2.1–3.2 M☉)");
+  if (s.i_lo !== undefined) {
+    el("rect", {x: x(s.i_lo), y: T, width: x(s.i_hi) - x(s.i_lo), height: H - T - B, fill: css("--band"), opacity: 0.6}, svg);
+    el("text", {x: (x(s.i_lo) + x(s.i_hi)) / 2, y: T + 14, "text-anchor": "middle"}, svg, "measured inclination");
+  }
+  for (const m of [1, 2, 3, 5, 10, 20, 50, 100]) {
+    el("line", {x1: L, x2: W - R, y1: y(m), y2: y(m), class: "gridl"}, svg);
+    el("text", {x: L - 8, y: y(m) + 4, "text-anchor": "end"}, svg, m);
+  }
+  for (let i = 10; i <= 90; i += 10) {
+    el("line", {x1: x(i), x2: x(i), y1: H - B, y2: H - B + 5, stroke: css("--axis")}, svg);
+    el("text", {x: x(i), y: H - B + 18, "text-anchor": "middle"}, svg, i + "°");
+  }
+  el("text", {x: (L + W - R) / 2, y: H - 6, "text-anchor": "middle"}, svg, "inclination (90° = edge-on)");
+  el("text", {x: 14, y: (T + H - B) / 2, transform: `rotate(-90 14 ${(T + H - B) / 2})`, "text-anchor": "middle"}, svg, "mass [M☉]");
+  let d = "";
+  for (let i = 10; i <= 90; i += 0.25) {
+    const mm = mass(s.fm, s.q, i);
+    if (mm > 100) continue;  // above the plot: start the curve where it enters
+    d += (d ? "L" : "M") + x(i).toFixed(1) + "," + y(mm).toFixed(1);
+  }
+  el("path", {d, fill: "none", stroke: css("--curve"), "stroke-width": 2}, svg);
+  const m = mass(s.fm, s.q, inc);
+  el("circle", {cx: x(inc), cy: y(m), r: 7, fill: css("--ours"), stroke: css("--card"), "stroke-width": 2}, svg);
+  $("incv").textContent = inc.toFixed(1) + "°";
+  $("r-p").textContent = s.porb_h < 48 ? s.porb_h.toFixed(2) + " h" : (s.porb_h / 24).toFixed(2) + " d";
+  $("r-k").textContent = s.k2.toFixed(0) + " km/s";
+  $("r-f").textContent = s.fm.toFixed(2) + " M☉";
+  $("r-m").textContent = m.toFixed(1) + " M☉";
+  const lim = s.fm > 3.2 ? "Its mass function alone exceeds any possible neutron star: a black hole at any inclination." :
+    `Its mass function (${s.fm.toFixed(2)} M☉) alone does not rule out a neutron star; the inclination and mass ratio do.`;
+  const meas = s.m_med !== undefined ? ` With the measured inclination (${s.i_txt}) and q (${s.q_txt}), the mass is ` +
+    `${s.m_med} M☉ (68%: ${s.m_lo}–${s.m_hi}). BlackCAT lists ${s.m1_pub}.` : ` Its inclination is not bounded from below, so only a minimum mass is known (BlackCAT: ${s.m1_pub}).`;
+  $("verdict").textContent = lim + meas + (s.refs ? ` Sources: ${s.refs}.` : "");
+}
+sel.onchange = () => { const s = SYS[+sel.value]; if (s.i_lo !== undefined) $("inc").value = ((s.i_lo + s.i_hi) / 2).toFixed(1); drawWeigh(); };
+$("inc").oninput = drawWeigh;
+
+// ---------------------------------------------------------------- outburst
+const N = OB.mjd.length; $("day").max = N - 1;
+const t0 = OB.mjd[0];
+function iso(mjd) { return new Date((mjd - 40587) * 86400000).toISOString().slice(0, 10); }
+function axes(svg, xs, ys, xl, yl, xt, yt) {
+  for (const v of yt) { el("line", {x1: xs(xt[0]), x2: xs(xt[xt.length - 1]), y1: ys(v), y2: ys(v), class: "gridl"}, svg);
+    el("text", {x: 40, y: ys(v) + 4, "text-anchor": "end"}, svg, v); }
+  for (const v of xt) el("text", {x: xs(v), y: 282, "text-anchor": "middle"}, svg, typeof v === "number" && v > 1000 ? iso(v).slice(5) : v);
+  el("text", {x: 260, y: 298, "text-anchor": "middle"}, svg, xl);
+  el("text", {x: 10, y: 140, transform: "rotate(-90 10 140)", "text-anchor": "middle"}, svg, yl);
+}
+function drawOB() {
+  const k = +$("day").value, lc = $("lc"), hid = $("hid");
+  lc.innerHTML = ""; hid.innerHTML = "";
+  const lx = m => 48 + (m - t0) / (OB.mjd[N - 1] - t0) * 420, ly = f => 10 + (Math.log10(5) - Math.log10(Math.max(f, 0.02))) / Math.log10(250) * 256;
+  axes(lc, lx, ly, "2018 (month-day)", "MAXI 2–20 keV [Crab]", [t0, t0 + 60, t0 + 120, t0 + 180, t0 + 240].map(v => Math.round(v)), [0.02, 0.1, 0.5, 1, 3]);
+  let d = ""; OB.mjd.forEach((m, j) => d += (j ? "L" : "M") + lx(m).toFixed(1) + "," + ly(OB.flux[j]).toFixed(1));
+  el("path", {d, fill: "none", stroke: css("--axis"), "stroke-width": 1.2}, lc);
+  for (const tt of [OB.h2s, OB.s2h]) el("line", {x1: lx(tt), x2: lx(tt), y1: 10, y2: 266, stroke: css("--ours"), "stroke-width": 1}, lc);
+  el("circle", {cx: lx(OB.mjd[k]), cy: ly(OB.flux[k]), r: 6, fill: css("--ours"), stroke: css("--card"), "stroke-width": 2}, lc);
+  const hx = h => 48 + (Math.log10(h) - Math.log10(0.12)) / (Math.log10(2.5) - Math.log10(0.12)) * 420;
+  axes(hid, hx, ly, "hardness (4–10)/(2–4) keV [Crab = 1]", "MAXI 2–20 keV [Crab]", [0.15, 0.3, 0.6, 1, 2], [0.02, 0.1, 0.5, 1, 3]);
+  let p = ""; for (let j = 0; j <= k; j++) p += (j ? "L" : "M") + hx(OB.hr[j]).toFixed(1) + "," + ly(OB.flux[j]).toFixed(1);
+  el("path", {d: p, fill: "none", stroke: css("--curve"), "stroke-width": 1.4, opacity: 0.8}, hid);
+  el("circle", {cx: hx(OB.hr[k]), cy: ly(OB.flux[k]), r: 6, fill: css("--ours"), stroke: css("--card"), "stroke-width": 2}, hid);
+  const m = OB.mjd[k];
+  const st = m < OB.h2s - 4 ? "Hard state: a hot corona of electrons up-scatters the disc's light into hard X-rays; a steady radio jet." :
+    m <= OB.h2s + 4 ? "The transition: within days the spectrum softens as the inner disc takes over; the jet switches off with a final ejection." :
+    m < OB.s2h ? "Soft state: a thermal disc reaching close to the black hole dominates, cooling slowly as the flux falls." :
+    "Back to the hard state at a flux several times lower than the one it left at (hysteresis), then fading towards quiescence.";
+  $("dayv").textContent = `${iso(m)}  ·  ${OB.flux[k].toFixed(2)} Crab  ·  hardness ${OB.hr[k].toFixed(2)}`;
+  $("state").textContent = st;
+}
+let timer = null;
+$("day").oninput = drawOB;
+$("play").onclick = () => {
+  if (timer) { clearInterval(timer); timer = null; $("play").textContent = "▶ Play"; return; }
+  $("play").textContent = "❚❚ Pause";
+  timer = setInterval(() => { const s = $("day"); if (+s.value >= N - 1) s.value = 0; else s.value = +s.value + 1; drawOB(); }, 60);
+};
+sel.value = SYS.findIndex(s => s.name === "GS 2023+338"); sel.onchange(); drawOB();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { drawWeigh(); drawOB(); });
+</script>
+</body></html>

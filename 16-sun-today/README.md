@@ -283,7 +283,7 @@ and the EUV Sun has a bright rim (in 171 Å, 2.8× the disc centre) instead of a
 ## How to run
 
 ```bash
-cd ~/Desktop/astrophysics/16-sun-today
+cd astrophysics/16-sun-today
 ../.venv/bin/python run.py                 # the pinned epoch, 2026-09-29 20:00 UTC
 ../.venv/bin/python run.py --epoch now     # the Sun as it is right now
 ../.venv/bin/python run.py --epoch 2026-10-05T12:00

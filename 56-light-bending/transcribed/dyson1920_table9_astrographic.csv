@@ -1,0 +1,46 @@
+# Source: Dyson, F. W., Eddington, A. S. & Davidson, C. 1920, "A determination of the deflection of light by the Sun's
+#   gravitational field, from observations made at the total eclipse of May 29, 1919", Phil. Trans. R. Soc. A 220, 291-333.
+# Table: Table IX, printed page 310 (archive.org philtrans06337895 leaf 019; read on the full-resolution 5120x6600
+#   JPEG-2000 06337895_0019.jp2). Section 24, Sobral expedition, astrographic object glass (stopped down to 8 inches, fed by a
+#   16-inch coelostat, p.309). Table heading as printed: "TABLE IX. (1r = 12".3)."
+# Printed column headings: "No. of Eclipse Plate." | "Ref. No. of Comparison Plate." | "No. of Stars." |
+#   "Values of d, e, alpha in Revolutions at 50' Distance." with sub-columns "d." "e." "alpha." | "alpha at Sun's Limb in Arc."
+# Column mapping: eclipse_plate = No. of Eclipse Plate; comparison_plate = Ref. No. of Comparison Plate; n_stars = No. of Stars;
+#   d_rev, e_rev, alpha_rev = d, e, alpha in revolutions at 50' distance; alpha_limb_arcsec = alpha at Sun's limb in arc.
+# Units: d_rev, e_rev, alpha_rev in revolutions (r) of the measuring screw, 1 r = 12.3 arcsec (table heading), "at 50' distance",
+#   i.e. at the unit distance of the reduction, 50 arcmin from the Sun's centre (defined on p.304). alpha_limb_arcsec in arcsec at
+#   the Sun's limb (Sun's radius 15'.8, p.306).
+# Definitions (p.310, verbatim): "the value of alpha, the constant of the gravitational displacement, as calculated from the
+#   measures; the apparent difference of scale e between the eclipse and comparison plates; d the difference of orientation of the
+#   plates given by the measures of y, and depending on the adjustment of the plates in the measuring machine."
+#   The astrographic plates "were only measured in declination, as the right ascensions were of little weight" (p.310).
+# Sign convention: signs exactly as printed; alpha > 0 means an outward (away from the Sun) displacement. Values printed without a
+#   sign (0.000, 0.00) are kept unsigned.
+# comparison_plate: printed as a number with a subscript (e.g. 18 with subscript 4), written here as 18_4. The paper does not
+#   explain the subscript. In the plate-15 row the subscript is partly broken in the print but reads 3 (as in the plate-16 row).
+# Eclipse plates 7 and 12 each appear twice (bracketed on the page), once per comparison plate; there are no plates 13 and 14.
+# Mean row: printed only under e, alpha and alpha at limb; d, n_stars and comparison_plate are left empty (nothing printed).
+#   The printed means are the plain means of all 18 rows (both rows of plates 7 and 12 counted): e 1.480/18 = 0.0822,
+#   alpha 0.398/18 = 0.0221, limb 15.48/18 = 0.8600.
+# Checks (details in dyson1920_astrographic_notes.md): alpha_limb = alpha_rev x 12.3 x 50/15.8 (= 38.92 arcsec per r) holds for
+#   all 18 rows within the rounding of alpha_rev (max |difference| 0.0056 arcsec, plate 11: 0.032 x 38.92 = 1.246, printed 1.24).
+eclipse_plate,comparison_plate,n_stars,d_rev,e_rev,alpha_rev,alpha_limb_arcsec
+1,18_4,7,+0.051,+0.089,+0.033,+1.28
+2,18_4,11,-0.009,+0.059,+0.025,+0.97
+3,18_4,8,-0.074,+0.101,+0.028,+1.09
+4,18_4,11,-0.168,+0.091,+0.033,+1.28
+5,11_3,10,+0.094,+0.076,+0.025,+0.97
+6,11_3,11,+0.186,+0.082,+0.021,+0.82
+7,14_3,12,+0.006,+0.119,0.000,0.00
+7,18_3,7,-0.054,+0.166,0.000,0.00
+8,14_3,10,+0.093,+0.064,+0.021,+0.82
+9,17_4,7,-0.096,+0.129,+0.008,+0.31
+10,17_4,10,+0.090,+0.045,+0.026,+1.01
+11,11_1,10,+0.073,+0.061,+0.032,+1.24
+12,11_1,11,-0.009,+0.102,+0.049,+1.91
+12,17_2,7,-0.102,+0.114,+0.019,+0.74
+15,15_3,6,+0.111,+0.036,+0.018,+0.70
+16,15_3,7,-0.002,+0.037,+0.018,+0.70
+17,17_2,8,-0.022,+0.109,+0.012,+0.47
+18,17_2,7,+0.045,0.000,+0.030,+1.17
+Mean,,,,+0.082,+0.022,+0.86
